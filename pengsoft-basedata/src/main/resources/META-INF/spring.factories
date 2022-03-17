@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration= \
+com.pengsoft.basedata.config.RecognitionServiceConfigurer, \
+com.pengsoft.basedata.config.CodingGeneratorConfigurer

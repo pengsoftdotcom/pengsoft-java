@@ -1,0 +1,4 @@
+pengsoft:
+  recognition:
+    enabled: false
+    endpoint: ${OCR_ENDPOINT}
