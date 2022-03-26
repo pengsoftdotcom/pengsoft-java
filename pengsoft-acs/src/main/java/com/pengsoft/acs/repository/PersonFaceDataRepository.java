@@ -1,5 +1,6 @@
 package com.pengsoft.acs.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.QueryHint;
@@ -33,6 +34,14 @@ public interface PersonFaceDataRepository
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     Page<PersonFaceData> findPageByPersonIdentityCardNumberNotNull(Pageable pageable);
+
+    /**
+     * 根据人员ID查询所有人员人脸数据
+     * 
+     * @param personIds 人员ID
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    List<PersonFaceData> findAllByPersonIdIn(List<String> personIds);
 
     /**
      * 根据给定的身份证号查询人脸数据

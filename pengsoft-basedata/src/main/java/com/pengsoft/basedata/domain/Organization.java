@@ -73,27 +73,27 @@ public class Organization extends OwnedExtTreeEntityImpl<Organization> {
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
     private List<Rank> ranks = new ArrayList<>();
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
     private List<Department> departments = new ArrayList<>();
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "supplier", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.REMOVE)
     private List<SupplierConsumer> suppliers = new ArrayList<>();
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "consumer", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "consumer", cascade = CascadeType.REMOVE)
     private List<SupplierConsumer> consumers = new ArrayList<>();
 
 }

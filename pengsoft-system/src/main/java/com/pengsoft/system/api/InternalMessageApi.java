@@ -1,0 +1,13 @@
+package com.pengsoft.system.api;
+
+import com.pengsoft.support.api.EntityApi;
+import com.pengsoft.system.domain.InternalMessage;
+import com.pengsoft.system.service.InternalMessageService;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping({ "/api/system/internal-message" })
+public class InternalMessageApi extends EntityApi<InternalMessageService, InternalMessage, String> {
+}

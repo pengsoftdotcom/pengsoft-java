@@ -18,8 +18,6 @@ import com.pengsoft.support.util.StringUtils;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -68,13 +66,14 @@ public class Role extends TreeEntityImpl<Role> implements Codeable {
     @Size(max = 255)
     private String remark;
 
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @OneToMany(mappedBy = "role", cascade = CascadeType.REMOVE)
     private List<UserRole> userRoles = new ArrayList<>();
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "role", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @NotFound(action = NotFoundAction.IGNORE)
+    @OneToMany(mappedBy = "role", cascade = CascadeType.REMOVE)
     private List<RoleAuthority> roleAuthorities = new ArrayList<>();
 
     public Role(@NotBlank @Size(max = 255) final String code) {

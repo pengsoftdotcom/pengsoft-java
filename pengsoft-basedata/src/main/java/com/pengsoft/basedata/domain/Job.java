@@ -59,12 +59,12 @@ public class Job extends OwnedExtTreeEntityImpl<Job> {
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "job", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.REMOVE)
     private List<Staff> staffs = new ArrayList<>();
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "job", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "job", cascade = CascadeType.REMOVE)
     private List<JobRole> jobRoles = new ArrayList<>();
 
 }

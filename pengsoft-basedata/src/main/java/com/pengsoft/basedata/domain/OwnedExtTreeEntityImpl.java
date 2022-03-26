@@ -4,9 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.domain.OwnedTreeEntityImpl;
 import com.pengsoft.support.util.StringUtils;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * {@link OwnedTreeEntity} implements {@link OwnedExt}
@@ -14,35 +18,23 @@ import com.pengsoft.support.util.StringUtils;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
+@Getter
+@Setter
 @MappedSuperclass
 public class OwnedExtTreeEntityImpl<T extends OwnedTreeEntityImpl<T>> extends OwnedTreeEntityImpl<T>
         implements OwnedExt {
 
     private static final long serialVersionUID = 7727144401744150942L;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Size(max = 255)
     @Column(updatable = false)
     private String controlledBy;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Size(max = 255)
     @Column(updatable = false)
     private String belongsTo;
-
-    public String getControlledBy() {
-        return controlledBy;
-    }
-
-    public void setControlledBy(String controlledBy) {
-        this.controlledBy = controlledBy;
-    }
-
-    public String getBelongsTo() {
-        return belongsTo;
-    }
-
-    public void setBelongsTo(String belongsTo) {
-        this.belongsTo = belongsTo;
-    }
 
     @Override
     public void preCreate() {

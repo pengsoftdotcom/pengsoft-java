@@ -35,7 +35,9 @@ import lombok.Setter;
 @Entity
 public class Contract extends OwnedExtEntityImpl {
 
-    @NotNull
+    private static final long serialVersionUID = -2346858411026418246L;
+
+	@NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private DictionaryItem partyAType;

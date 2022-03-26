@@ -37,6 +37,14 @@ public interface StaffService extends EntityService<Staff, String> {
     Optional<Staff> findOneByPersonAndPrimaryTrue(@NotNull Person person);
 
     /**
+     * Returns an {@link Optional} of a {@link Staff} with the given person and job.
+     *
+     * @param person The {@link Staff}'s person
+     * @param job    The {@link Staff}'s job
+     */
+    Optional<Staff> findOneByPersonAndJob(@NotNull Person person, @NotNull Job job);
+
+    /**
      * Returns all {@link Staff}s with the given person.
      *
      * @param person {@link Staff}'s person

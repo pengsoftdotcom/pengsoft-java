@@ -2,10 +2,12 @@ package com.pengsoft.acs.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.List;
 import java.util.Optional;
 
 import com.pengsoft.acs.domain.PersonFaceData;
 import com.pengsoft.acs.repository.PersonFaceDataRepository;
+import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
 
@@ -42,6 +44,11 @@ public class PersonFaceDataServiceImpl extends EntityServiceImpl<PersonFaceDataR
     @Override
     public Page<PersonFaceData> findPageByPersonIdentityCardNumberNotNull(Pageable pageable) {
         return getRepository().findPageByPersonIdentityCardNumberNotNull(pageable);
+    }
+
+    @Override
+    public List<PersonFaceData> findAllByPersonIn(List<Person> persons) {
+        return getRepository().findAllByPersonIdIn(persons.stream().map(Person::getId).toList());
     }
 
     @Override

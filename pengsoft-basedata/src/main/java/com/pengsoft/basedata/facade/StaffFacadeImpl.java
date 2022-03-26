@@ -49,6 +49,11 @@ public class StaffFacadeImpl extends EntityFacadeImpl<StaffService, Staff, Strin
     }
 
     @Override
+    public Optional<Staff> findOneByPersonAndJob(Person person, Job job) {
+        return getService().findOneByPersonAndJob(person, job);
+    }
+
+    @Override
     public List<Staff> findAllByPerson(final Person person) {
         return getService().findAllByPerson(person);
     }

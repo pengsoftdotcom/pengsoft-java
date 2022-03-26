@@ -3,6 +3,7 @@ package com.pengsoft.basedata.domain;
 import java.util.Collection;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.pengsoft.basedata.json.DepartmentJsonSerializer;
 import com.pengsoft.basedata.json.JobCollectionJsonSerializer;
@@ -31,6 +32,9 @@ public class StaffDetails extends PersonDetails {
     @JsonSerialize(using = JobCollectionJsonSerializer.class)
     private Collection<Job> jobs;
 
+    @JsonIgnore
+    private Staff staff;
+
     @JsonSerialize(using = JobJsonSerializer.class)
     private Job primaryJob;
 
@@ -44,6 +48,7 @@ public class StaffDetails extends PersonDetails {
             final List<GrantedAuthority> authorities) {
         super(staff.getPerson(), roles, null, authorities);
         setJobs(jobs);
+        setStaff(staff);
         setPrimaryJob(staff.getJob());
         setPrimaryDepartment(staff.getDepartment());
         setPrimaryOrganization(staff.getDepartment().getOrganization());

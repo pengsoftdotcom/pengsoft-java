@@ -14,6 +14,8 @@ import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
@@ -61,6 +63,15 @@ public interface StaffRepository extends EntityRepository<QStaff, Staff, String>
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     List<Staff> findAllByPersonId(@NotNull String personId);
+
+    /**
+     * Returns a {@link Pageable} of {@link Staff}s with the given jobs
+     *
+     * @param jobIds   A collection of {@link Job}'s id
+     * @param pageable {@link Pageable}
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    Page<Staff> findPageByJobIdIn(@NotEmpty List<String> jobIds, Pageable pageable);
 
     /**
      * Returns all {@link Staff}s with the given jobs

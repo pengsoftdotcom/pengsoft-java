@@ -1,8 +1,8 @@
 package com.pengsoft.oa.repository;
 
+import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.AttendanceRecord;
 import com.pengsoft.oa.domain.QAttendanceRecord;
-import com.pengsoft.security.repository.OwnedRepository;
 import com.pengsoft.support.repository.EntityRepository;
 
 import org.springframework.stereotype.Repository;
@@ -15,6 +15,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AttendanceRecordRepository
-        extends EntityRepository<QAttendanceRecord, AttendanceRecord, String>, OwnedRepository {
+        extends EntityRepository<QAttendanceRecord, AttendanceRecord, String>, OwnedExtRepository {
 
 }

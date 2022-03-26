@@ -3,6 +3,7 @@ package com.pengsoft.basedata.service;
 import java.util.Optional;
 
 import com.pengsoft.basedata.domain.Department;
+import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.repository.DepartmentRepository;
 import com.pengsoft.support.service.TreeEntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
@@ -24,18 +25,24 @@ public class DepartmentServiceImpl extends TreeEntityServiceImpl<DepartmentRepos
 
     @Override
     public Department save(final Department department) {
-        final var organizationId = department.getOrganization().getId();
-        final var parentId = Optional.ofNullable(department.getParent()).map(Department::getId).orElse(null);
-        getRepository().findOneByOrganizationIdAndParentIdAndName(organizationId, parentId, department.getName())
-                .ifPresent(source -> {
-                    if (EntityUtils.notEquals(source, department)) {
-                        throw getExceptions().constraintViolated("name", "exists", department.getName());
-                    }
-                });
+        final var organization = department.getOrganization();
+        final var parent = Optional.ofNullable(department.getParent()).orElse(null);
+        findOneByOrganizationAndParentAndName(organization, parent, department.getName()).ifPresent(source -> {
+            if (EntityUtils.notEquals(source, department)) {
+                throw getExceptions().constraintViolated("name", "exists", department.getName());
+            }
+        });
         if (StringUtils.isBlank(department.getShortName())) {
             department.setShortName(department.getName());
         }
         return super.save(department);
+    }
+
+    @Override
+    public Optional<Department> findOneByOrganizationAndParentAndName(Organization organization, Department parent,
+            String name) {
+        return getRepository().findOneByOrganizationIdAndParentIdAndName(organization.getId(),
+                Optional.ofNullable(parent).map(Department::getId).orElse(null), name);
     }
 
 }

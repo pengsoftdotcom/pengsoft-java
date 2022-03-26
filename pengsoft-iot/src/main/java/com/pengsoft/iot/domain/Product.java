@@ -29,7 +29,9 @@ import lombok.Setter;
 @Entity
 public class Product extends EntityImpl {
 
-    @NotNull
+    private static final long serialVersionUID = -3381982816066160971L;
+
+	@NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private DictionaryItem catalog;

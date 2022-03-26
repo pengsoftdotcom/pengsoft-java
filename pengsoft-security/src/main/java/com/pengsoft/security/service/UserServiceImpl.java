@@ -19,9 +19,12 @@ import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import lombok.SneakyThrows;
 
 /**
  * The implementer of {@link UserService} based on JPA.
@@ -43,13 +46,13 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
     private Validator validator;
 
     @Override
-    public User createFromWeixin(String weixinMpOpenId) {
-        final var optional = findOneByWeixinMpOpenId(weixinMpOpenId);
+    public User createFromWeixin(String mpOpenid) {
+        final var optional = findOneByMpOpenid(mpOpenid);
         if (optional.isPresent()) {
-            throw getExceptions().constraintViolated("weixinMpOpenId", "exists", weixinMpOpenId);
+            throw getExceptions().constraintViolated("mpOpenid", "exists", mpOpenid);
         } else {
-            final var user = new User(weixinMpOpenId, UUID.randomUUID().toString());
-            user.setWeixinMpOpenId(weixinMpOpenId);
+            final var user = new User(mpOpenid, UUID.randomUUID().toString());
+            user.setMpOpenid(mpOpenid);
             return saveWithoutValidation(user);
         }
     }
@@ -60,7 +63,7 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
             findOneByUsername(target.getUsername()).ifPresent(source -> usernameAlreadyExists(source, target));
             findOneByMobile(target.getUsername()).ifPresent(source -> usernameAlreadyExists(source, target));
             findOneByEmail(target.getUsername()).ifPresent(source -> usernameAlreadyExists(source, target));
-            findOneByWeixinMpOpenId(target.getUsername()).ifPresent(source -> usernameAlreadyExists(source, target));
+            findOneByMpOpenid(target.getUsername()).ifPresent(source -> usernameAlreadyExists(source, target));
             target.setPassword(passwordEncoder.encode(target.getPassword()));
         }
         return getRepository().save(target);
@@ -158,6 +161,13 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
         }
     }
 
+    @SneakyThrows
+    @Override
+    public void bind(String username, String value, String type) {
+        final var methodName = "update" + StringUtils.capitalize(type);
+        MethodUtils.invokeMethod(getRepository(), methodName, username, value);
+    }
+
     @Override
     public Optional<User> findOneByUsername(final String username) {
         return getRepository().findOneByUsername(username);
@@ -174,8 +184,8 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
     }
 
     @Override
-    public Optional<User> findOneByWeixinMpOpenId(final String weixinMpOpenId) {
-        return getRepository().findOneByWeixinMpOpenId(weixinMpOpenId);
+    public Optional<User> findOneByMpOpenid(final String mpOpenid) {
+        return getRepository().findOneByMpOpenid(mpOpenid);
     }
 
 }

@@ -10,8 +10,8 @@ import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
+import com.pengsoft.support.util.StringUtils;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -34,13 +34,12 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
         if (leftQuantity < 0) {
             throw new BusinessException("staff.save.exceeded", staff.getJob().getName());
         }
-        getRepository().findOneByPersonIdAndJobId(staff.getPerson().getId(), staff.getJob().getId())
-                .ifPresent(source -> {
-                    if (EntityUtils.notEquals(source, staff)) {
-                        throw new BusinessException("staff.save.unique", staff.getPerson().getName(),
-                                staff.getJob().getName());
-                    }
-                });
+        findOneByPersonAndJob(staff.getPerson(), staff.getJob()).ifPresent(source -> {
+            if (EntityUtils.notEquals(source, staff)) {
+                throw new BusinessException("staff.save.unique", staff.getPerson().getName(),
+                        staff.getJob().getName());
+            }
+        });
         staff.setDepartment(staff.getJob().getDepartment());
         staff.setOrganization(staff.getJob().getDepartment().getOrganization());
         super.save(staff);
@@ -68,6 +67,11 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
     @Override
     public Optional<Staff> findOneByPersonAndPrimaryTrue(final Person person) {
         return getRepository().findOneByPersonIdAndPrimaryTrue(person.getId());
+    }
+
+    @Override
+    public Optional<Staff> findOneByPersonAndJob(Person person, Job job) {
+        return getRepository().findOneByPersonIdAndJobId(person.getId(), job.getId());
     }
 
     @Override

@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Chinese {
 
-    String message() default "{Chinese}";
+    String message() default "{Chinese}${validatedValue}";
 
     Class<?>[] groups() default {};
 

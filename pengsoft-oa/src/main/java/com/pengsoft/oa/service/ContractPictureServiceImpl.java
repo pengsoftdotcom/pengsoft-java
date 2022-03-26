@@ -1,7 +1,10 @@
 package com.pengsoft.oa.service;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
+import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.ContractPicture;
 import com.pengsoft.oa.repository.ContractPictureRepository;
 import com.pengsoft.support.service.EntityServiceImpl;
@@ -28,6 +31,11 @@ public class ContractPictureServiceImpl extends EntityServiceImpl<ContractPictur
     public void delete(ContractPicture contractPicture) {
         super.delete(contractPicture);
         assetService.delete(contractPicture.getAsset());
+    }
+
+    @Override
+    public List<ContractPicture> findAllByContract(Contract contract) {
+        return getRepository().findAllByContractId(contract.getId());
     }
 
 }

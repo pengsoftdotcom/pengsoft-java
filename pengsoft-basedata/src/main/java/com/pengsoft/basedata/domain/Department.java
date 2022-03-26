@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pengsoft.security.annotation.Authorized;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -31,6 +32,7 @@ import lombok.Setter;
 @Setter
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
+@Authorized
 public class Department extends OwnedExtTreeEntityImpl<Department> {
 
     private static final long serialVersionUID = 2966045982167958343L;
@@ -49,7 +51,7 @@ public class Department extends OwnedExtTreeEntityImpl<Department> {
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "department", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "department", cascade = CascadeType.REMOVE)
     private final List<Job> jobs = new ArrayList<>();
 
 }

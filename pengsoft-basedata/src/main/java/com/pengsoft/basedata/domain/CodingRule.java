@@ -23,10 +23,12 @@ import lombok.Setter;
 @Setter
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-@Table(indexes = { @Index(name = "coding_rule_entity", columnList = "entity", unique = true) })
+@Table(indexes = { @Index(name = "coding_rule_entity", columnList = "entity, controlledBy, belongsTo", unique = true) })
 public class CodingRule extends OwnedExtEntityImpl {
 
-    @NotBlank
+    private static final long serialVersionUID = 362440273163308625L;
+
+	@NotBlank
     @Size(max = 255)
     private String entity;
 
@@ -42,8 +44,8 @@ public class CodingRule extends OwnedExtEntityImpl {
     @Min(1)
     private int length = 1;
 
-    @Min(1)
-    private int index = 1;
+    @Min(0)
+    private int index;
 
     @Size(max = 255)
     private String value;

@@ -4,9 +4,13 @@ import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.domain.TreeEntityImpl;
 import com.pengsoft.support.util.StringUtils;
+
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * {@link TreeEntityImpl} implements {@link Owned}
@@ -14,34 +18,21 @@ import com.pengsoft.support.util.StringUtils;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
+@Getter
+@Setter
 @MappedSuperclass
 public class OwnedTreeEntityImpl<T extends OwnedTreeEntityImpl<T>> extends TreeEntityImpl<T> implements Owned {
 
     private static final long serialVersionUID = 6277558798346028175L;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Size(max = 255)
     @Column(updatable = false)
     private String createdBy;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Size(max = 255)
-    @Column(updatable = false)
     private String updatedBy;
-
-    public String getCreatedBy() {
-        return createdBy;
-    }
-
-    public void setCreatedBy(String createdBy) {
-        this.createdBy = createdBy;
-    }
-
-    public String getUpdatedBy() {
-        return updatedBy;
-    }
-
-    public void setUpdatedBy(String updatedBy) {
-        this.updatedBy = updatedBy;
-    }
 
     @Override
     public void preCreate() {
@@ -58,8 +49,7 @@ public class OwnedTreeEntityImpl<T extends OwnedTreeEntityImpl<T>> extends TreeE
     @Override
     public void preUpdate() {
         super.preUpdate();
-        final var userId = SecurityUtils.getUserId();
-        setUpdatedBy(userId);
+        setUpdatedBy(SecurityUtils.getUserId());
     }
 
 }

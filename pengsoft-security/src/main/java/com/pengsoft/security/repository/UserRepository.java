@@ -44,6 +44,36 @@ public interface UserRepository extends EntityRepository<QUser, User, String> {
     void resetPassword(@NotBlank final String id, @NotBlank final String password);
 
     /**
+     * Update the user's mobile
+     *
+     * @param username The user's username
+     * @param mobile   The user's mobile
+     */
+    @Modifying
+    @Query("update User set mobile = ?2 where username = ?1")
+    void updateMobile(String username, String mobile);
+
+    /**
+     * Update the user's mpOpenid
+     *
+     * @param username The user's username
+     * @param mpOpenid The user's mobile
+     */
+    @Modifying
+    @Query("update User set mpOpenid = ?2 where username = ?1")
+    void updateMpOpenid(String username, String mpOpenid);
+
+    /**
+     * Update the user's email
+     *
+     * @param username The user's username
+     * @param email    The user's email
+     */
+    @Modifying
+    @Query("update User set email = ?2 where username = ?1")
+    void updateEmail(String username, String email);
+
+    /**
      * Returns an {@link Optional} of a {@link User} with the given username.
      *
      * @param username {@link User}'s username
@@ -71,9 +101,9 @@ public interface UserRepository extends EntityRepository<QUser, User, String> {
      * Returns an {@link Optional} of a {@link User} with the given weixin mp open
      * id.
      *
-     * @param weixinMpOpenId {@link User}'s weixinMpOpenId
+     * @param mpOpenid {@link User}'s mpOpenid
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    Optional<User> findOneByWeixinMpOpenId(@NotBlank String weixinMpOpenId);
+    Optional<User> findOneByMpOpenid(@NotBlank String mpOpenid);
 
 }

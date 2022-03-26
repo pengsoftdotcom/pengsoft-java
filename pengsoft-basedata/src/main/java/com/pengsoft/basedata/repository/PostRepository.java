@@ -38,6 +38,6 @@ public interface PostRepository extends EntityRepository<QPost, Post, String>, O
      * @param name           The {@link Post}'s name
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    Optional<Post> findOneByOrganizationIdAndName(@NotBlank String organizationId, String name);
+    Optional<Post> findOneByOrganizationIdAndName(@NotBlank String organizationId, @NotBlank String name);
 
 }

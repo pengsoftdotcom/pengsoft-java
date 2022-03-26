@@ -1,5 +1,7 @@
 package com.pengsoft.oa.domain;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
@@ -30,13 +32,15 @@ import lombok.Setter;
 @Entity
 public class PayrollRecord extends OwnedExtEntityImpl implements Codeable {
 
-    @NotBlank
+    private static final long serialVersionUID = -1350196681980716549L;
+
+	@NotBlank
     @Size(max = 255)
     private String code;
 
-    private int paidCount;
+    private long paidCount;
 
-    private int confirmedCount;
+    private long confirmedCount;
 
     @NotNull
     @OneToOne
@@ -47,5 +51,7 @@ public class PayrollRecord extends OwnedExtEntityImpl implements Codeable {
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset signedSheet;
+
+    private LocalDateTime importedAt;
 
 }

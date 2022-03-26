@@ -15,8 +15,6 @@ import com.pengsoft.support.domain.Codeable;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +33,9 @@ import lombok.Setter;
 @Entity
 public class Group extends OwnedExtTreeEntityImpl<Group> implements Codeable {
 
-    @NotBlank
+    private static final long serialVersionUID = -3016292017059199868L;
+
+	@NotBlank
     @Size(max = 255)
     private String code;
 
@@ -49,7 +49,6 @@ public class Group extends OwnedExtTreeEntityImpl<Group> implements Codeable {
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @OneToMany(mappedBy = "group", cascade = CascadeType.REMOVE)
-    @NotFound(action = NotFoundAction.IGNORE)
     private List<GroupDevice> groupDevices = new ArrayList<>();
 
     public Group(String id) {

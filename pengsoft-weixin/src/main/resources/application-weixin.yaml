@@ -2,8 +2,8 @@ pengsoft:
   weixin:
     miniapp:
       configs:
-        - appid: wx302f8ba7876e6006
-          secret: d5c4416a770a81d65aab940e29e8b502
-          token: weixin.pengsoft
-          aesKey: L27zCe1If3tLg4ADMj7fg0V7zlOe6zQX4GPOyYcKuD7
+        - appid: ${WX_MINIAPP_1_APP_ID}
+          secret: ${WX_MINIAPP_1_SECRET}
+          token: ${WX_MINIAPP_1_TOKEN}
+          aesKey: ${WX_MINIAPP_1_TAES_KEY}
           msgDataFormat: JSON

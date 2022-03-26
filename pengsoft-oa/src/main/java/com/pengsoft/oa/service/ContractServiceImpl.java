@@ -50,8 +50,8 @@ public class ContractServiceImpl extends EntityServiceImpl<ContractRepository, C
 
             if (partyBTypeCode.equals("organization")) {
                 final var jobIds = jobRoleRepository
-                        .findAllByJobDepartmentOrganizationIdAndRoleCode(partyBId, Role.ORG_ADMIN)
-                        .stream().map(JobRole::getJob).map(Job::getId).toList();
+                        .findAllByJobDepartmentOrganizationIdAndRoleCode(partyBId, Role.ORG_ADMIN).stream()
+                        .map(JobRole::getJob).map(Job::getId).toList();
                 final var staffs = staffRepository.findAllByJobIdIn(jobIds);
                 if (staffs.stream().map(Staff::getPerson).map(Person::getUser).map(User::getId)
                         .noneMatch(SecurityUtils.getUserId()::equals)) {

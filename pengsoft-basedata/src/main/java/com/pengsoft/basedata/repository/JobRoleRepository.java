@@ -22,6 +22,15 @@ import org.springframework.stereotype.Repository;
 public interface JobRoleRepository extends EntityRepository<QJobRole, JobRole, String> {
 
     /**
+     * Returns all {@link JobRole} with the given department id and role code.
+     *
+     * @param departmentId The id of the {@link Organization}
+     * @param roleCode     The code of the {@link Role}
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    List<JobRole> findAllByJobDepartmentIdAndRoleCode(String departmentId, String roleCode);
+
+    /**
      * Returns all {@link JobRole} with the given organization id and role code.
      *
      * @param organizationId The id of the {@link Organization}

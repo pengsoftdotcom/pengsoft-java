@@ -1,16 +1,18 @@
 spring:
   profiles:
-    active: support, security, system, basedata, weixin, iot, acs, oa
+    active: support, security, system, basedata, weixin, iot, acs, oa, ss
   messages:
-    basename: META-INF/support, META-INF/security, META-INF/system, META-INF/basedata, META-INF/weixin, META-INF/iot, META-INF/acs, META-INF/oa 
+    basename: META-INF/support, META-INF/security, META-INF/system, META-INF/basedata, META-INF/weixin, META-INF/iot, META-INF/acs, META-INF/oa, META-INF/ss
 pengsoft:
   system:
     captcha:
       verification-required-uris:
         - /api/user-details/reset-password
+        - /api/user-details/bind
   security:
     uris-permitted:
       - /api/user-details/reset-password
+      - /api/user-details/bind
       - /api/system/captcha/generate
       - /api/weixin/**
       - /api/iot/device/heartbeat
@@ -30,8 +32,8 @@ pengsoft:
           access-token-validity-seconds: 2592000
           grant-types:
             - password
-        - id: weixin_mp
+        - id: mp
           secret: 13639e6f-7b36-4852-aa88-d35f45430244
           access-token-validity-seconds: 2592000
           grant-types:
-            - weixin_mp
+            - mp

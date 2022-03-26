@@ -22,9 +22,11 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IdentityNumber {
 
-    String message() default "{IdentityNumber}";
+    String message() default "{IdentityNumber}${validatedValue}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    boolean allowBlank() default false;
 }

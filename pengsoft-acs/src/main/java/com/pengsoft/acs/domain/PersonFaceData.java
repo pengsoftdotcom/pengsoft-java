@@ -34,7 +34,9 @@ import lombok.Setter;
 @Entity
 public class PersonFaceData extends OwnedEntityImpl {
 
-    @NotNull
+    private static final long serialVersionUID = -3274072350021511374L;
+
+	@NotNull
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Person person;

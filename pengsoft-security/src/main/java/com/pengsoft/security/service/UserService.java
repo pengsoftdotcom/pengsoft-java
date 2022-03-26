@@ -22,10 +22,10 @@ public interface UserService extends EntityService<User, String> {
     /**
      * Create user from weixin.
      * 
-     * @param weixinMpOpenId The weixin mp open id.
+     * @param mpOpenid The weixin mp open id.
      * @return the created user
      */
-    User createFromWeixin(String weixinMpOpenId);
+    User createFromWeixin(String mpOpenid);
 
     /**
      * Save one user without validation.
@@ -73,7 +73,7 @@ public interface UserService extends EntityService<User, String> {
      *
      * @param username The username.
      */
-    void signInSuccess(String username);
+    void signInSuccess(@NotBlank String username);
 
     /**
      * Save the sign in failure count.
@@ -81,7 +81,16 @@ public interface UserService extends EntityService<User, String> {
      * @param username           The username.
      * @param allowSignInFailure The maximum count of sign in failure.
      */
-    void signInFailure(String username, int allowSignInFailure);
+    void signInFailure(@NotBlank String username, int allowSignInFailure);
+
+    /**
+     * Bind user's email, mp_openid, mobile.
+     * 
+     * @param username The user's username.
+     * @param value    The bind value
+     * @param type     The bind type in user, email, mp_openid, mobile
+     */
+    void bind(@NotBlank String username, String value, @NotBlank String type);
 
     /**
      * Returns an {@link Optional} of a {@link User} with the given username.
@@ -108,8 +117,8 @@ public interface UserService extends EntityService<User, String> {
      * Returns an {@link Optional} of a {@link User} with the given weixin mp open
      * id.
      *
-     * @param weixinMpOpenId {@link User}' weixinMpOpenId.
+     * @param mpOpenid {@link User}' mpOpenid.
      */
-    Optional<User> findOneByWeixinMpOpenId(@NotBlank String weixinMpOpenId);
+    Optional<User> findOneByMpOpenid(@NotBlank String mpOpenid);
 
 }

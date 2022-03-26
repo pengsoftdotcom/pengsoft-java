@@ -38,6 +38,7 @@ public interface JobRepository extends TreeEntityRepository<QJob, Job, String>, 
      * @param name         The {@link Job}'s name
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    Optional<Job> findOneByDepartmentIdAndParentIdAndName(@NotBlank String departmentId, String parentId, String name);
+    Optional<Job> findOneByDepartmentIdAndParentIdAndName(@NotBlank String departmentId, String parentId,
+            @NotBlank String name);
 
 }

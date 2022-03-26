@@ -15,8 +15,14 @@ import lombok.Setter;
 @Setter
 public class PayrollDetailData {
 
+    private String name;
+
     private String identityCardNumber;
 
-    private BigDecimal gross;
+    private String mobile;
+
+    private BigDecimal grossPay;
+
+    private BigDecimal netPay;
 
 }

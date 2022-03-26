@@ -2,7 +2,6 @@ package com.pengsoft.acs.repository;
 
 import com.pengsoft.acs.domain.AccessRecord;
 import com.pengsoft.acs.domain.QAccessRecord;
-import com.pengsoft.security.repository.OwnedRepository;
 import com.pengsoft.support.repository.EntityRepository;
 
 import org.springframework.stereotype.Repository;
@@ -14,6 +13,6 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface AccessRecordRepository extends EntityRepository<QAccessRecord, AccessRecord, String>, OwnedRepository {
+public interface AccessRecordRepository extends EntityRepository<QAccessRecord, AccessRecord, String> {
 
 }

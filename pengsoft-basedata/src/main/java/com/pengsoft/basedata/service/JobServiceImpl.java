@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.JobRole;
 import com.pengsoft.basedata.repository.JobRepository;
@@ -31,14 +32,13 @@ public class JobServiceImpl extends TreeEntityServiceImpl<JobRepository, Job, St
 
     @Override
     public Job save(final Job job) {
-        final var departmentId = job.getDepartment().getId();
-        final var parentId = Optional.ofNullable(job.getParent()).map(Job::getId).orElse(null);
-        getRepository().findOneByDepartmentIdAndParentIdAndName(departmentId, parentId, job.getName())
-                .ifPresent(source -> {
-                    if (EntityUtils.notEquals(source, job)) {
-                        throw getExceptions().constraintViolated("name", "exists", job.getName());
-                    }
-                });
+        final var department = job.getDepartment();
+        final var parent = Optional.ofNullable(job.getParent()).orElse(null);
+        findOneByDepartmentAndParentAndName(department, parent, job.getName()).ifPresent(source -> {
+            if (EntityUtils.notEquals(source, job)) {
+                throw getExceptions().constraintViolated("name", "exists", job.getName());
+            }
+        });
         return super.save(job);
     }
 
@@ -57,6 +57,12 @@ public class JobServiceImpl extends TreeEntityServiceImpl<JobRepository, Job, St
         jobRoleRepository.saveAll(created);
         source.addAll(created);
         super.save(job);
+    }
+
+    @Override
+    public Optional<Job> findOneByDepartmentAndParentAndName(Department department, Job parent, String name) {
+        return getRepository().findOneByDepartmentIdAndParentIdAndName(department.getId(),
+                Optional.ofNullable(parent).map(Job::getId).orElse(null), name);
     }
 
 }

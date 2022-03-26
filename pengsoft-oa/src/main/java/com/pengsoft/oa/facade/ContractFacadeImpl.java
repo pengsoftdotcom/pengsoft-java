@@ -6,7 +6,6 @@ import javax.inject.Inject;
 
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.ContractPicture;
-import com.pengsoft.oa.domain.QContractPicture;
 import com.pengsoft.oa.service.ContractPictureService;
 import com.pengsoft.oa.service.ContractService;
 import com.pengsoft.support.facade.EntityFacadeImpl;
@@ -16,7 +15,6 @@ import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.AssetService;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 /**
@@ -40,8 +38,7 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
         if (StringUtils.isBlank(contract.getId())) {
             super.save(contract);
         }
-        contract.setPictures(contractPictureService
-                .findAll(QContractPicture.contractPicture.contract.id.eq(contract.getId()), Sort.unsorted()));
+        contract.setPictures(contractPictureService.findAllByContract(contract));
         final var sourcePictures = contract.getPictures();
         final var targetPictures = pictures.stream().map(asset -> new ContractPicture(contract, asset)).toList();
         final var createdPictures = targetPictures.stream().filter(t -> sourcePictures.stream().noneMatch(

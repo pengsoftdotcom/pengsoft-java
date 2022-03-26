@@ -8,4 +8,10 @@ package com.pengsoft.acs.exception;
  */
 public class WeikenException extends RuntimeException {
 
+    private static final long serialVersionUID = 8919999818332018014L;
+
+	public WeikenException(Exception e) {
+        super(e);
+    }
+
 }

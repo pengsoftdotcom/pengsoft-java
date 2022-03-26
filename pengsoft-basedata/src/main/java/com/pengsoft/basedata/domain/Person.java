@@ -18,6 +18,7 @@ import com.pengsoft.security.domain.OwnedEntityImpl;
 import com.pengsoft.security.domain.User;
 import com.pengsoft.security.json.MobileJsonSerializer;
 import com.pengsoft.support.validation.Chinese;
+import com.pengsoft.support.validation.IdentityNumber;
 import com.pengsoft.support.validation.Mobile;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.domain.DictionaryItem;
@@ -82,8 +83,8 @@ public class Person extends OwnedEntityImpl {
     @NotFound(action = NotFoundAction.IGNORE)
     private IdentityCard identityCard;
 
-    @Size(max = 255)
-    @Column(insertable = false, updatable = false, unique = true)
+    @IdentityNumber(allowBlank = true)
+    @Column(updatable = false, unique = true)
     private String identityCardNumber;
 
 }

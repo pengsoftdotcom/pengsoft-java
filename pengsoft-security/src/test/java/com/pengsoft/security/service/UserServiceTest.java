@@ -26,8 +26,8 @@ class UserServiceTest {
     }
 
     @Test
-    void findOneByWeixinMpOpenId() {
-        service.findOneByWeixinMpOpenId("1");
+    void findOneByMpOpenid() {
+        service.findOneByMpOpenid("1");
     }
 
 }

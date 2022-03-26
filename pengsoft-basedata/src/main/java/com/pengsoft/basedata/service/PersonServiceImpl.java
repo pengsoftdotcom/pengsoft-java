@@ -56,6 +56,7 @@ public class PersonServiceImpl extends EntityServiceImpl<PersonRepository, Perso
             userRepository.findOneByUsername(person.getMobile())
                     .ifPresent(user -> fieldValueExists("user.username", user.getUsername()));
             final var user = new User(person.getMobile(), passwordEncoder.encode(UUID.randomUUID().toString()));
+            user.setMobile(person.getMobile());
             person.setUser(userRepository.save(user));
         }
         getRepository().save(person);

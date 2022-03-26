@@ -4,7 +4,6 @@ import java.util.Optional;
 
 import javax.validation.constraints.NotBlank;
 
-import com.pengsoft.basedata.domain.CodingRule;
 import com.pengsoft.oa.domain.PayrollRecord;
 import com.pengsoft.support.service.EntityService;
 
@@ -17,10 +16,10 @@ import com.pengsoft.support.service.EntityService;
 public interface PayrollRecordService extends EntityService<PayrollRecord, String> {
 
     /**
-     * Returns an {@link Optional} of a {@link CodingRule} with the given code.
+     * Returns an {@link Optional} of a {@link PayrollRecord} with the given code.
      * 
      * @param code The coding rule's code
      */
-    Optional<CodingRule> findOneByCode(@NotBlank String code);
+    Optional<PayrollRecord> findOneByCode(@NotBlank String code);
 
 }

@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
@@ -31,18 +30,21 @@ import lombok.Setter;
 @Entity
 public class PayrollDetail extends OwnedExtEntityImpl {
 
-    @NotNull
+    private static final long serialVersionUID = -4847027306280433452L;
+
+	@NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
-    private PayrollRecord payrollRecord;
+    private PayrollRecord payroll;
 
     @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Staff staff;
 
-    @Min(0)
-    private BigDecimal gross;
+    private BigDecimal grossPay;
+
+    private BigDecimal netPay;
 
     private LocalDateTime confirmedAt;
 

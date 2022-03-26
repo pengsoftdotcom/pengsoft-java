@@ -11,6 +11,10 @@
     <dependencies>
         <dependency>
             <groupId>com.pengsoft</groupId>
+            <artifactId>pengsoft-ss</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.pengsoft</groupId>
             <artifactId>pengsoft-oa</artifactId>
         </dependency>
         <dependency>

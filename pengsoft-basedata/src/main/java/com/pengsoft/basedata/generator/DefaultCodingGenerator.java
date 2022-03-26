@@ -5,6 +5,7 @@ import javax.inject.Named;
 
 import com.pengsoft.basedata.domain.CodingRule;
 import com.pengsoft.basedata.service.CodingRuleService;
+import com.pengsoft.support.util.StringUtils;
 
 /**
  * 默认的编码生成器
@@ -23,9 +24,9 @@ public class DefaultCodingGenerator implements CodingGenerator {
         final var index = codingRule.getIndex() + codingRule.getStep();
         final var format = "%0" + codingRule.getLength() + "d";
         final var value = new StringBuilder();
-        value.append(codingRule.getPrefix());
+        value.append(StringUtils.defaultString(codingRule.getPrefix(), ""));
         value.append(String.format(format, index));
-        value.append(codingRule.getSuffix());
+        value.append(StringUtils.defaultString(codingRule.getSuffix(), ""));
         codingRule.setValue(value.toString());
         service.save(codingRule);
         return value.toString();

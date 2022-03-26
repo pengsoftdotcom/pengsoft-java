@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 1.0.0
  */
 @RestController
-@RequestMapping(Constant.API_PREFIX + "/device")
+@RequestMapping(Constant.API_PREFIX + "/iot/device")
 public class DeviceExtApi {
 
     @Inject

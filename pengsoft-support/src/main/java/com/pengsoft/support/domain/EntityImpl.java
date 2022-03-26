@@ -10,6 +10,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Version;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.StringUtils;
 
@@ -36,9 +37,11 @@ public class EntityImpl implements Entity<String> {
     @GenericGenerator(name = "id-generator", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime updatedAt;
 
     @Version

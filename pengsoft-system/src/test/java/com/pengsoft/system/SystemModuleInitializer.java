@@ -13,8 +13,10 @@ import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.domain.DictionaryType;
 import com.pengsoft.system.domain.EmailMessage;
 import com.pengsoft.system.domain.InternalMessage;
+import com.pengsoft.system.domain.PushMessage;
 import com.pengsoft.system.domain.Region;
 import com.pengsoft.system.domain.SmsMessage;
+import com.pengsoft.system.domain.SubscribeMessage;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,8 +35,8 @@ class SystemModuleInitializer {
     @Test
     void initRolesAndAuthorities() {
         List.of(CompositeMessageTemplate.class, EmailMessage.class, SmsMessage.class, InternalMessage.class,
-                Asset.class,
-                Captcha.class, DictionaryType.class, DictionaryItem.class, Region.class).forEach(entityClass -> {
+                PushMessage.class, SubscribeMessage.class, Asset.class, Captcha.class, DictionaryType.class,
+                DictionaryItem.class, Region.class).forEach(entityClass -> {
                     service.saveEntityAdmin(entityClass);
                     facade.saveEntityAdminAuthorities(entityClass);
                 });

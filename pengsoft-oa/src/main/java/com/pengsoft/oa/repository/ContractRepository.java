@@ -1,8 +1,8 @@
 package com.pengsoft.oa.repository;
 
+import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.QContract;
-import com.pengsoft.security.repository.OwnedRepository;
 import com.pengsoft.support.repository.EntityRepository;
 
 import org.springframework.stereotype.Repository;
@@ -14,6 +14,6 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface ContractRepository extends EntityRepository<QContract, Contract, String>, OwnedRepository {
+public interface ContractRepository extends EntityRepository<QContract, Contract, String>, OwnedExtRepository {
 
 }

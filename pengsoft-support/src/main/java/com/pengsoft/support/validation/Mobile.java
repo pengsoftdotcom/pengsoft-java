@@ -22,7 +22,7 @@ import javax.validation.Payload;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Mobile {
 
-    String message() default "{Mobile}";
+    String message() default "{Mobile}${validatedValue}";
 
     Class<?>[] groups() default {};
 

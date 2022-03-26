@@ -21,6 +21,7 @@ public class OrganizationJsonSerializer extends JsonSerializer<Organization> {
         gen.writeStartObject();
         gen.writeStringField("id", organization.getId());
         gen.writeStringField("name", organization.getName());
+        gen.writeStringField("shortName", organization.getShortName());
         gen.writeEndObject();
     }
 

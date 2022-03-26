@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
 import com.pengsoft.support.domain.Codeable;
 
@@ -35,7 +36,9 @@ import lombok.Setter;
 @Entity
 public class Device extends OwnedExtEntityImpl implements Codeable {
 
-    @NotBlank
+    private static final long serialVersionUID = -2430815767746162830L;
+
+	@NotBlank
     @Size(max = 255)
     private String code;
 
@@ -53,6 +56,8 @@ public class Device extends OwnedExtEntityImpl implements Codeable {
 
     private LocalDateTime connectedAt;
 
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @OneToMany(mappedBy = "device", cascade = CascadeType.REMOVE)
     private List<GroupDevice> groupDevices = new ArrayList<>();
 

@@ -25,7 +25,7 @@ public class PayrollRecordCodingGenerator implements CodingGenerator {
     @Override
     public String generate(CodingRule codingRule) {
         final var date = DateUtils.currentDate();
-        String value = codingRule.getPrefix() + " - " + date.getYear() + String.format("%02d", date.getMonthValue());
+        String value = codingRule.getPrefix() + date.getYear() + String.format("%02d", date.getMonthValue());
         if (StringUtils.notEquals(codingRule.getValue(), value)) {
             codingRule.setValue(value);
             service.save(codingRule);

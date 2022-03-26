@@ -10,7 +10,7 @@ import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.json.ImageJsonDeserializer;
 import com.pengsoft.basedata.json.ImageJsonSerializer;
 import com.pengsoft.iot.domain.Device;
-import com.pengsoft.security.domain.OwnedEntityImpl;
+import com.pengsoft.support.domain.EntityImpl;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -30,9 +30,11 @@ import lombok.Setter;
 @Setter
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class AccessRecord extends OwnedEntityImpl {
+public class AccessRecord extends EntityImpl {
 
-    @OneToOne
+    private static final long serialVersionUID = 4643825005175238950L;
+
+	@OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Person person;
 

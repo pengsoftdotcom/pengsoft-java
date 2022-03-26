@@ -8,6 +8,7 @@
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <artifactId>pengsoft-oa</artifactId>
+    <name>Office Automation</name>
 
     <dependencies>
         <dependency>

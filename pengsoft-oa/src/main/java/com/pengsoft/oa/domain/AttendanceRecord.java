@@ -29,7 +29,9 @@ import lombok.Setter;
 @Entity
 public class AttendanceRecord extends OwnedExtEntityImpl {
 
-    @NotNull
+    private static final long serialVersionUID = -2652386762637121804L;
+
+	@NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Staff staff;

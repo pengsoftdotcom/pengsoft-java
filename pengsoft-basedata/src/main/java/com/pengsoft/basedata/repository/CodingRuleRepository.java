@@ -25,10 +25,12 @@ public interface CodingRuleRepository extends EntityRepository<QCodingRule, Codi
      * Returns an {@link Optional} of a {@link CodingRule} with the given entity and
      * belongsTo.
      * 
-     * @param entity    The coding rule's entity
-     * @param belongsTo The coding rule's belongsTo
+     * @param entity       The coding rule entity
+     * @param controlledBy The coding rule controlledBy
+     * @param belongsTo    The coding rule belongsTo
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    Optional<CodingRule> findOneByEntityAndBelongsTo(@NotBlank String entity, String belongsTo);
+    Optional<CodingRule> findOneByEntityAndControlledByAndBelongsTo(@NotBlank String entity, String controlledBy,
+            String belongsTo);
 
 }

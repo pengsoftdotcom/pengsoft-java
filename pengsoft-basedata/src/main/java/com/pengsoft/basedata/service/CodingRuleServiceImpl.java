@@ -34,7 +34,8 @@ public class CodingRuleServiceImpl extends EntityServiceImpl<CodingRuleRepositor
 
     @Override
     public Optional<CodingRule> findOneByEntity(String entity) {
-        return getRepository().findOneByEntityAndBelongsTo(entity, SecurityUtilsExt.getPrimaryOrganizationId());
+        return getRepository().findOneByEntityAndControlledByAndBelongsTo(entity,
+                SecurityUtilsExt.getPrimaryDepartmentId(), SecurityUtilsExt.getPrimaryOrganizationId());
     }
 
 }

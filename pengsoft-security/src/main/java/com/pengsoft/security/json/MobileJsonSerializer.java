@@ -5,8 +5,6 @@ import java.io.IOException;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.pengsoft.security.domain.Role;
-import com.pengsoft.security.util.SecurityUtils;
 
 /**
  * Mobile number serializer.
@@ -21,11 +19,12 @@ public class MobileJsonSerializer extends JsonSerializer<String> {
         if (value == null) {
             gen.writeNull();
         } else {
-            if (SecurityUtils.hasAnyRole(Role.ADMIN, Role.ORG_ADMIN)) {
-                gen.writeString(value);
-            } else {
-                gen.writeString(value.substring(0, 3) + "****" + value.substring(7, 11));
-            }
+            gen.writeString(value);
+            // if (SecurityUtils.hasAnyRole(Role.ADMIN, Role.ORG_ADMIN)) {
+            // gen.writeString(value);
+            // } else {
+            // gen.writeString(value.substring(0, 3) + "****" + value.substring(7, 11));
+            // }
         }
     }
 

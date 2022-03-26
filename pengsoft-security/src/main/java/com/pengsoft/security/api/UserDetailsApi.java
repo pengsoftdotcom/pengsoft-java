@@ -68,4 +68,14 @@ public class UserDetailsApi {
         // HandleAuthorityChangedAspect will do the rest.
     }
 
+    @PostMapping("bind")
+    public void bind(String username, String value, String type) {
+        userService.bind(username, value, type);
+    }
+
+    @PostMapping("unbind")
+    public void unbind(@CurrentSecurityContext(expression = "authentication.principal.user") User user, String type) {
+        userService.bind(user.getUsername(), null, type);
+    }
+
 }

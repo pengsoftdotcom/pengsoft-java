@@ -21,6 +21,7 @@ public class DepartmentJsonSerializer extends JsonSerializer<Department> {
         gen.writeStartObject();
         gen.writeStringField("id", department.getId());
         gen.writeStringField("name", department.getName());
+        gen.writeStringField("shortName", department.getShortName());
         gen.writeEndObject();
     }
 

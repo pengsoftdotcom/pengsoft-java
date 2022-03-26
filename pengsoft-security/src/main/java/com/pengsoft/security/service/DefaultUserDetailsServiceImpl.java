@@ -77,7 +77,7 @@ public class DefaultUserDetailsServiceImpl implements DefaultUserDetailsService 
         if (optional.isPresent()) {
             return buildUserDetails(optional.get());
         } else {
-            optional = userService.findOneByWeixinMpOpenId(username);
+            optional = userService.findOneByMpOpenid(username);
         }
 
         if (optional.isPresent()) {

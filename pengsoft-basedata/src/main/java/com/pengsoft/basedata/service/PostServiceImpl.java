@@ -1,5 +1,8 @@
 package com.pengsoft.basedata.service;
 
+import java.util.Optional;
+
+import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Post;
 import com.pengsoft.basedata.repository.PostRepository;
 import com.pengsoft.support.service.EntityServiceImpl;
@@ -22,13 +25,17 @@ public class PostServiceImpl extends EntityServiceImpl<PostRepository, Post, Str
 
     @Override
     public Post save(final Post post) {
-        getRepository().findOneByOrganizationIdAndName(post.getOrganization().getId(), post.getName())
-                .ifPresent(source -> {
-                    if (EntityUtils.notEquals(source, post)) {
-                        throw getExceptions().constraintViolated("name", "exists", post.getName());
-                    }
-                });
+        findOneByOrganizationAndName(post.getOrganization(), post.getName()).ifPresent(source -> {
+            if (EntityUtils.notEquals(source, post)) {
+                throw getExceptions().constraintViolated("name", "exists", post.getName());
+            }
+        });
         return super.save(post);
+    }
+
+    @Override
+    public Optional<Post> findOneByOrganizationAndName(Organization organization, String name) {
+        return getRepository().findOneByOrganizationIdAndName(organization.getId(), name);
     }
 
     @Override

@@ -14,9 +14,9 @@ import org.springframework.security.oauth2.provider.token.AuthorizationServerTok
 
 public class WeixinMpTokenGranter extends AbstractTokenGranter {
 
-    public static final String GRANT_TYPE = "weixin_mp";
+    public static final String GRANT_TYPE = "mp";
 
-    private static final String PARAM_NAME = "weixin_mp_open_id";
+    private static final String PARAM_NAME = "mp_open_id";
 
     private UserDetailsService userDetailsService;
 
@@ -38,8 +38,8 @@ public class WeixinMpTokenGranter extends AbstractTokenGranter {
             final TokenRequest tokenRequest) {
         final var storedOAuth2Request = getRequestFactory().createOAuth2Request(client, tokenRequest);
         final var parameters = new LinkedHashMap<>(tokenRequest.getRequestParameters());
-        final var weixinMpOpenId = parameters.get(PARAM_NAME);
-        final var userDetails = userDetailsService.loadUserByUsername(weixinMpOpenId);
+        final var mpOpenid = parameters.get(PARAM_NAME);
+        final var userDetails = userDetailsService.loadUserByUsername(mpOpenid);
         final var authentication = new RememberMeAuthenticationToken(userDetails.getUsername(), userDetails,
                 userDetails.getAuthorities());
         return new OAuth2Authentication(storedOAuth2Request, authentication);

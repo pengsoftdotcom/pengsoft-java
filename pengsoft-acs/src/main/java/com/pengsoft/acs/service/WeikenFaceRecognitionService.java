@@ -3,13 +3,22 @@ package com.pengsoft.acs.service;
 import java.util.Base64;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
+import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.pengsoft.acs.domain.AccessRecord;
 import com.pengsoft.acs.exception.WeikenException;
+import com.pengsoft.basedata.domain.Job;
+import com.pengsoft.basedata.domain.JobRole;
+import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.basedata.repository.JobRoleRepository;
+import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.basedata.service.PersonService;
+import com.pengsoft.iot.repository.GroupRepository;
 import com.pengsoft.iot.service.DeviceService;
 import com.pengsoft.support.exception.Exceptions;
+import com.pengsoft.support.exception.InvalidConfigurationException;
 import com.pengsoft.support.json.ObjectMapper;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.StringUtils;
@@ -40,6 +49,8 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
 
     private static final String ID_CARD_NUM = "idcardNum";
 
+    private MapLikeType type;
+
     @Inject
     private Exceptions exceptions;
 
@@ -48,6 +59,15 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
 
     @Inject
     private DeviceService deviceService;
+
+    @Inject
+    private GroupRepository groupRepository;
+
+    @Inject
+    private StaffRepository staffRepository;
+
+    @Inject
+    private JobRoleRepository jobRoleRepository;
 
     @Inject
     private PersonService personService;
@@ -73,8 +93,6 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
         public Map<String, Object> toMap() {
             Map<String, Object> map = null;
             try {
-                final var type = objectMapper.getTypeFactory().constructMapLikeType(Map.class, String.class,
-                        Object.class);
                 map = objectMapper.convertValue(this, type);
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -83,16 +101,35 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
         }
     }
 
+    @PostConstruct
+    void setType() {
+        this.type = objectMapper.getTypeFactory().constructMapLikeType(Map.class, String.class, Object.class);
+    }
+
     @Override
     public Map<String, Object> syncPersons(Map<String, Object> params) {
         final var response = new Response();
         try {
+            final var groupId = (String) params.get("groupId");
+            final var group = groupRepository.findOneByCode(groupId)
+                    .orElseThrow(() -> exceptions.entityNotExists(groupId));
+            final var departmentId = group.getControlledBy();
+            final var jobIds = jobRoleRepository.findAllByJobDepartmentIdAndRoleCode(departmentId, "worker").stream()
+                    .map(JobRole::getJob).map(Job::getId).toList();
+            if (jobIds.isEmpty()) {
+                throw new InvalidConfigurationException("no job with role worker configed");
+            }
+            if (jobIds.size() > 1) {
+                throw new InvalidConfigurationException("multiple jobs with role worker configed");
+            }
+
             final var page = Integer.parseInt((String) params.get("page"));
             final var size = Integer.parseInt((String) params.get("pageSize"));
-            final var result = personFaceDataService
-                    .findPageByPersonIdentityCardNumberNotNull(PageRequest.of(page - 1, size));
+            final var result = staffRepository.findPageByJobIdIn(jobIds, PageRequest.of(page - 1, size));
+            final var persons = result.getContent().stream().map(Staff::getPerson).toList();
+            final var personFaceDatas = personFaceDataService.findAllByPersonIn(persons);
             response.setTotal(result.getTotalElements());
-            response.setData(result.getContent().stream()
+            response.setData(personFaceDatas.stream()
                     .map(personFaceData -> {
                         var md5 = new StringBuilder();
                         md5.append(DigestUtils.md5DigestAsHex(personFaceData.getPerson().getName().getBytes()));
@@ -105,7 +142,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
                     .toList());
         } catch (Exception e) {
             log.error("sync persons error: {}", e.getMessage());
-            throw new WeikenException();
+            throw new WeikenException(e);
         }
         return response.toMap();
     }
@@ -133,7 +170,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
                     }));
         } catch (Exception e) {
             log.error("sync person error: {}", e.getMessage());
-            throw new WeikenException();
+            throw new WeikenException(e);
         }
         return response.toMap();
     }
@@ -152,15 +189,13 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
             if (StringUtils.isNotBlank(identityCardNumber)) {
                 personService.findOneByIdentityCardNumber(identityCardNumber)
                         .ifPresentOrElse(accessRecord::setPerson, () -> exceptions.entityNotExists(identityCardNumber));
-                final var type = objectMapper.getTypeFactory().constructMapLikeType(Map.class, String.class,
-                        Object.class);
                 final Map<String, Object> extra = objectMapper.readValue((String) params.get("extra"), type);
                 accessRecord.setTemperature(Float.parseFloat((String) extra.get("bodyTemp")));
                 accessRecordService.save(accessRecord);
             }
         } catch (Exception e) {
             log.error("create access record error: {}", e.getMessage());
-            throw new WeikenException();
+            throw new WeikenException(e);
         }
         return response.toMap();
     }
@@ -180,7 +215,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
                     () -> exceptions.entityNotExists(code));
         } catch (Exception e) {
             log.error("create access record error: {}", e.getMessage());
-            throw new WeikenException();
+            throw new WeikenException(e);
         }
         return response.toMap();
     }

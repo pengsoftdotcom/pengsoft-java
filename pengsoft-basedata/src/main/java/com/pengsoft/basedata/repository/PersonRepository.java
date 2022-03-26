@@ -11,6 +11,7 @@ import com.pengsoft.security.domain.User;
 import com.pengsoft.security.repository.OwnedRepository;
 import com.pengsoft.support.repository.EntityRepository;
 import com.pengsoft.support.validation.IdentityNumber;
+import com.pengsoft.support.validation.Mobile;
 import com.querydsl.core.types.dsl.StringPath;
 
 import org.springframework.data.jpa.repository.Modifying;
@@ -63,9 +64,22 @@ public interface PersonRepository extends EntityRepository<QPerson, Person, Stri
 
     /**
      * 更新身份证号
+     * 
+     * @param id                 The person's id.
+     * @param identityCardNumber The person's identity card number.
      */
     @Modifying
     @Query("update Person set identityCardNumber = ?2, dateUpdated = now() where id = ?1")
     void updateIdentityCardNumber(@NotBlank String id, @IdentityNumber String identityCardNumber);
+
+    /**
+     * 更新手机号码
+     * 
+     * @param id     The person's id.
+     * @param mobile The person's mobile
+     */
+    @Modifying
+    @Query("update Person set mobile = ?2, dateUpdated = now() where id = ?1")
+    void updateMobile(@NotBlank String id, @Mobile String mobile);
 
 }

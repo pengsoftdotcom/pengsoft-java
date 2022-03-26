@@ -1,10 +1,16 @@
 package com.pengsoft.oa.repository;
 
+import java.util.List;
+
+import javax.persistence.QueryHint;
+import javax.validation.constraints.NotBlank;
+
+import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.ContractPicture;
 import com.pengsoft.oa.domain.QContractPicture;
-import com.pengsoft.security.repository.OwnedRepository;
 import com.pengsoft.support.repository.EntityRepository;
 
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,6 +21,14 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ContractPictureRepository
-        extends EntityRepository<QContractPicture, ContractPicture, String>, OwnedRepository {
+        extends EntityRepository<QContractPicture, ContractPicture, String>, OwnedExtRepository {
+
+    /**
+     * Returns all {@link ContractPicture}s with the given contract id.
+     * 
+     * @param contractId The contract id.
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    List<ContractPicture> findAllByContractId(@NotBlank String contractId);
 
 }

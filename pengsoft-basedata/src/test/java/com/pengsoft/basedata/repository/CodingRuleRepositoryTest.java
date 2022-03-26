@@ -15,6 +15,6 @@ public class CodingRuleRepositoryTest {
 
     @Test
     void testFindOneByEntityAndBelongsTo() {
-        repository.findOneByEntityAndBelongsTo("1", null);
+        repository.findOneByEntityAndControlledByAndBelongsTo("1", null, null);
     }
 }

@@ -33,7 +33,9 @@ import lombok.Setter;
         @Index(name = "group_device_group_id_device_id", columnList = "group_id, device_id", unique = true) })
 public class GroupDevice extends EntityImpl {
 
-    @ManyToOne
+    private static final long serialVersionUID = -2662335572601950661L;
+
+	@ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Group group;
 

@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pengsoft.support.domain.Codeable;
 import com.pengsoft.support.domain.EntityImpl;
 import com.pengsoft.support.util.StringUtils;
@@ -50,6 +51,8 @@ public class Authority extends EntityImpl implements Codeable {
     @Size(max = 255)
     private String remark;
 
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @OneToMany(mappedBy = "authority", cascade = CascadeType.REMOVE)
     private List<RoleAuthority> roleAuthorities = new ArrayList<>();
 

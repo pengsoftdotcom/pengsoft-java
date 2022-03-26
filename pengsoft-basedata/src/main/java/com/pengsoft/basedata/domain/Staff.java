@@ -8,6 +8,8 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
+import com.pengsoft.security.annotation.Authorized;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
@@ -27,6 +29,7 @@ import lombok.Setter;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
 @Table(indexes = { @Index(name = "staff_person_id_job_id", columnList = "person_id, job_id", unique = true) })
+@Authorized
 public class Staff extends OwnedExtEntityImpl {
 
     private static final long serialVersionUID = -2460320115818477044L;

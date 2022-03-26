@@ -7,6 +7,7 @@ import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.security.util.SecurityUtils;
 
 /**
@@ -36,35 +37,42 @@ public class SecurityUtilsExt {
     }
 
     /**
-     * Returns current user's primary job.
+     * Returns current staff.
+     */
+    public static Staff getStaff() {
+        return SecurityUtils.get("staff", Staff.class);
+    }
+
+    /**
+     * Returns the person's primary job.
      */
     public static Job getPrimaryJob() {
         return SecurityUtils.get("primaryJob", Job.class);
     }
 
     /**
-     * Returns current user's department.
+     * Returns the person's primary department.
      */
     public static Department getPrimaryDepartment() {
         return Optional.ofNullable(SecurityUtils.get("primaryDepartment", Department.class)).orElse(null);
     }
 
     /**
-     * Returns current user's primary department id.
+     * Returns the person's primary department id.
      */
     public static String getPrimaryDepartmentId() {
         return Optional.ofNullable(getPrimaryDepartment()).map(Department::getId).orElse(null);
     }
 
     /**
-     * Returns current user's primary organization.
+     * Returns the person's primary organization.
      */
     public static Organization getPrimaryOrganization() {
         return Optional.ofNullable(SecurityUtils.get("primaryOrganization", Organization.class)).orElse(null);
     }
 
     /**
-     * Returns current user's primary organization id.
+     * Returns the person's primary organization id.
      */
     public static String getPrimaryOrganizationId() {
         return Optional.ofNullable(getPrimaryOrganization()).map(Organization::getId).orElse(null);

@@ -72,7 +72,8 @@ public class OwnedExtEntityApiMethodArgumentsHandler extends OwnedEntityApiMetho
     }
 
     @Override
-    public boolean isAuthorized(final OwnedEntityImpl entity, Authorized authorized) {
+    public boolean isAuthorized(OwnedEntityImpl entity, Authorized authorized) {
+        entity = getEntity(entity);
         final var entityClass = entity.getClass();
         if (StringUtils.isBlank(entity.getId()) || isWritable(authorized, entityClass) || hasAdminRole(entityClass)) {
             return true;

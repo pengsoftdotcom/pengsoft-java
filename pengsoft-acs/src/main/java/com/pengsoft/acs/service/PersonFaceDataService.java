@@ -1,10 +1,12 @@
 package com.pengsoft.acs.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.constraints.NotBlank;
 
 import com.pengsoft.acs.domain.PersonFaceData;
+import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.support.service.EntityService;
 
 import org.springframework.data.domain.Page;
@@ -25,6 +27,13 @@ public interface PersonFaceDataService extends EntityService<PersonFaceData, Str
      * @param pageable {@link Pageable}
      */
     Page<PersonFaceData> findPageByPersonIdentityCardNumberNotNull(Pageable pageable);
+
+    /**
+     * 根据人员ID查询所有人员人脸数据
+     * 
+     * @param persons 人员ID
+     */
+    List<PersonFaceData> findAllByPersonIn(List<Person> persons);
 
     /**
      * 根据给定的身份证号查询人脸数据
