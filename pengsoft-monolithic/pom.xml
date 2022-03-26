@@ -21,14 +21,6 @@
             <groupId>com.pengsoft</groupId>
             <artifactId>pengsoft-weixin</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
     </dependencies>
     <build>
         <plugins>
