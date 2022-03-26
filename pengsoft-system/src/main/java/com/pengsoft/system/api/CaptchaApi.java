@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/captcha" })
+@RequestMapping("/api/system/captcha")
 public class CaptchaApi extends EntityApi<CaptchaService, Captcha, String> {
     @Inject
     private UserService userService;

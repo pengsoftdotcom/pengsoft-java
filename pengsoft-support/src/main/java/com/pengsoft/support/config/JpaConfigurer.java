@@ -18,7 +18,7 @@ import org.springframework.data.repository.support.Repositories;
 @ComponentScan({ "com.pengsoft.*.facade", "com.pengsoft.*.service" })
 @EnableJpaRepositories({ "com.pengsoft.*.repository" })
 @EntityScan({ "com.pengsoft.*.domain" })
-public class DefaultJpaConfigurer {
+public class JpaConfigurer {
 
     @Bean
     public Repositories repositories(ApplicationContext context) {

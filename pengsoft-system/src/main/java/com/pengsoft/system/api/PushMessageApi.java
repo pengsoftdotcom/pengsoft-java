@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/push-message" })
+@RequestMapping("/api/system/push-message")
 public class PushMessageApi extends EntityApi<PushMessageService, PushMessage, String> {
 }

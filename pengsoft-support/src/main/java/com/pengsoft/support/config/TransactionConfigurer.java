@@ -30,7 +30,7 @@ import org.springframework.transaction.interceptor.TransactionInterceptor;
 @Configuration
 @EnableTransactionManagement
 @EnableConfigurationProperties(TransactionProperties.class)
-public class DefaultTransactionConfigurer {
+public class TransactionConfigurer {
 
     /**
      * Transaction interceptor

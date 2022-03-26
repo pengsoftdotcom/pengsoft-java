@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/dictionary-type" })
+@RequestMapping("/api/system/dictionary-type")
 public class DictionaryTypeApi extends EntityApi<DictionaryTypeService, DictionaryType, String> {
 }

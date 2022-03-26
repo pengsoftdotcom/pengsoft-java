@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/dictionary-item" })
+@RequestMapping("/api/system/dictionary-item")
 public class DictionaryItemApi extends TreeEntityApi<DictionaryItemService, DictionaryItem, String> {
 
     @GetMapping({ "find-all-by-type-code" })

@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/sms-message" })
+@RequestMapping("/api/system/sms-message")
 public class SmsMessageApi extends EntityApi<SmsMessageService, SmsMessage, String> {
 }

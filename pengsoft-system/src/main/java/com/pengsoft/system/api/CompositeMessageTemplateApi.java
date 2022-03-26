@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/composite-message-template" })
+@RequestMapping("/api/system/composite-message-template")
 public class CompositeMessageTemplateApi
         extends EntityApi<CompositeMessageTemplateService, CompositeMessageTemplate, String> {
 }

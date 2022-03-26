@@ -10,6 +10,6 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 @Configuration
 @EnableAspectJAutoProxy
 @ComponentScan("com.pengsoft.*.aspect")
-public class DefaultAspectJConfigurer {
+public class AspectJConfigurer {
 
 }

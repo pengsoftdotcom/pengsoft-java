@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/region" })
+@RequestMapping("/api/system/region")
 public class RegionApi extends TreeEntityApi<RegionService, Region, String> {
 
     @GetMapping({ "find-all-indexed-cities" })

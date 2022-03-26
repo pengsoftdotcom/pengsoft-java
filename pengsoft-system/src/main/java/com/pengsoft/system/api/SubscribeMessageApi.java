@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping({ "/api/system/subscribe-message" })
+@RequestMapping("/api/system/subscribe-message")
 public class SubscribeMessageApi extends EntityApi<SubscribeMessageService, SubscribeMessage, String> {
 }

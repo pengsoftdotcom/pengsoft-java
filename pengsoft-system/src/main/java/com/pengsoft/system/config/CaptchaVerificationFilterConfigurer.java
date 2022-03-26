@@ -8,6 +8,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @ComponentScan({ "com.pengsoft.system.filter" })
@@ -19,7 +20,7 @@ public class CaptchaVerificationFilterConfigurer {
             CaptchaVerificationFilterProperties properties, CaptchaVerificationFilter filter) {
         final var registrationBean = new FilterRegistrationBean<OncePerRequestFilter>();
         registrationBean.setFilter(filter);
-        registrationBean.setOrder(-2147483648);
+        registrationBean.setOrder(Ordered.LOWEST_PRECEDENCE);
         registrationBean.setUrlPatterns(properties.getVerificationRequiredUris());
         return registrationBean;
     }
