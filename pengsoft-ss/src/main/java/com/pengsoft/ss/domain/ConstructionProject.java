@@ -35,13 +35,17 @@ public class ConstructionProject extends OwnedExtEntityImpl implements Codeable 
 
     private static final long serialVersionUID = 3844774310596073097L;
 
-	@NotBlank
+    @NotBlank
     @Size(max = 255)
     private String code;
 
     @NotBlank
     @Size(max = 255)
     private String name;
+
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Organization regulatoryUnit;
 
     @NotNull
     @ManyToOne

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotBlank;
 
 import com.pengsoft.security.domain.User;
 import com.pengsoft.security.service.UserService;
+import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.validation.Mobile;
 import com.pengsoft.system.domain.Captcha;
@@ -16,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/system/captcha")
+@RequestMapping(Constant.API_PREFIX + "/system/captcha")
 public class CaptchaApi extends EntityApi<CaptchaService, Captcha, String> {
     @Inject
     private UserService userService;

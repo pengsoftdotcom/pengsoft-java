@@ -2,6 +2,7 @@ package com.pengsoft.system.api;
 
 import java.util.List;
 
+import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.TreeEntityApi;
 import com.pengsoft.system.domain.Region;
 import com.pengsoft.system.json.RegionWrapper;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/system/region")
+@RequestMapping(Constant.API_PREFIX + "/system/region")
 public class RegionApi extends TreeEntityApi<RegionService, Region, String> {
 
     @GetMapping({ "find-all-indexed-cities" })

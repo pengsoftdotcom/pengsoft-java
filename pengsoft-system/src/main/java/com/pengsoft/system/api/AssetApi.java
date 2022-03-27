@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.system.domain.Asset;
@@ -23,7 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import net.coobird.thumbnailator.Thumbnails;
 
 @RestController
-@RequestMapping("/api/system/asset")
+@RequestMapping(Constant.API_PREFIX + "/system/asset")
 public class AssetApi extends EntityApi<AssetService, Asset, String> {
 
     @Inject
