@@ -30,7 +30,11 @@ public class StaffFacadeImpl extends EntityFacadeImpl<StaffService, Staff, Strin
 
     @Override
     public Staff save(final Staff staff) {
-        final var person = personService.findOneByMobile(staff.getPerson().getMobile()).orElse(staff.getPerson());
+        final var mobile = staff.getPerson().getMobile();
+        var person = staff.getPerson();
+        if (StringUtils.isNotBlank(mobile)) {
+            person = personService.findOneByMobile(mobile).orElse(staff.getPerson());
+        }
         if (StringUtils.isNotBlank(person.getId())) {
             BeanUtils.copyProperties(staff.getPerson(), person, "id", "mobile", "user", "version");
         }

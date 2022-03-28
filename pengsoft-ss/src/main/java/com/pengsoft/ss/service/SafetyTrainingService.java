@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.ss.domain.SafetyTraining;
@@ -46,7 +47,7 @@ public interface SafetyTrainingService extends EntityService<SafetyTraining, Str
      * @param training {@link SafetyTraining}
      * @param files    培训过程照片
      */
-    void end(@NotNull SafetyTraining training, List<Asset> files);
+    void end(@NotNull SafetyTraining training, @NotEmpty List<Asset> files);
 
     /**
      * Returns an {@link Optional} of a {@link SafetyTraining}

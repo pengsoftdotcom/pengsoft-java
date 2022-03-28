@@ -1,8 +1,15 @@
 package com.pengsoft.ss.excel;
 
+import javax.inject.Inject;
+
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.pengsoft.basedata.domain.Job;
+import com.pengsoft.basedata.domain.Person;
+import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.basedata.service.PersonService;
+import com.pengsoft.basedata.service.StaffService;
+import com.pengsoft.support.util.StringUtils;
 
 import lombok.Setter;
 
@@ -14,32 +21,34 @@ import lombok.Setter;
  */
 public class SupervisionEngineerDataReadListener implements ReadListener<SupervisionEngineerData> {
 
-    // @Inject
-    // private PersonService personService;
+    @Inject
+    private PersonService personService;
 
-    // @Inject
-    // private StaffService staffService;
+    @Inject
+    private StaffService staffService;
 
     @Setter
     private Job job;
 
     @Override
     public void invoke(SupervisionEngineerData data, AnalysisContext context) {
-        // final var person = personService.findOneByMobile(data.getMobile()).orElse(new
-        // Person());
-        // if (StringUtils.isBlank(person.getId())) {
-        // person.setName(data.getName());
-        // person.setMobile(data.getMobile());
-        // personService.save(person);
-        // }
+        final var name = StringUtils.replace(data.getName(), "\s", "");
+        final var mobile = StringUtils.replace(data.getMobile(), "\s", "");
+        if (StringUtils.isNotBlank(data.getMobile())) {
+            final var person = personService.findOneByMobile(mobile).orElse(new Person());
+            if (StringUtils.isBlank(person.getId())) {
+                person.setName(name);
+                person.setMobile(mobile);
+                personService.save(person);
+            }
 
-        // final var staff = staffService.findOneByPersonIdAndJobId(person.getId(),
-        // job.getId()).orElse(new Staff());
-        // if (StringUtils.isBlank(staff.getId())) {
-        // staff.setPerson(person);
-        // staff.setJob(job);
-        // staffService.save(staff);
-        // }
+            final var staff = staffService.findOneByPersonAndJob(person, job).orElse(new Staff());
+            if (StringUtils.isBlank(staff.getId())) {
+                staff.setPerson(person);
+                staff.setJob(job);
+                staffService.save(staff);
+            }
+        }
     }
 
     @Override

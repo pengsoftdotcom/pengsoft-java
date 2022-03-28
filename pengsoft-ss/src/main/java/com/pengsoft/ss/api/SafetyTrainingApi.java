@@ -1,20 +1,29 @@
 package com.pengsoft.ss.api;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 
+import com.fasterxml.jackson.databind.type.MapType;
+import com.pengsoft.basedata.domain.QStaff;
+import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.domain.SafetyTraining;
+import com.pengsoft.ss.domain.SafetyTrainingFile;
+import com.pengsoft.ss.facade.SafetyTrainingFacade;
 import com.pengsoft.ss.service.ConstructionProjectService;
-import com.pengsoft.ss.service.SafetyTrainingService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
+import com.pengsoft.support.json.ObjectMapper;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,10 +39,22 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/ss/safety-training")
-public class SafetyTrainingApi extends EntityApi<SafetyTrainingService, SafetyTraining, String> {
+public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTraining, String> {
 
     @Inject
     private ConstructionProjectService projectService;
+
+    @Inject
+    private StaffService staffService;
+
+    private ObjectMapper objectMapper;
+
+    private MapType type;
+
+    public SafetyTrainingApi(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+        type = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
+    }
 
     @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
     @PostMapping("save-and-submit")
@@ -54,26 +75,33 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingService, SafetyTr
 
     @PutMapping("end")
     public void end(@RequestParam("id") SafetyTraining training,
-            @RequestParam(value = "file.id", required = false) List<Asset> files) {
+            @RequestParam(value = "file.id", required = false) @NotEmpty List<Asset> files) {
         getService().end(training, files);
     }
 
-    @Override
-    public SafetyTraining findOne(@RequestParam(value = "id", required = false) SafetyTraining entity) {
-        entity = super.findOne(entity);
-        final var root = QConstructionProject.constructionProject;
-        projectService
-                .findOne(root.controlledBy.eq(SecurityUtilsExt.getPrimaryDepartmentId())
-                        .and(root.belongsTo.eq(SecurityUtilsExt.getPrimaryOrganizationId())))
-                .ifPresent(entity::setProject);
+    @DeleteMapping("delete-file-by-asset")
+    public void deletePictureByAsset(@RequestParam(value = "id", required = false) SafetyTraining training,
+            @RequestParam("asset.id") Asset asset) {
+        getService().deleteFileByAsset(training, asset);
+    }
+
+    @GetMapping("find-one-with-files")
+    public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyTraining entity) {
+        final var training = super.findOne(entity);
         final var job = SecurityUtilsExt.getPrimaryJob();
         if (job != null && StringUtils.equals(job.getName(), "安全员")) {
-            entity.setTrainer(SecurityUtilsExt.getStaff());
+            training.setTrainer(SecurityUtilsExt.getStaff());
+            staffService.findOne(QStaff.staff.job.id.eq(job.getParent().getId()))
+                    .ifPresent(staff -> projectService
+                            .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
+                            .ifPresent(training::setProject));
         }
-        if (entity.getProject() != null) {
-            entity.setAddress(entity.getProject().getName() + "项目部");
+        if (training.getProject() != null) {
+            training.setAddress(training.getProject().getName() + "项目部");
         }
-        return entity;
+        Map<String, Object> result = objectMapper.convertValue(training, type);
+        result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
+        return result;
     }
 
 }

@@ -15,7 +15,7 @@ class DictionaryItemRepositoryTest {
 
     @Test
     void findOneByTypeAndParentAndCode() {
-        repository.findOneByTypeIdAndParentIdAndCode("1", "1", "1");
+        repository.findOneByTypeCodeAndParentIdAndCode("1", "1", "1");
     }
 
 }

@@ -7,8 +7,10 @@ import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.PayrollDetail;
 import com.pengsoft.oa.domain.QPayrollDetail;
 import com.pengsoft.support.repository.EntityRepository;
+import com.querydsl.core.types.dsl.StringPath;
 
 import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -20,6 +22,12 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PayrollDetailRepository
         extends EntityRepository<QPayrollDetail, PayrollDetail, String>, OwnedExtRepository {
+
+    @Override
+    default void customize(QuerydslBindings bindings, QPayrollDetail root) {
+        EntityRepository.super.customize(bindings, root);
+        bindings.bind(root.payroll.code).first(StringPath::contains);
+    }
 
     /**
      * Whether exists a {@link PayrollDetail} with the given payroll record code and

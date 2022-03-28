@@ -7,7 +7,6 @@ import com.pengsoft.support.domain.EntityImpl;
 import com.pengsoft.support.service.TreeEntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.system.domain.DictionaryItem;
-import com.pengsoft.system.domain.DictionaryType;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 
 import org.springframework.context.annotation.Primary;
@@ -20,7 +19,7 @@ public class DictionaryItemServiceImpl extends TreeEntityServiceImpl<DictionaryI
 
     @Override
     public DictionaryItem save(DictionaryItem item) {
-        findOneByTypeAndParentAndCode(item.getType(), (DictionaryItem) item.getParent(), item.getCode())
+        findOneByTypeCodeAndParentAndCode(item.getType().getCode(), item.getParent(), item.getCode())
                 .ifPresent(source -> {
                     if (EntityUtils.notEquals(source, item)) {
                         throw getExceptions().constraintViolated("code", "exists", item.getCode());
@@ -35,10 +34,10 @@ public class DictionaryItemServiceImpl extends TreeEntityServiceImpl<DictionaryI
     }
 
     @Override
-    public Optional<DictionaryItem> findOneByTypeAndParentAndCode(DictionaryType type, DictionaryItem parent,
+    public Optional<DictionaryItem> findOneByTypeCodeAndParentAndCode(String typeCode, DictionaryItem parent,
             String code) {
         String parentId = Optional.<DictionaryItem>ofNullable(parent).map(EntityImpl::getId).orElse(null);
-        return getRepository().findOneByTypeIdAndParentIdAndCode(type.getId(), parentId, code);
+        return getRepository().findOneByTypeCodeAndParentIdAndCode(typeCode, parentId, code);
     }
 
 }

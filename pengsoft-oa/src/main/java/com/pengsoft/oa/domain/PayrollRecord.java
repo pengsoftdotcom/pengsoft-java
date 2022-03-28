@@ -1,13 +1,18 @@
 package com.pengsoft.oa.domain;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
 import com.pengsoft.support.domain.Codeable;
 import com.pengsoft.system.domain.Asset;
@@ -34,7 +39,7 @@ public class PayrollRecord extends OwnedExtEntityImpl implements Codeable {
 
     private static final long serialVersionUID = -1350196681980716549L;
 
-	@NotBlank
+    @NotBlank
     @Size(max = 255)
     private String code;
 
@@ -53,5 +58,9 @@ public class PayrollRecord extends OwnedExtEntityImpl implements Codeable {
     private Asset signedSheet;
 
     private LocalDateTime importedAt;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "payroll", cascade = CascadeType.REMOVE)
+    private List<PayrollDetail> details = new ArrayList<>();
 
 }

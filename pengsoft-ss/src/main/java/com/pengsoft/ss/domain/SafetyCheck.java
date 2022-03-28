@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -16,20 +17,19 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.support.domain.Codeable;
-import com.pengsoft.support.util.DateUtils;
+import com.pengsoft.system.domain.DictionaryItem;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.validator.constraints.Length;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Construction project safety training
+ * Construction project safety check
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
@@ -39,9 +39,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class SafetyTraining extends OwnedExtEntityImpl implements Codeable {
-
-    private static final long serialVersionUID = -7377239434296886716L;
+public class SafetyCheck extends OwnedExtEntityImpl implements Codeable {
 
     @NotNull
     @ManyToOne
@@ -51,7 +49,7 @@ public class SafetyTraining extends OwnedExtEntityImpl implements Codeable {
     @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
-    private Staff trainer;
+    private Staff checker;
 
     @Size(max = 255)
     @NotBlank
@@ -59,34 +57,28 @@ public class SafetyTraining extends OwnedExtEntityImpl implements Codeable {
 
     @Size(max = 255)
     @NotBlank
-    private String subject = "例行安全培训";
+    private String subject = "例行安全检查";
+
+    @NotNull
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private DictionaryItem status;
 
     @NotBlank
-    @Length(max = 255)
-    private String address;
+    @Size(max = 500)
+    @Column(updatable = false)
+    private String reason;
 
-    private boolean allWorkers = true;
-
-    @NotNull
-    private LocalDateTime estimatedStartTime = DateUtils.beginningOfToday().plusHours(9);
-
-    @NotNull
-    private LocalDateTime estimatedEndTime = DateUtils.beginningOfToday().plusHours(10);
-
+    @Column(updatable = false)
     private LocalDateTime submittedAt;
 
-    private LocalDateTime startedAt;
+    private String result;
 
-    private LocalDateTime endedAt;
-
-    @JsonIgnore
-    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "training")
-    private List<SafetyTrainingFile> files = new ArrayList<>();
+    private LocalDateTime handledAt;
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "training", cascade = CascadeType.REMOVE)
-    private List<SafetyTrainingParticipant> participants = new ArrayList<>();
+    @OneToMany(mappedBy = "check", cascade = CascadeType.REMOVE)
+    private List<SafetyCheckFile> files = new ArrayList<>();
 
 }

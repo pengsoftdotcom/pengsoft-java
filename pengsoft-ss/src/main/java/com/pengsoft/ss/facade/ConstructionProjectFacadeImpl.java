@@ -105,16 +105,38 @@ public class ConstructionProjectFacadeImpl extends
     public void importData(MultipartFile file) {
         final var bytes = file.getBytes();
 
+        final var constructionProject = handleConstructionProjectData(bytes);
+        handleSuperVisionUnitRelatedData(bytes, constructionProject);
+        handleBuildingUnitRelatedData(bytes, constructionProject);
+    }
+
+    private ConstructionProject handleConstructionProjectData(final byte[] bytes) {
         EasyExcel.read(new ByteArrayInputStream(bytes), ConstructionProjectData.class,
                 constructionProjectDataReadListener).sheet(0).doRead();
 
-        final var constructionProject = constructionProjectDataReadListener.getConstructionProject();
-        final var buildingUnit = constructionProject.getBuildingUnit();
-        final var buDepartment = constructionProject.getBuManager().getDepartment();
-        final var buManagerJob = constructionProject.getBuManager().getJob();
+        return constructionProjectDataReadListener.getConstructionProject();
+    }
+
+    private void handleSuperVisionUnitRelatedData(final byte[] bytes, final ConstructionProject constructionProject) {
+        final var supervisionUnit = constructionProject.getSupervisionUnit();
+        final var suDepartment = constructionProject.getSuManager().getDepartment();
+        final var suManagerJob = constructionProject.getSuManager().getJob();
+
+        final var supervisionEngineerPostName = "监理工程师";
+        final var supervisionEngineerJobName = "监理工程师";
+        final var supervisionEngineerRoleCode = "supervision_engineer";
+        final var supervisionEngineerJob = getJob(supervisionUnit, suDepartment, suManagerJob,
+                supervisionEngineerPostName, supervisionEngineerJobName, supervisionEngineerRoleCode);
+        supervisionEngineerDataReadListener.setJob(supervisionEngineerJob);
 
         EasyExcel.read(new ByteArrayInputStream(bytes), SupervisionEngineerData.class,
                 supervisionEngineerDataReadListener).sheet(1).doRead();
+    }
+
+    private void handleBuildingUnitRelatedData(final byte[] bytes, final ConstructionProject constructionProject) {
+        final var buildingUnit = constructionProject.getBuildingUnit();
+        final var buDepartment = constructionProject.getBuManager().getDepartment();
+        final var buManagerJob = constructionProject.getBuManager().getJob();
 
         final var securityOfficerPostName = "安全员";
         final var securityOfficerJobName = "安全员";

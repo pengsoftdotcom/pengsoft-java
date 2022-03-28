@@ -15,6 +15,8 @@ public class ConstructionProjectData {
 
     private String name;
 
+    private String regulatoryUnit;
+
     private String owner;
 
     private String ownerManager;

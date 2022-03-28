@@ -23,7 +23,6 @@ import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.system.domain.Asset;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +35,7 @@ import org.springframework.stereotype.Service;
  */
 @Primary
 @Service
-public class SafetyTrainingServiceImpl extends
-        EntityServiceImpl<SafetyTrainingRepository, SafetyTraining, String>
+public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingRepository, SafetyTraining, String>
         implements SafetyTrainingService {
 
     @Inject
@@ -108,11 +106,11 @@ public class SafetyTrainingServiceImpl extends
         }
         training.setEndedAt(DateUtils.currentDateTime());
         super.save(training);
-        if (CollectionUtils.isNotEmpty(files)) {
-            final var trainingFiles = files.stream()
-                    .map(file -> new SafetyTrainingFile(training, file)).toList();
-            fileRepository.saveAll(trainingFiles);
-        }
+        final var trainingFiles = files.stream()
+                .map(file -> new SafetyTrainingFile(training, file)).toList();
+        fileRepository.saveAll(trainingFiles);
+        training.setFiles(trainingFiles);
+        super.save(training);
     }
 
     @Override

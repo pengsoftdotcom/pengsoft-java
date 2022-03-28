@@ -65,7 +65,6 @@ public class Person extends OwnedEntityImpl {
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset avatar;
 
-    @NotBlank
     @Mobile
     @JsonSerialize(using = MobileJsonSerializer.class)
     @Column(updatable = false)

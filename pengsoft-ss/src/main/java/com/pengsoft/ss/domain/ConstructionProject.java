@@ -7,9 +7,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.pengsoft.basedata.domain.Organization;
-import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.support.domain.Codeable;
+import com.pengsoft.support.domain.EntityImpl;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -31,7 +31,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class ConstructionProject extends OwnedExtEntityImpl implements Codeable {
+public class ConstructionProject extends EntityImpl implements Codeable {
 
     private static final long serialVersionUID = 3844774310596073097L;
 
@@ -59,7 +59,10 @@ public class ConstructionProject extends OwnedExtEntityImpl implements Codeable 
     @NotFound(action = NotFoundAction.IGNORE)
     private Organization supervisionUnit;
 
-    private String suManager;
+    @NotNull
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Staff suManager;
 
     @NotNull
     @ManyToOne

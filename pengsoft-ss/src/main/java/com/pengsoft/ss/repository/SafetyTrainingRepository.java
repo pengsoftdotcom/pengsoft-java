@@ -16,8 +16,7 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
 
 /**
- * The repository interface of {@link SafetyTraining} based
- * on JPA
+ * The repository interface of {@link SafetyTraining} based on JPA
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0

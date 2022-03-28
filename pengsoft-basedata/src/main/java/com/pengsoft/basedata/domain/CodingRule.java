@@ -28,7 +28,7 @@ public class CodingRule extends OwnedExtEntityImpl {
 
     private static final long serialVersionUID = 362440273163308625L;
 
-	@NotBlank
+    @NotBlank
     @Size(max = 255)
     private String entity;
 
@@ -41,8 +41,8 @@ public class CodingRule extends OwnedExtEntityImpl {
     @Min(1)
     private int step = 1;
 
-    @Min(1)
-    private int length = 1;
+    @Min(0)
+    private int length;
 
     @Min(0)
     private int index;

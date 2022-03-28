@@ -27,7 +27,7 @@ public interface DictionaryItemRepository
     }
 
     @QueryHints(value = { @QueryHint(name = "org.hibernate.cacheable", value = "true") }, forCounting = false)
-    Optional<DictionaryItem> findOneByTypeIdAndParentIdAndCode(@NotBlank String typeId, String parentId,
+    Optional<DictionaryItem> findOneByTypeCodeAndParentIdAndCode(@NotBlank String typeCode, String parentId,
             @NotBlank String code);
 
     @QueryHints(value = { @QueryHint(name = "org.hibernate.cacheable", value = "true") }, forCounting = false)

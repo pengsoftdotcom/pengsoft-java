@@ -42,23 +42,28 @@ public class PersonServiceImpl extends EntityServiceImpl<PersonRepository, Perso
 
     @Override
     public Person save(final Person person) {
-        getRepository().findOneByMobile(person.getMobile()).ifPresent(source -> {
-            if (EntityUtils.notEquals(source, person)) {
-                fieldValueExists("mobile", person.getMobile());
+        final var mobile = person.getMobile();
+        if (StringUtils.isNotBlank(mobile)) {
+            getRepository().findOneByMobile(mobile).ifPresent(source -> {
+                if (EntityUtils.notEquals(source, person)) {
+                    fieldValueExists("mobile", mobile);
+                }
+            });
+            if (StringUtils.isBlank(person.getId())) {
+                userRepository.findOneByMobile(mobile)
+                        .ifPresent(user -> fieldValueExists("user.mobile", user.getMobile()));
+                userRepository.findOneByUsername(mobile)
+                        .ifPresent(user -> fieldValueExists("user.username", user.getUsername()));
+                final var user = new User(mobile, passwordEncoder.encode(UUID.randomUUID().toString()));
+                user.setMobile(mobile);
+                person.setUser(userRepository.save(user));
             }
-        });
+        }
+
         if (StringUtils.isBlank(person.getNickname())) {
             person.setNickname("*" + person.getName().substring(1));
         }
-        if (StringUtils.isBlank(person.getId())) {
-            userRepository.findOneByMobile(person.getMobile())
-                    .ifPresent(user -> fieldValueExists("user.mobile", user.getMobile()));
-            userRepository.findOneByUsername(person.getMobile())
-                    .ifPresent(user -> fieldValueExists("user.username", user.getUsername()));
-            final var user = new User(person.getMobile(), passwordEncoder.encode(UUID.randomUUID().toString()));
-            user.setMobile(person.getMobile());
-            person.setUser(userRepository.save(user));
-        }
+
         getRepository().save(person);
         if (person.getIdentityCard() != null) {
             getRepository().updateIdentityCardNumber(person.getId(), person.getIdentityCard().getNumber());

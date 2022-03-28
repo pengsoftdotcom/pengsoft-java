@@ -5,6 +5,7 @@ import com.pengsoft.ss.domain.SafetyTrainingParticipant;
 import com.pengsoft.ss.repository.SafetyTrainingParticipantRepository;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.domain.DictionaryItem;
 
@@ -36,6 +37,7 @@ public class SafetyTrainingParticipantServiceImpl extends
         }
         participant.setStatus(status);
         participant.setReason(reason);
+        participant.setConfirmedAt(DateUtils.currentDateTime());
         save(participant);
     }
 

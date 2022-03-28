@@ -2,7 +2,6 @@ package com.pengsoft.system.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -12,6 +11,7 @@ import com.aliyun.oss.OSSClientBuilder;
 import com.aliyun.oss.common.utils.IOUtils;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.exception.BusinessException;
+import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.config.properties.StorageServiceProperties;
 import com.pengsoft.system.domain.Asset;
 
@@ -67,14 +67,16 @@ public class StorageServiceImpl implements StorageService {
     @SneakyThrows
     @Override
     public Asset upload(MultipartFile file, boolean locked, int width, int height) {
-        InputStream is = file.getInputStream();
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        String bucket = getBucket(locked);
-        Asset asset = new Asset();
-        String contentType = file.getContentType();
-        String[] parts = ((String) Optional.<String>ofNullable(contentType).orElse("unkown/unkown")).split("/");
-        if ("image".equals(parts[0])) {
-            Thumbnails.of(new InputStream[] { is }).outputFormat(parts[1]).size(width, height).toOutputStream(os);
+        var is = file.getInputStream();
+        final var os = new ByteArrayOutputStream();
+        final var bucket = getBucket(locked);
+        final var asset = new Asset();
+        final var contentType = file.getContentType();
+        final var parts = Optional.ofNullable(contentType).orElse("unkown/unkown").split("/");
+        final var isImage = "image".equals(parts[0]);
+        final var extension = parts[1];
+        if (isImage) {
+            Thumbnails.of(is).outputFormat(extension).size(width, height).toOutputStream(os);
             byte[] bytes = os.toByteArray();
             is = new ByteArrayInputStream(bytes);
             asset.setContentLength(bytes.length);
@@ -84,11 +86,11 @@ public class StorageServiceImpl implements StorageService {
         asset.setContentType(contentType);
         asset.setLocked(locked);
         asset.setOriginalName(file.getOriginalFilename());
-        asset.setPresentName(getPresentName(asset));
+        asset.setPresentName(getPresentName(asset, isImage, extension));
         StringBuilder accessPathPrefix = new StringBuilder(getAccessPathPrefix(locked));
         StringBuilder accessPathSuffix = getAccessPathSuffix(asset);
         asset.setAccessPath(accessPathPrefix.append(accessPathSuffix).toString());
-        asset.setStoragePath(bucket + "::" + bucket);
+        asset.setStoragePath(bucket + "::" + accessPathSuffix);
 
         OSS client = getClient(locked);
         try {
@@ -101,8 +103,16 @@ public class StorageServiceImpl implements StorageService {
         return asset;
     }
 
-    private String getPresentName(Asset asset) {
-        return UUID.randomUUID().toString() + "." + UUID.randomUUID().toString();
+    private String getPresentName(Asset asset, boolean isImage, String extension) {
+        final var presentName = new StringBuilder();
+        presentName.append(UUID.randomUUID().toString());
+        presentName.append(StringUtils.PACKAGE_SEPARATOR);
+        if (isImage) {
+            presentName.append(extension);
+        } else {
+            presentName.append(StringUtils.substringAfterLast(asset.getOriginalName(), StringUtils.PACKAGE_SEPARATOR));
+        }
+        return presentName.toString();
     }
 
     private StringBuilder getAccessPathSuffix(Asset asset) {

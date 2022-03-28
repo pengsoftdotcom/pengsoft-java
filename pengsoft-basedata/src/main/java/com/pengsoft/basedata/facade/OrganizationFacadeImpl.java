@@ -16,7 +16,6 @@ import com.pengsoft.support.facade.TreeEntityFacadeImpl;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.DictionaryItemService;
-import com.pengsoft.system.service.DictionaryTypeService;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,9 +36,6 @@ public class OrganizationFacadeImpl extends TreeEntityFacadeImpl<OrganizationSer
     private AuthenticationService authenticationService;
 
     @Inject
-    private DictionaryTypeService dictionaryTypeService;
-
-    @Inject
     private DictionaryItemService dictionaryItemService;
 
     @Override
@@ -50,8 +46,8 @@ public class OrganizationFacadeImpl extends TreeEntityFacadeImpl<OrganizationSer
         final var authentication = new Authentication();
         authentication.setName(organization.getName());
         authentication.setNumber(organization.getBusinessLicense().getRegisterNumber());
-        dictionaryTypeService.findOneByCode("authentication_status").ifPresent(type -> dictionaryItemService
-                .findOneByTypeAndParentAndCode(type, null, "submitted").ifPresent(authentication::setStatus));
+        dictionaryItemService.findOneByTypeCodeAndParentAndCode("authentication_status", null, "submitted")
+                .ifPresent(authentication::setStatus);
         authenticationService.save(authentication);
         organization.setAuthentication(authentication);
         save(organization);
@@ -64,10 +60,8 @@ public class OrganizationFacadeImpl extends TreeEntityFacadeImpl<OrganizationSer
             throw new BusinessException("authentication.status.error", HttpStatus.BAD_REQUEST,
                     authentication.getStatus().getCode());
         }
-        dictionaryTypeService.findOneByCode("authentication_status")
-                .ifPresent(type -> dictionaryItemService
-                        .findOneByTypeAndParentAndCode(type, null, authenticated ? "authenticated" : "unauthenticated")
-                        .ifPresent(authentication::setStatus));
+        dictionaryItemService.findOneByTypeCodeAndParentAndCode("authentication_status", null,
+                authenticated ? "authenticated" : "unauthenticated").ifPresent(authentication::setStatus);
         authenticationService.save(authentication);
         save(organization);
     }
