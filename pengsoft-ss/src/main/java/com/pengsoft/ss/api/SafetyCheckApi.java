@@ -11,7 +11,9 @@ import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.QConstructionProject;
+import com.pengsoft.ss.domain.QSafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheckFile;
 import com.pengsoft.ss.facade.SafetyCheckFacade;
@@ -20,10 +22,14 @@ import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
+import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
+import com.querydsl.core.types.Predicate;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -61,14 +67,13 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         this.type = this.objectMapper.getTypeFactory().constructMapLikeType(Map.class, String.class, Object.class);
     }
 
-    @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
+    @Messaging(builder = "safetyCheckHandleMessageBuilder")
     @PostMapping("submit")
     public void submit(@RequestBody SafetyCheck check,
             @RequestParam(value = "asset.id", required = false) @NotEmpty List<Asset> submitFiles) {
         getService().submit(check, submitFiles);
     }
 
-    @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
     @PutMapping("handle")
     public void handle(@RequestParam("id") SafetyCheck check, @NotBlank String result,
             @RequestParam(value = "asset.id", required = false) @NotEmpty List<Asset> handleFiles) {
@@ -86,6 +91,13 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
                             .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
                             .ifPresent(check::setProject));
         }
+        if (job != null && StringUtils.equals(job.getName(), "监理工程师")) {
+            check.setChecker(SecurityUtilsExt.getStaff());
+            staffService.findOne(QStaff.staff.job.id.eq(job.getParent().getId()))
+                    .ifPresent(staff -> projectService
+                            .findOne(QConstructionProject.constructionProject.suManager.id.eq(staff.getId()))
+                            .ifPresent(check::setProject));
+        }
         Map<String, Object> result = objectMapper.convertValue(check, type);
         if (StringUtils.isNotBlank(check.getId())) {
             result.put("submitFiles", safetyCheckFileRepository.findAllByCheckIdAndTypeCode(check.getId(), "submit")
@@ -94,6 +106,19 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
                     .stream().map(SafetyCheckFile::getFile).toList());
         }
         return result;
+    }
+
+    @Override
+    public Page<SafetyCheck> findPage(Predicate predicate, Pageable pageable) {
+        final var staff = SecurityUtilsExt.getStaff();
+        final var root = QSafetyCheck.safetyCheck;
+        if (SecurityUtils.hasAnyRole("bu_manager'")) {
+            predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
+        }
+        if (SecurityUtils.hasAnyRole("security_officer", "supervision_engineer")) {
+            predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
+        }
+        return super.findPage(predicate, pageable);
     }
 
     @DeleteMapping("delete-file-by-asset")

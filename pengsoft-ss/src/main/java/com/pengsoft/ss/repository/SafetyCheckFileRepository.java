@@ -5,7 +5,6 @@ import java.util.List;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
-import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.ss.domain.QSafetyCheckFile;
 import com.pengsoft.ss.domain.SafetyCheckFile;
 import com.pengsoft.support.repository.EntityRepository;
@@ -21,8 +20,7 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface SafetyCheckFileRepository
-        extends OwnedExtRepository, EntityRepository<QSafetyCheckFile, SafetyCheckFile, String> {
+public interface SafetyCheckFileRepository extends EntityRepository<QSafetyCheckFile, SafetyCheckFile, String> {
 
     /**
      * Returns all safety check files with the given safety check id and safety

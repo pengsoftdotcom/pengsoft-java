@@ -10,7 +10,10 @@ import com.fasterxml.jackson.databind.type.MapType;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.QConstructionProject;
+import com.pengsoft.ss.domain.QSafetyTraining;
+import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.ss.domain.SafetyTrainingFile;
 import com.pengsoft.ss.facade.SafetyTrainingFacade;
@@ -18,10 +21,15 @@ import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
+import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.JPAExpressions;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -102,6 +110,25 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
         Map<String, Object> result = objectMapper.convertValue(training, type);
         result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
         return result;
+    }
+
+    @Override
+    public Page<SafetyTraining> findPage(Predicate predicate, Pageable pageable) {
+        final var staff = SecurityUtilsExt.getStaff();
+        final var root = QSafetyTraining.safetyTraining;
+        if (SecurityUtils.hasAnyRole("bu_manager'")) {
+            predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
+        }
+        if (SecurityUtils.hasAnyRole("security_officer")) {
+            predicate = QueryDslUtils.merge(predicate, root.trainer.id.eq(staff.getId()));
+        }
+        if (SecurityUtils.hasAnyRole("worker")) {
+            final var participants = QSafetyTraining.safetyTraining.participants;
+            final var participant = QSafetyTrainingParticipant.safetyTrainingParticipant;
+            predicate = QueryDslUtils.merge(predicate, JPAExpressions.selectOne().from(participants, participant)
+                    .where(participant.staff.id.eq(staff.getId())).exists());
+        }
+        return super.findPage(predicate, pageable);
     }
 
 }

@@ -9,8 +9,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
 import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.support.domain.EntityImpl;
 import com.pengsoft.system.domain.DictionaryItem;
 
 import org.hibernate.annotations.Cache;
@@ -36,11 +36,11 @@ import lombok.Setter;
 @Table(indexes = {
         @Index(name = "safety_training_participant_1", columnList = "training_id, staff_id", unique = true)
 })
-public class SafetyTrainingParticipant extends OwnedExtEntityImpl {
+public class SafetyTrainingParticipant extends EntityImpl {
 
     private static final long serialVersionUID = -875092997387906731L;
 
-	@NotNull
+    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private SafetyTraining training;

@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
-import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.ss.domain.QSafetyTraining;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.support.repository.EntityRepository;
@@ -22,8 +21,7 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface SafetyTrainingRepository
-        extends OwnedExtRepository, EntityRepository<QSafetyTraining, SafetyTraining, String> {
+public interface SafetyTrainingRepository extends EntityRepository<QSafetyTraining, SafetyTraining, String> {
 
     @Override
     default void customize(final QuerydslBindings bindings, final QSafetyTraining root) {

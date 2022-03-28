@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotNull;
 
-import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
+import com.pengsoft.support.domain.EntityImpl;
 import com.pengsoft.system.domain.Asset;
 
 import org.hibernate.annotations.Cache;
@@ -27,11 +27,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class SafetyTrainingFile extends OwnedExtEntityImpl {
+public class SafetyTrainingFile extends EntityImpl {
 
     private static final long serialVersionUID = 3579219312536097170L;
 
-	@NotNull
+    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private SafetyTraining training;

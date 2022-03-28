@@ -5,7 +5,6 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
-import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.ss.domain.QSafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.support.repository.EntityRepository;
@@ -22,8 +21,7 @@ import org.springframework.stereotype.Repository;
  * @since 1.0.0
  */
 @Repository
-public interface SafetyCheckRepository
-        extends OwnedExtRepository, EntityRepository<QSafetyCheck, SafetyCheck, String> {
+public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, SafetyCheck, String> {
 
     @Override
     default void customize(final QuerydslBindings bindings, final QSafetyCheck root) {

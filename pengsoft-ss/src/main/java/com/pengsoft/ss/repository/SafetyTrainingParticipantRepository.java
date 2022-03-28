@@ -3,7 +3,6 @@ package com.pengsoft.ss.repository;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
-import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
 import com.pengsoft.support.repository.EntityRepository;
@@ -19,7 +18,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface SafetyTrainingParticipantRepository
-        extends OwnedExtRepository, EntityRepository<QSafetyTrainingParticipant, SafetyTrainingParticipant, String> {
+        extends EntityRepository<QSafetyTrainingParticipant, SafetyTrainingParticipant, String> {
 
     /**
      * 安全培训是否存在参与人

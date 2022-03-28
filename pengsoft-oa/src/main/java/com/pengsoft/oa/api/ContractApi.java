@@ -89,7 +89,6 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         getService().saveWithPictures(contract, pictures);
     }
 
-    @Messaging(builder = "contractConfirmMessageBuilder")
     @DeleteMapping("delete-picture-by-asset")
     public void deletePictureByAsset(@RequestParam(value = "id", required = false) Contract contract,
             @RequestParam("asset.id") Asset asset) {

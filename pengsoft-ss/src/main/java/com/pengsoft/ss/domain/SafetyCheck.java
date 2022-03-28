@@ -14,9 +14,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.support.domain.Codeable;
+import com.pengsoft.support.domain.EntityImpl;
 import com.pengsoft.system.domain.DictionaryItem;
 
 import org.hibernate.annotations.Cache;
@@ -39,9 +39,11 @@ import lombok.Setter;
 @NoArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class SafetyCheck extends OwnedExtEntityImpl implements Codeable {
+public class SafetyCheck extends EntityImpl implements Codeable {
 
-    @NotNull
+    private static final long serialVersionUID = -1683778090254264112L;
+
+	@NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private ConstructionProject project;
