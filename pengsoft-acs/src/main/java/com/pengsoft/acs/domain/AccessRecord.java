@@ -1,6 +1,7 @@
 package com.pengsoft.acs.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -16,6 +17,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Type;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +36,7 @@ public class AccessRecord extends EntityImpl {
 
     private static final long serialVersionUID = 4643825005175238950L;
 
-	@OneToOne
+    @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Person person;
 
@@ -45,7 +47,9 @@ public class AccessRecord extends EntityImpl {
 
     @JsonSerialize(using = ImageJsonSerializer.class)
     @JsonDeserialize(using = ImageJsonDeserializer.class)
-    private byte[] photo;
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
+    private String photo;
 
     private float temperature;
 

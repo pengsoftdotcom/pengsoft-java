@@ -2,6 +2,7 @@ package com.pengsoft.acs.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,10 +32,10 @@ public class PersonFaceDataServiceImpl extends EntityServiceImpl<PersonFaceDataR
 
     @Override
     public PersonFaceData save(PersonFaceData personFaceData) {
-        try (final var is = new ByteArrayInputStream(personFaceData.getFace());
+        try (final var is = new ByteArrayInputStream(Base64.getDecoder().decode(personFaceData.getFace()));
                 final var os = new ByteArrayOutputStream();) {
             Thumbnails.of(is).outputFormat("jpg").size(500, 500).toOutputStream(os);
-            personFaceData.setFace(os.toByteArray());
+            personFaceData.setFace(Base64.getEncoder().encodeToString(os.toByteArray()));
         } catch (Exception e) {
             throw new BusinessException("person_face_data.save.zoom_image_error", e.getMessage());
         }

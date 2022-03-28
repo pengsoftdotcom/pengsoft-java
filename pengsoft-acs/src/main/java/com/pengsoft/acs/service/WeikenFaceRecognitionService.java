@@ -1,6 +1,5 @@
 package com.pengsoft.acs.service;
 
-import java.util.Base64;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -133,7 +132,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
                     .map(personFaceData -> {
                         var md5 = new StringBuilder();
                         md5.append(DigestUtils.md5DigestAsHex(personFaceData.getPerson().getName().getBytes()));
-                        md5.append(DigestUtils.md5DigestAsHex(Base64.getEncoder().encode(personFaceData.getFace())));
+                        md5.append(DigestUtils.md5DigestAsHex(personFaceData.getFace().getBytes()));
                         md5.append(DigestUtils.md5DigestAsHex(RECOGNITION_TYPE.getBytes()));
                         md5.append(DigestUtils.md5DigestAsHex(personFaceData.getDuration().getBytes()));
                         md5 = new StringBuilder(DigestUtils.md5DigestAsHex(md5.toString().getBytes()));
@@ -156,14 +155,14 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
                     .map(personFaceData -> {
                         var md5 = new StringBuilder();
                         md5.append(DigestUtils.md5DigestAsHex(personFaceData.getPerson().getName().getBytes()));
-                        md5.append(DigestUtils.md5DigestAsHex(Base64.getEncoder().encode(personFaceData.getFace())));
+                        md5.append(DigestUtils.md5DigestAsHex(personFaceData.getFace().getBytes()));
                         md5.append(DigestUtils.md5DigestAsHex(RECOGNITION_TYPE.getBytes()));
                         md5.append(DigestUtils.md5DigestAsHex(personFaceData.getDuration().getBytes()));
                         md5 = new StringBuilder(DigestUtils.md5DigestAsHex(md5.toString().getBytes()));
                         return Map.of(
                                 ID_CARD_NUM, personFaceData.getPerson().getIdentityCardNumber(),
                                 "name", personFaceData.getPerson().getName(),
-                                "imgBase64", Base64.getEncoder().encodeToString(personFaceData.getFace()),
+                                "imgBase64", personFaceData.getFace(),
                                 "type", RECOGNITION_TYPE,
                                 "passtime", personFaceData.getDuration(),
                                 MD5, md5);
@@ -183,7 +182,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
             final var accessRecord = new AccessRecord();
             deviceService.findOneByCode(deviceCode).ifPresentOrElse(accessRecord::setDevice,
                     () -> exceptions.entityNotExists(deviceCode));
-            accessRecord.setPhoto(((String) params.get("path")).getBytes());
+            accessRecord.setPhoto((String) params.get("path"));
             final var identityCardNumber = (String) params.get(ID_CARD_NUM);
             // 识别成功
             if (StringUtils.isNotBlank(identityCardNumber)) {

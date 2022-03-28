@@ -1,9 +1,9 @@
 package com.pengsoft.acs.domain;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -18,6 +18,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+import org.hibernate.annotations.Type;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -36,15 +37,17 @@ public class PersonFaceData extends OwnedEntityImpl {
 
     private static final long serialVersionUID = -3274072350021511374L;
 
-	@NotNull
+    @NotNull
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Person person;
 
-    @NotEmpty
     @JsonSerialize(using = ImageJsonSerializer.class)
     @JsonDeserialize(using = ImageJsonDeserializer.class)
-    private byte[] face;
+    @NotBlank
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
+    private String face;
 
     @NotBlank
     @Size(max = 255)
