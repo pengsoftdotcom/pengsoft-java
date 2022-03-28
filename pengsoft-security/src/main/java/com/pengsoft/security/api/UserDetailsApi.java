@@ -65,6 +65,7 @@ public class UserDetailsApi {
     @AuthorityChanged
     @PostMapping("sign-out")
     public void signOut(@CurrentSecurityContext(expression = "authentication.principal.user") User user) {
+        System.out.println(user);
         // HandleAuthorityChangedAspect will do the rest.
     }
 
@@ -73,6 +74,7 @@ public class UserDetailsApi {
         userService.bind(username, value, type);
     }
 
+    @AuthorityChanged
     @PostMapping("unbind")
     public void unbind(@CurrentSecurityContext(expression = "authentication.principal.user") User user, String type) {
         userService.bind(user.getUsername(), null, type);
