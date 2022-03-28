@@ -8,6 +8,7 @@ import com.pengsoft.oa.domain.PayrollRecord;
 import com.pengsoft.oa.repository.PayrollDetailRepository;
 import com.pengsoft.oa.repository.PayrollRecordRepository;
 import com.pengsoft.security.util.SecurityUtils;
+import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
 
@@ -30,6 +31,10 @@ public class PayrollDetailServiceImpl extends EntityServiceImpl<PayrollDetailRep
 
     @Override
     public void confirm(PayrollDetail payrollDetail) {
+        if (payrollDetail.getConfirmedAt() != null) {
+            throw new BusinessException("payroll.confirm.already");
+        }
+
         payrollDetail.setConfirmedAt(DateUtils.currentDateTime());
         payrollDetail.setConfirmedBy(SecurityUtils.getUserId());
         save(payrollDetail);
