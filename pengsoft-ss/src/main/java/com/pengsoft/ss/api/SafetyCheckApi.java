@@ -26,6 +26,7 @@ import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
+import com.pengsoft.system.service.DictionaryItemService;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
@@ -58,6 +59,9 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     @Inject
     private SafetyCheckFileRepository safetyCheckFileRepository;
 
+    @Inject
+    private DictionaryItemService dictionaryItemService;
+
     private ObjectMapper objectMapper;
 
     private MapLikeType type;
@@ -83,6 +87,10 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     @GetMapping("find-one-with-files")
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyCheck entity) {
         final var check = super.findOne(entity);
+        if (check.getStatus() == null) {
+            dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
+                    .ifPresent(check::setStatus);
+        }
         final var job = SecurityUtilsExt.getPrimaryJob();
         if (job != null && StringUtils.equals(job.getName(), "安全员")) {
             check.setChecker(SecurityUtilsExt.getStaff());
