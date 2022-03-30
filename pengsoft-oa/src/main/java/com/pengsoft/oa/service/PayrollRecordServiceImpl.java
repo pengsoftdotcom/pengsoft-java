@@ -24,6 +24,8 @@ import com.pengsoft.system.service.StorageService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -96,6 +98,11 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
     @Override
     public Optional<PayrollRecord> findOneByCode(String code) {
         return getRepository().findOneByCodeAndBelongsTo(code, SecurityUtilsExt.getPrimaryOrganizationId());
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.DESC, "code");
     }
 
 }

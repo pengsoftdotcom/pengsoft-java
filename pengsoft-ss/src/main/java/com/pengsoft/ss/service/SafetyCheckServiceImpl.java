@@ -19,6 +19,8 @@ import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -83,6 +85,11 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
     @Override
     public Optional<SafetyCheck> findOneByCode(@NotBlank final String code) {
         return getRepository().findOneByCode(code);
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.DESC, "code");
     }
 
 }

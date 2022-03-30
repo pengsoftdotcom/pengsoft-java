@@ -24,6 +24,8 @@ import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.system.domain.Asset;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -116,6 +118,11 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
     @Override
     public Optional<SafetyTraining> findOneByCode(@NotBlank final String code) {
         return getRepository().findOneByCode(code);
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.DESC, "code");
     }
 
 }

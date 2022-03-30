@@ -13,6 +13,8 @@ import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -58,6 +60,11 @@ public class PayrollDetailServiceImpl extends EntityServiceImpl<PayrollDetailRep
     @Override
     public long countByPayrollAndConfirmedAtIsNotNull(PayrollRecord payroll) {
         return getRepository().countByPayrollIdAndConfirmedAtIsNotNull(payroll.getId());
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.DESC, "payroll.code");
     }
 
 }
