@@ -12,7 +12,9 @@ import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.domain.Asset;
+import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.service.AssetService;
+import com.pengsoft.system.service.DictionaryItemService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
@@ -32,6 +34,9 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
 
     @Inject
     private AssetService assetService;
+
+    @Inject
+    private DictionaryItemService dictionaryItemService;
 
     @Override
     public Contract saveWithPictures(Contract contract, List<Asset> pictures) {
@@ -54,6 +59,13 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
                     picture -> deletedPictures.stream().anyMatch(deleted -> EntityUtils.equals(picture, deleted)));
         }
         sourcePictures.addAll(createdPictures);
+
+        if (CollectionUtils.isNotEmpty(contract.getPictures())) {
+            final var status = dictionaryItemService
+                    .findOneByTypeCodeAndParentAndCode("contract_status", null, "unconfirmed")
+                    .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "unconfirmed"));
+            contract.setStatus(status);
+        }
         super.save(contract);
         return contract;
     }

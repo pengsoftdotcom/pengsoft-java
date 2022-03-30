@@ -11,6 +11,7 @@ import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.system.domain.DictionaryItem;
+import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
@@ -31,6 +32,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SafetyTrainingParticipantApi extends
         EntityApi<SafetyTrainingParticipantService, SafetyTrainingParticipant, String> {
 
+    @TaskHandler(name = "safetyTrainingConfirmTaskHandler", finish = true)
     @PutMapping("confirm")
     public void confirm(@RequestParam("id") SafetyTrainingParticipant participant, String reason,
             @RequestParam(value = "status.id", required = false) @NotNull DictionaryItem status) {

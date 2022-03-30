@@ -1,11 +1,15 @@
 package com.pengsoft.oa.service;
 
+import javax.inject.Inject;
+
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.repository.ContractRepository;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
+import com.pengsoft.system.domain.DictionaryItem;
+import com.pengsoft.system.repository.DictionaryItemRepository;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -21,11 +25,17 @@ import org.springframework.stereotype.Service;
 public class ContractServiceImpl extends EntityServiceImpl<ContractRepository, Contract, String>
         implements ContractService {
 
+    @Inject
+    private DictionaryItemRepository dictionaryItemRepository;
+
     @Override
     public void confirm(Contract contract) {
         if (contract.getConfirmedAt() != null) {
             throw new BusinessException("contract.confirm.already");
         }
+        contract.setStatus(dictionaryItemRepository
+                .findOneByTypeCodeAndParentIdAndCode("contract_status", null, "confirmed").orElseThrow(
+                        () -> getExceptions().entityNotExists(DictionaryItem.class, "contract_status::confirmed")));
         contract.setConfirmedAt(DateUtils.currentDateTime());
         contract.setConfirmedBy(SecurityUtils.getUserId());
         save(contract);

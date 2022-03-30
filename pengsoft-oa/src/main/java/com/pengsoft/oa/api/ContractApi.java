@@ -2,6 +2,7 @@ package com.pengsoft.oa.api;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,7 @@ import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.AssetService;
 import com.pengsoft.system.service.DictionaryItemService;
 import com.pengsoft.system.service.StorageService;
+import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
@@ -44,6 +46,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 
 /**
@@ -52,6 +55,7 @@ import net.coobird.thumbnailator.Thumbnails;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
+@Slf4j
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/oa/contract")
 public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
@@ -82,6 +86,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         type = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
     }
 
+    @TaskHandler(name = "contractConfirmTaskHandler", create = true)
     @Messaging(builder = "contractConfirmMessageBuilder")
     @PostMapping("save-with-pictures")
     public void saveWithPictures(@RequestBody Contract contract,
@@ -95,6 +100,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         getService().deletePictureByAsset(contract, asset);
     }
 
+    @TaskHandler(name = "contractConfirmTaskHandler", finish = true)
     @PutMapping("confirm")
     public void confirm(@RequestParam("id") Contract contract) {
         getService().confirm(contract);
@@ -113,7 +119,20 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
 
         }
         final var data = setParty(target);
-        data.put("pictures", target.getPictures().stream().map(ContractPicture::getAsset).toList());
+        data.put("pictures", target.getPictures().stream().map(ContractPicture::getAsset).map(asset -> {
+            if (asset.isLocked()) {
+                storageService.download(asset);
+                try (ByteArrayOutputStream os = new ByteArrayOutputStream();
+                        ByteArrayInputStream is = new ByteArrayInputStream(asset.getData());) {
+                    Thumbnails.of(is).outputFormat("jpg").size(600, 600).toOutputStream(os);
+                    asset.setAccessPath(
+                            "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(os.toByteArray()));
+                } catch (Exception e) {
+                    log.error("asset.download.failed: {}", e.getMessage());
+                }
+            }
+            return asset;
+        }).toList());
         return data;
     }
 
@@ -159,6 +178,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         return findPageWithParty(predicate, pageable);
     }
 
+    @TaskHandler(name = "contractConfirmTaskHandler", finish = true)
     @Authorized
     @PutMapping("confirm-mine")
     public void confirmMine(String id) {

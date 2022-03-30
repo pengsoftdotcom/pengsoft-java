@@ -6,6 +6,7 @@ import com.pengsoft.oa.service.PayrollRecordService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.system.annotation.Messaging;
+import com.pengsoft.task.annotation.TaskHandler;
 
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Constant.API_PREFIX + "/oa/payroll-record")
 public class PayrollRecordApi extends EntityApi<PayrollRecordService, PayrollRecord, String> {
 
+    @TaskHandler(name = "payrollDetailConfirmTaskHandler", create = true)
     @Messaging(builder = "payrollDetailConfirmMessageBuilder")
     @Override
     public void save(@RequestBody PayrollRecord entity) {

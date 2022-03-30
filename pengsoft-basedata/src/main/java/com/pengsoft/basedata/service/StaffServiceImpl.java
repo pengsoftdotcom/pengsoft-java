@@ -86,7 +86,7 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
 
     @Override
     protected Sort getDefaultSort() {
-        return Sort.by(Direction.ASC, "job.parentIds");
+        return Sort.by(Direction.ASC, "job.parentIds", "job.name", "person.mobile");
     }
 
 }

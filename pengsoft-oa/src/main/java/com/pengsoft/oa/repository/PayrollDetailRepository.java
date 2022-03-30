@@ -1,5 +1,7 @@
 package com.pengsoft.oa.repository;
 
+import java.util.List;
+
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
@@ -55,5 +57,13 @@ public interface PayrollDetailRepository
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     long countByPayrollIdAndConfirmedAtIsNotNull(@NotBlank String payrollId);
+
+    /**
+     * Returns all payroll details with given payroll record id.
+     * 
+     * @param payrollId The payroll record id.
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    List<PayrollDetail> findAllByPayrollId(@NotBlank String payrollId);
 
 }

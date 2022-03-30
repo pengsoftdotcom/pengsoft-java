@@ -1,5 +1,7 @@
 package com.pengsoft.ss.repository;
 
+import java.util.List;
+
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
@@ -27,5 +29,13 @@ public interface SafetyTrainingParticipantRepository
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     boolean existsByTrainingId(@NotBlank String trainingId);
+
+    /**
+     * 返回该培训的所有参与人
+     * 
+     * @param trainingId 安全培训ID
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    List<SafetyTrainingParticipant> findAllByTrainingId(@NotBlank String trainingId);
 
 }

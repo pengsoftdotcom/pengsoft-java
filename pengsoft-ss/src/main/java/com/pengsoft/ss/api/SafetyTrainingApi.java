@@ -25,6 +25,7 @@ import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
+import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPAExpressions;
 
@@ -64,12 +65,14 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
         type = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
     }
 
+    @TaskHandler(name = "safetyTrainingConfirmTaskHandler", create = true)
     @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
     @PostMapping("save-and-submit")
     public void saveAndSubmit(@RequestBody SafetyTraining training) {
         getService().saveAndSubmit(training);
     }
 
+    @TaskHandler(name = "safetyTrainingConfirmTaskHandler", create = true)
     @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
     @PutMapping("submit")
     public void submit(@RequestParam("id") SafetyTraining training) {

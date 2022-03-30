@@ -37,7 +37,7 @@ public class Contract extends OwnedExtEntityImpl {
 
     private static final long serialVersionUID = -2346858411026418246L;
 
-	@NotNull
+    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private DictionaryItem partyAType;
@@ -54,6 +54,10 @@ public class Contract extends OwnedExtEntityImpl {
     private String partyBId;
 
     private LocalDate signedAt;
+
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private DictionaryItem status;
 
     private LocalDateTime confirmedAt;
 
