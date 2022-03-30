@@ -34,13 +34,13 @@ public abstract class AbstractMessageBuilder implements MessageBuilder {
     private Exceptions exceptions;
 
     protected CompositeMessageTemplate getCompositeMessageTemplate(String templateCode) {
-        return (CompositeMessageTemplate) this.compositeMessageTemplateService.findOneByCode(templateCode)
-                .orElseThrow(() -> this.exceptions.entityNotExists(templateCode));
+        return this.compositeMessageTemplateService.findOneByCode(templateCode)
+                .orElseThrow(() -> this.exceptions.entityNotExists(CompositeMessageTemplate.class, templateCode));
     }
 
     protected User getSender(Object[] args, Object result) {
-        return (User) this.userService.findOneByUsername("admin")
-                .orElseThrow(() -> this.exceptions.entityNotExists("admin"));
+        return this.userService.findOneByUsername("admin")
+                .orElseThrow(() -> this.exceptions.entityNotExists(User.class, "admin"));
     }
 
     public Map<String, List<Message>> build(Object[] args, Object result, String[] types) {

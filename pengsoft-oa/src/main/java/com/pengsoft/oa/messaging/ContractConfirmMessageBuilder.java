@@ -49,7 +49,7 @@ public class ContractConfirmMessageBuilder extends AbstractMessageBuilder {
         String partyBTypeCode = contract.getPartyBType().getCode();
         if (partyBTypeCode.equals("personal")) {
             return List.of(personFacade.findOne(partyBId)
-                    .orElseThrow(() -> getExceptions().entityNotExists(partyBId)).getUser());
+                    .orElseThrow(() -> getExceptions().entityNotExists(Contract.class, partyBId)).getUser());
         }
         if (partyBTypeCode.equals("organization")) {
             final var jobs = jobRoleRepository.findAllByJobDepartmentOrganizationIdAndRoleCode(partyBId, Role.ORG_ADMIN)
@@ -62,9 +62,8 @@ public class ContractConfirmMessageBuilder extends AbstractMessageBuilder {
     @Override
     public Map<String, List<Message>> build(Object[] args, Object result, String[] types) {
         final var messages = super.build(args, result, types);
-        messages.entrySet().stream().flatMap(entry -> entry.getValue().stream()).forEach(message -> {
-            message.setParams(Map.of("thing1", "test", "phrase2", "待确认"));
-        });
+        messages.entrySet().stream().flatMap(entry -> entry.getValue().stream())
+                .forEach(message -> message.setParams(Map.of("thing1", "test", "phrase2", "待确认")));
         return messages;
     }
 

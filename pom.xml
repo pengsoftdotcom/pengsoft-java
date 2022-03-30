@@ -22,6 +22,7 @@
         <module>pengsoft-acs</module>
         <module>pengsoft-oa</module>
         <module>pengsoft-ss</module>
+        <module>pengsoft-task</module>
         <module>pengsoft-monolithic</module>
     </modules>
 
@@ -50,6 +51,7 @@
         <easyexcel.version>3.0.5</easyexcel.version>
         <tea-openapi.version>0.2.2</tea-openapi.version>
         <dysmsapi.version>2.0.9</dysmsapi.version>
+        <hibernate-types-52.version>2.14.1</hibernate-types-52.version>
     </properties>
 
     <dependencyManagement>
@@ -134,6 +136,11 @@
                 <artifactId>commons-text</artifactId>
                 <version>${commons-text.version}</version>
             </dependency>
+            <dependency>
+                <groupId>com.vladmihalcea</groupId>
+                <artifactId>hibernate-types-52</artifactId>
+                <version>${hibernate-types-52.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>com.pengsoft</groupId>
@@ -178,6 +185,11 @@
             <dependency>
                 <groupId>com.pengsoft</groupId>
                 <artifactId>pengsoft-ss</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.pengsoft</groupId>
+                <artifactId>pengsoft-task</artifactId>
                 <version>${project.version}</version>
             </dependency>
         </dependencies>

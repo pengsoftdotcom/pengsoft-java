@@ -169,7 +169,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
     @GetMapping("download")
     public String download(String id, @RequestParam(defaultValue = "600") int width,
             @RequestParam(defaultValue = "600") int height) {
-        var asset = assetService.findOne(id).orElseThrow(() -> getExceptions().entityNotExists(id));
+        var asset = assetService.findOne(id).orElseThrow(() -> getExceptions().entityNotExists(Asset.class, id));
         asset = this.storageService.download(asset);
         if (asset.getContentType().startsWith("image")) {
             try (ByteArrayOutputStream os = new ByteArrayOutputStream();

@@ -3,6 +3,7 @@ package com.pengsoft.system.ws;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import com.aliyuncs.ram.model.v20150501.CreateUserResponse.User;
 import com.pengsoft.security.service.UserService;
 import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.system.service.InternalMessageService;
@@ -38,7 +39,7 @@ public class InternalMessageWebSocketHandler extends TextWebSocketHandler {
             log.debug(username + "连接");
             sessions.put(username, session);
             final var receiver = userService.findOneByUsername(username)
-                    .orElseThrow(() -> exceptions.entityNotExists(username));
+                    .orElseThrow(() -> exceptions.entityNotExists(User.class, username));
             final var unreadCount = internalMessageService.countByReceiverAndReadAtIsNull(receiver);
             session.sendMessage(new TextMessage(String.valueOf(unreadCount)));
         }

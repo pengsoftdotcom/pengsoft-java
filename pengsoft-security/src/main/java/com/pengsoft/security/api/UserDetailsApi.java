@@ -58,7 +58,8 @@ public class UserDetailsApi {
 
     @PostMapping("reset-password")
     public void resetPassword(final String username, final String password) {
-        var user = userService.findOneByMobile(username).orElseThrow(() -> exceptions.entityNotExists(username));
+        var user = userService.findOneByMobile(username)
+                .orElseThrow(() -> exceptions.entityNotExists(User.class, username));
         userService.resetPassword(user.getId(), password);
     }
 

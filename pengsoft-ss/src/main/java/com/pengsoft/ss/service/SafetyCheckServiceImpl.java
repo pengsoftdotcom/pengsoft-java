@@ -63,7 +63,7 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
 
     private DictionaryItem getSafetyCheckFileType(String typeCode) {
         return dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode("safety_check_file_type", null, typeCode)
-                .orElseThrow(() -> getExceptions().entityNotExists("typeCode"));
+                .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "typeCode"));
     }
 
     @Override

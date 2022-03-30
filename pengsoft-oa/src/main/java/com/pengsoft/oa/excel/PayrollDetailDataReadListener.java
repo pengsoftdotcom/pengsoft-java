@@ -8,6 +8,8 @@ import javax.inject.Inject;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.pengsoft.basedata.domain.Job;
+import com.pengsoft.basedata.domain.Person;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.repository.PersonRepository;
 import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.oa.domain.PayrollDetail;
@@ -64,9 +66,9 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
         BeanUtils.copyProperties(data, detail);
         detail.setPayroll(payroll);
         final var person = personRepository.findOneByIdentityCardNumber(data.getIdentityCardNumber())
-                .orElseThrow(() -> exceptions.entityNotExists(data.getIdentityCardNumber()));
+                .orElseThrow(() -> exceptions.entityNotExists(Person.class, data.getIdentityCardNumber()));
         final var staff = staffRepository.findOneByPersonIdAndJobId(person.getId(), job.getId())
-                .orElseThrow(() -> exceptions.entityNotExists(data.getIdentityCardNumber()));
+                .orElseThrow(() -> exceptions.entityNotExists(Staff.class, data.getIdentityCardNumber()));
         detail.setStaff(staff);
         if (!payrollDetailService.existsByRecordCodeAndStaff(payroll.getCode(), staff)) {
             payrollDetails.add(detail);

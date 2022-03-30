@@ -94,7 +94,7 @@ public class OwnedEntityApiMethodArgsDataAuthorityHandler implements ApiMethodAr
             final var repository = repositories.getRepositoryFor(entityClass).map(CrudRepository.class::cast)
                     .orElseThrow(() -> new InvalidConfigurationException("No repository for " + entityClass.getName()));
             return (OwnedEntityImpl) repository.findById(entity.getId())
-                    .orElseThrow(() -> exceptions.entityNotExists(entity.getId()));
+                    .orElseThrow(() -> exceptions.entityNotExists(entityClass, entity.getId()));
         } else {
             return entity;
         }

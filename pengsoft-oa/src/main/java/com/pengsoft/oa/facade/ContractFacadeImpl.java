@@ -65,7 +65,7 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
         } else {
             final var picture = contract.getPictures().stream()
                     .filter(source -> EntityUtils.equals(source.getAsset(), target)).findFirst()
-                    .orElseThrow(() -> getExceptions().entityNotExists(target.getId()));
+                    .orElseThrow(() -> getExceptions().entityNotExists(ContractPicture.class, target.getId()));
             contractPictureService.delete(picture);
             contract.getPictures().remove(picture);
             super.save(contract);

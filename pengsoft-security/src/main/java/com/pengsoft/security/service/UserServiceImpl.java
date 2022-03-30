@@ -101,14 +101,15 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
     @Override
     public void resetPassword(final String id, final String password) {
         if (findOne(id).isEmpty()) {
-            throw getExceptions().entityNotExists(id);
+            throw getExceptions().entityNotExists(User.class, id);
         }
         getRepository().resetPassword(id, passwordEncoder.encode(password));
     }
 
     @Override
     public void grantRoles(final User target, final List<Role> roles) {
-        final var source = findOne(target.getId()).orElseThrow(() -> getExceptions().entityNotExists(target.getId()));
+        final var source = findOne(target.getId())
+                .orElseThrow(() -> getExceptions().entityNotExists(User.class, target.getId()));
         final var sourceUserRoles = source.getUserRoles();
         final var targetUserRoles = roles.stream().map(role -> new UserRole(source, role)).toList();
         final var deletedUserRoles = sourceUserRoles.stream().filter(s -> targetUserRoles.stream().noneMatch(
@@ -142,7 +143,8 @@ public class UserServiceImpl extends EntityServiceImpl<UserRepository, User, Str
 
     @Override
     public void signInSuccess(final String username) {
-        final var user = findOneByUsername(username).orElseThrow(() -> getExceptions().entityNotExists(username));
+        final var user = findOneByUsername(username)
+                .orElseThrow(() -> getExceptions().entityNotExists(User.class, username));
         user.setSignedInAt(DateUtils.currentDateTime());
         user.setSignInFailureCount(0L);
         save(user);

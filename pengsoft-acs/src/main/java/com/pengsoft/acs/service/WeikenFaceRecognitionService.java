@@ -10,10 +10,13 @@ import com.pengsoft.acs.domain.AccessRecord;
 import com.pengsoft.acs.exception.WeikenException;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.JobRole;
+import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.repository.JobRoleRepository;
 import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.basedata.service.PersonService;
+import com.pengsoft.iot.domain.Device;
+import com.pengsoft.iot.domain.Group;
 import com.pengsoft.iot.repository.GroupRepository;
 import com.pengsoft.iot.service.DeviceService;
 import com.pengsoft.support.exception.Exceptions;
@@ -111,7 +114,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
         try {
             final var groupId = (String) params.get("groupId");
             final var group = groupRepository.findOneByCode(groupId)
-                    .orElseThrow(() -> exceptions.entityNotExists(groupId));
+                    .orElseThrow(() -> exceptions.entityNotExists(Group.class, groupId));
             final var departmentId = group.getControlledBy();
             final var jobIds = jobRoleRepository.findAllByJobDepartmentIdAndRoleCode(departmentId, "worker").stream()
                     .map(JobRole::getJob).map(Job::getId).toList();
@@ -181,13 +184,13 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
             final var deviceCode = (String) params.get(DEVICE_KEY);
             final var accessRecord = new AccessRecord();
             deviceService.findOneByCode(deviceCode).ifPresentOrElse(accessRecord::setDevice,
-                    () -> exceptions.entityNotExists(deviceCode));
+                    () -> exceptions.entityNotExists(Device.class, deviceCode));
             accessRecord.setPhoto((String) params.get("path"));
             final var identityCardNumber = (String) params.get(ID_CARD_NUM);
             // 识别成功
             if (StringUtils.isNotBlank(identityCardNumber)) {
-                personService.findOneByIdentityCardNumber(identityCardNumber)
-                        .ifPresentOrElse(accessRecord::setPerson, () -> exceptions.entityNotExists(identityCardNumber));
+                personService.findOneByIdentityCardNumber(identityCardNumber).ifPresentOrElse(accessRecord::setPerson,
+                        () -> exceptions.entityNotExists(Person.class, identityCardNumber));
                 final Map<String, Object> extra = objectMapper.readValue((String) params.get("extra"), type);
                 accessRecord.setTemperature(Float.parseFloat((String) extra.get("bodyTemp")));
                 accessRecordService.save(accessRecord);
@@ -211,7 +214,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
                         device.setIp(ip);
                         deviceService.save(device);
                     },
-                    () -> exceptions.entityNotExists(code));
+                    () -> exceptions.entityNotExists(Device.class, code));
         } catch (Exception e) {
             log.error("create access record error: {}", e.getMessage());
             throw new WeikenException(e);

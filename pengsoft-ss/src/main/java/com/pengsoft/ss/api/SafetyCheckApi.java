@@ -27,6 +27,7 @@ import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.DictionaryItemService;
+import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
@@ -71,6 +72,7 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         this.type = this.objectMapper.getTypeFactory().constructMapLikeType(Map.class, String.class, Object.class);
     }
 
+    @TaskHandler(name = "safetyCheckRiskTaskHandler", create = true)
     @Messaging(builder = "safetyCheckHandleMessageBuilder")
     @PostMapping("submit")
     public void submit(@RequestBody SafetyCheck check,
@@ -78,6 +80,7 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         getService().submit(check, submitFiles);
     }
 
+    @TaskHandler(name = "safetyCheckRiskTaskHandler", finish = true)
     @PutMapping("handle")
     public void handle(@RequestParam("id") SafetyCheck check, @NotBlank String result,
             @RequestParam(value = "asset.id", required = false) @NotEmpty List<Asset> handleFiles) {
