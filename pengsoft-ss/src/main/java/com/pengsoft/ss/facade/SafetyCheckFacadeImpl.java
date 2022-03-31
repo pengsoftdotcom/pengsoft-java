@@ -56,4 +56,10 @@ public class SafetyCheckFacadeImpl extends EntityFacadeImpl<SafetyCheckService, 
         }
     }
 
+    @Override
+    public void delete(SafetyCheck entity) {
+        safetyCheckFileService.delete(entity.getFiles());
+        super.delete(entity);
+    }
+
 }

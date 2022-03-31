@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
@@ -81,7 +80,7 @@ public class SafetyCheck extends EntityImpl implements Codeable {
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-    @OneToMany(mappedBy = "check", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "check")
     private List<SafetyCheckFile> files = new ArrayList<>();
 
 }
