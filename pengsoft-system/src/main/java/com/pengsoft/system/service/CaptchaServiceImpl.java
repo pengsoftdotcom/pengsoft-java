@@ -32,9 +32,8 @@ public class CaptchaServiceImpl extends EntityServiceImpl<CaptchaRepository, Cap
 
     @Override
     public Captcha generate(User user) {
-        List<Captcha> captchas = ((CaptchaRepository) getRepository())
-                .findAllByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(user.getId(),
-                        DateUtils.currentDate().atStartOfDay());
+        List<Captcha> captchas = getRepository().findAllByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(user.getId(),
+                DateUtils.currentDate().atStartOfDay());
         if (captchas.size() >= CAPTCHA_GENERATION_MAX_COUNT) {
             throw new BusinessException("captcha.generate.exceeded", Integer.valueOf(5));
         }
@@ -48,7 +47,7 @@ public class CaptchaServiceImpl extends EntityServiceImpl<CaptchaRepository, Cap
                         Long.valueOf(Duration.between(currentDateTime, allowAt).toSeconds()));
             if (captcha1.getExpiredAt().isAfter(currentDateTime)) {
                 captcha1.setExpiredAt(DateUtils.currentDateTime().plus(CAPTCHA_EXPIRATION, ChronoUnit.SECONDS));
-                return (Captcha) save(captcha1);
+                return save(captcha1);
             }
         }
         Captcha captcha = new Captcha();
@@ -60,9 +59,8 @@ public class CaptchaServiceImpl extends EntityServiceImpl<CaptchaRepository, Cap
 
     @Override
     public boolean isValid(User user, String code) {
-        List<Captcha> captchas = ((CaptchaRepository) getRepository())
-                .findAllByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(user.getId(),
-                        DateUtils.currentDate().atStartOfDay());
+        List<Captcha> captchas = getRepository().findAllByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(user.getId(),
+                DateUtils.currentDate().atStartOfDay());
         if (CollectionUtils.isNotEmpty(captchas)) {
             Captcha captcha = captchas.get(0);
             if (captcha.getExpiredAt().isAfter(DateUtils.currentDateTime()) &&
@@ -76,7 +74,7 @@ public class CaptchaServiceImpl extends EntityServiceImpl<CaptchaRepository, Cap
 
     @Override
     protected Sort getDefaultSort() {
-        return Sort.by(Sort.Direction.DESC, new String[] { "createdAt" });
+        return Sort.by(Sort.Direction.DESC, "createdAt");
     }
 
 }

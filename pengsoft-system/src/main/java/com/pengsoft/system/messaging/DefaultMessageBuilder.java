@@ -10,6 +10,7 @@ import com.pengsoft.system.domain.Message;
 @Named
 public class DefaultMessageBuilder implements MessageBuilder {
 
+    @Override
     public Map<String, List<Message>> build(Object[] args, Object result, String[] types) {
         return Map.of();
     }

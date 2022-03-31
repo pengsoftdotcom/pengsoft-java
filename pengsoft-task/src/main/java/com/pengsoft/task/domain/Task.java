@@ -10,7 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.pengsoft.security.domain.OwnedEntityImpl;
-import com.pengsoft.support.domain.Params;
+import com.pengsoft.support.domain.Param;
 import com.pengsoft.system.domain.DictionaryItem;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 
@@ -53,7 +53,7 @@ public class Task extends OwnedEntityImpl {
 
     @Type(type = "jsonb")
     @Column(columnDefinition = "jsonb")
-    private Params targetParams;
+    private Param targetParam;
 
     private String finishedBy;
 

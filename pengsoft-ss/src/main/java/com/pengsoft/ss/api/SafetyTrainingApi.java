@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.databind.type.MapType;
+import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
@@ -22,7 +23,6 @@ import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
 import com.pengsoft.support.util.QueryDslUtils;
-import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.task.annotation.TaskHandler;
@@ -49,6 +49,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/ss/safety-training")
 public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTraining, String> {
+
+    public static final String ROL_BU_MANAGER = "bu_manager";
+
+    public static final String ROL_SECURITY_OFFICER = "security_officer";
+
+    public static final String ROL_WORKER = "worker";
 
     @Inject
     private ConstructionProjectService projectService;
@@ -100,32 +106,38 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyTraining entity) {
         final var training = super.findOne(entity);
         final var job = SecurityUtilsExt.getPrimaryJob();
-        if (job != null && StringUtils.equals(job.getName(), "安全员")) {
+        if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
             training.setTrainer(SecurityUtilsExt.getStaff());
-            staffService.findOne(QStaff.staff.job.id.eq(job.getParent().getId()))
-                    .ifPresent(staff -> projectService
-                            .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
-                            .ifPresent(training::setProject));
+            setProject(training, job.getParent());
+        }
+        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
+            training.setTrainer(SecurityUtilsExt.getStaff());
+            setProject(training, job);
         }
         if (training.getProject() != null) {
-            training.setAddress(training.getProject().getName() + "项目部");
+            training.setAddress(training.getProject().getBuManager().getJob().getDepartment().getShortName() + "项目部");
         }
         Map<String, Object> result = objectMapper.convertValue(training, type);
         result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
         return result;
     }
 
+    private void setProject(final SafetyTraining training, final Job job) {
+        staffService.findOne(QStaff.staff.job.eq(job)).ifPresent(staff -> projectService
+                .findOne(QConstructionProject.constructionProject.buManager.eq(staff)).ifPresent(training::setProject));
+    }
+
     @Override
     public Page<SafetyTraining> findPage(Predicate predicate, Pageable pageable) {
         final var staff = SecurityUtilsExt.getStaff();
         final var root = QSafetyTraining.safetyTraining;
-        if (SecurityUtils.hasAnyRole("bu_manager'")) {
+        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
             predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
         }
-        if (SecurityUtils.hasAnyRole("security_officer")) {
+        if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
             predicate = QueryDslUtils.merge(predicate, root.trainer.id.eq(staff.getId()));
         }
-        if (SecurityUtils.hasAnyRole("worker")) {
+        if (SecurityUtils.hasAnyRole(ROL_WORKER)) {
             final var participants = QSafetyTraining.safetyTraining.participants;
             final var participant = QSafetyTrainingParticipant.safetyTrainingParticipant;
             predicate = QueryDslUtils.merge(predicate, JPAExpressions.selectOne().from(participants, participant)

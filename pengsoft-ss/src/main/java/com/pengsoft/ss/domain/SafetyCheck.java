@@ -43,7 +43,7 @@ public class SafetyCheck extends EntityImpl implements Codeable {
 
     private static final long serialVersionUID = -1683778090254264112L;
 
-	@NotNull
+    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private ConstructionProject project;
@@ -57,9 +57,10 @@ public class SafetyCheck extends EntityImpl implements Codeable {
     @NotBlank
     private String code;
 
-    @Size(max = 255)
-    @NotBlank
-    private String subject = "例行安全检查";
+    @NotNull
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private DictionaryItem type;
 
     @NotNull
     @ManyToOne

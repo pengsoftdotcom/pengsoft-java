@@ -8,6 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import com.fasterxml.jackson.databind.type.MapLikeType;
+import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
@@ -51,6 +52,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(Constant.API_PREFIX + "/ss/safety-check")
 public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, String> {
 
+    public static final String ROL_BU_MANAGER = "bu_manager";
+
+    public static final String ROL_SECURITY_OFFICER = "security_officer";
+
+    public static final String ROL_SUPERVISION_ENGINEER = "supervision_engineer";
+
     @Inject
     private ConstructionProjectService projectService;
 
@@ -90,24 +97,26 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     @GetMapping("find-one-with-files")
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyCheck entity) {
         final var check = super.findOne(entity);
+        if (check.getType() == null) {
+            dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_type", null, "safety")
+                    .ifPresent(check::setType);
+        }
         if (check.getStatus() == null) {
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
         }
         final var job = SecurityUtilsExt.getPrimaryJob();
-        if (job != null && StringUtils.equals(job.getName(), "安全员")) {
+        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SUPERVISION_ENGINEER, ROL_SECURITY_OFFICER)) {
             check.setChecker(SecurityUtilsExt.getStaff());
-            staffService.findOne(QStaff.staff.job.id.eq(job.getParent().getId()))
-                    .ifPresent(staff -> projectService
-                            .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
-                            .ifPresent(check::setProject));
-        }
-        if (job != null && StringUtils.equals(job.getName(), "监理工程师")) {
-            check.setChecker(SecurityUtilsExt.getStaff());
-            staffService.findOne(QStaff.staff.job.id.eq(job.getParent().getId()))
-                    .ifPresent(staff -> projectService
-                            .findOne(QConstructionProject.constructionProject.suManager.id.eq(staff.getId()))
-                            .ifPresent(check::setProject));
+            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
+                setProject(check, job, true);
+            }
+            if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
+                setProject(check, job.getParent(), true);
+            }
+            if (SecurityUtils.hasAnyRole(ROL_SUPERVISION_ENGINEER)) {
+                setProject(check, job.getParent(), false);
+            }
         }
         Map<String, Object> result = objectMapper.convertValue(check, type);
         if (StringUtils.isNotBlank(check.getId())) {
@@ -119,14 +128,22 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         return result;
     }
 
+    private void setProject(final SafetyCheck check, final Job job, final boolean isBu) {
+        final var qProject = QConstructionProject.constructionProject;
+        final var qJob = QStaff.staff.job;
+        staffService.findOne(qJob.eq(job)).ifPresent(staff -> projectService
+                .findOne(isBu ? qProject.buManager.eq(staff) : qProject.suManager.eq(staff))
+                .ifPresent(check::setProject));
+    }
+
     @Override
     public Page<SafetyCheck> findPage(Predicate predicate, Pageable pageable) {
         final var staff = SecurityUtilsExt.getStaff();
         final var root = QSafetyCheck.safetyCheck;
-        if (SecurityUtils.hasAnyRole("bu_manager'")) {
+        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
             predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
         }
-        if (SecurityUtils.hasAnyRole("security_officer", "supervision_engineer")) {
+        if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER, ROL_SUPERVISION_ENGINEER)) {
             predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
         }
         return super.findPage(predicate, pageable);

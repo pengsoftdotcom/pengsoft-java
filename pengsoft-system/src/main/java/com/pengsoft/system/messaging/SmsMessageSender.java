@@ -15,7 +15,9 @@ import com.pengsoft.system.domain.Message;
 import com.pengsoft.system.domain.SmsMessage;
 import com.pengsoft.system.domain.SmsMessageTemplate;
 import com.pengsoft.system.service.SmsMessageService;
+import com.pengsoft.system.service.SystemParamService;
 
+import org.apache.commons.text.StringSubstitutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
@@ -36,6 +38,9 @@ public class SmsMessageSender
     @Inject
     private ObjectMapper objectMapper;
 
+    @Inject
+    private SystemParamService systemParamService;
+
     @SneakyThrows
     @Async
     public void send(@NotNull Message message) {
@@ -45,11 +50,22 @@ public class SmsMessageSender
         LocalDateTime sentAt = smsMessage.getSentAt();
         String mobile = receiver.getMobile();
         if (StringUtils.isNotBlank(mobile)) {
-            SendSmsRequest req = (new SendSmsRequest()).setSignName(template.getSignName())
-                    .setTemplateCode(template.getTemplateCode()).setPhoneNumbers(mobile)
-                    .setTemplateParam(this.objectMapper.writeValueAsString(smsMessage.getParams()));
-            this.client.sendSms(req);
+            systemParamService.findOneByCode("sms_switch").ifPresent(systemParam -> {
+                if ((boolean) systemParam.getParam().get("value")) {
+                    try {
+                        SendSmsRequest req = (new SendSmsRequest()).setSignName(template.getSignName())
+                                .setTemplateCode(template.getTemplateCode()).setPhoneNumbers(mobile)
+                                .setTemplateParam(this.objectMapper.writeValueAsString(smsMessage.getParams()));
+                        this.client.sendSms(req);
+                    } catch (Exception e) {
+                        log.warn("sms message not sent cause' {}", e.getMessage());
+                    }
+                } else {
+                    log.info("sms message not sent cause' sms_switch set to false");
+                }
+            });
             smsMessage.setSentAt(sentAt);
+            smsMessage.setContent(new StringSubstitutor(smsMessage.getParams()).replace(smsMessage.getContent()));
             this.service.save(smsMessage);
         } else {
             log.warn("sms message not sent cause user({})'s mobile is blank", receiver.getUsername());

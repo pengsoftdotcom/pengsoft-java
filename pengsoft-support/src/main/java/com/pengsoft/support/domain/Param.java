@@ -13,7 +13,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class Params extends HashMap<String, Object> {
+public class Param extends HashMap<String, Object> {
 
     private static final long serialVersionUID = -6526598264051880081L;
 

@@ -8,6 +8,8 @@ import com.pengsoft.system.domain.DictionaryType;
 import com.pengsoft.system.repository.DictionaryTypeRepository;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 @Primary
@@ -28,4 +30,10 @@ public class DictionaryTypeServiceImpl extends EntityServiceImpl<DictionaryTypeR
     public Optional<DictionaryType> findOneByCode(String code) {
         return getRepository().findOneByCode(code);
     }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.DESC, "createdAt");
+    }
+
 }

@@ -25,6 +25,7 @@ public class InternalMessageSender implements MessageSender {
     private WebSocketSessions sessions;
 
     @SneakyThrows
+    @Override
     public void send(@NotNull Message message) {
         final var internalMessage = (InternalMessage) message;
         final var substitutor = new StringSubstitutor(message.getParams());

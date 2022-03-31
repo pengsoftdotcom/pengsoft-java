@@ -8,6 +8,7 @@ import com.pengsoft.system.domain.Message;
 @Named
 public class PushMessageSender implements MessageSender {
 
+    @Override
     public void send(@NotNull Message message) {
     }
 

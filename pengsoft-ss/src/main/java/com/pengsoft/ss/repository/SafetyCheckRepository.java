@@ -27,7 +27,6 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
     default void customize(final QuerydslBindings bindings, final QSafetyCheck root) {
         EntityRepository.super.customize(bindings, root);
         bindings.bind(root.code).first(StringPath::contains);
-        bindings.bind(root.subject).first(StringPath::contains);
     }
 
     /**

@@ -22,6 +22,7 @@ public class CaptchaMessageBuilder extends AbstractMessageBuilder {
         return List.of(captcha.getUser());
     }
 
+    @Override
     public Map<String, List<Message>> build(Object[] args, Object result, String[] types) {
         Map<String, List<Message>> messages = super.build(args, result, types);
         Captcha captcha = ((CaptchaWrapper) result).getCaptcha();
