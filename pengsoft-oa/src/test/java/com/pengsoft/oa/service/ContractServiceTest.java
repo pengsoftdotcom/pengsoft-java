@@ -6,14 +6,17 @@ import javax.inject.Inject;
 
 import com.pengsoft.basedata.domain.QJobRole;
 import com.pengsoft.basedata.domain.QStaff;
+import com.pengsoft.basedata.repository.PersonRepository;
 import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.basedata.service.OrganizationService;
 import com.pengsoft.oa.domain.Contract;
+import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.system.service.DictionaryItemService;
 import com.querydsl.jpa.JPAExpressions;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
@@ -32,9 +35,17 @@ class ContractServiceTest {
     @Inject
     StaffRepository staffRepository;
 
+    @Inject
+    PersonRepository personRepository;
+
     @Test
+    @WithUserDetails("13668001277")
     void create() {
-        final var partyA = organizationService.findOne("8eba908e-041c-49ad-b6d2-b83dbe2427d0").orElseThrow();
+        final var cashier = staffRepository
+                .findOneByPersonIdAndPrimaryTrue(
+                        personRepository.findOneByUserId(SecurityUtils.getUserId()).orElseThrow().getId())
+                .orElseThrow();
+        final var partyA = cashier.getJob().getDepartment().getOrganization();
         final var partyAType = dictionaryItemService
                 .findOneByTypeCodeAndParentAndCode("contract_party_type", null, "organization").orElseThrow();
         final var partyBType = dictionaryItemService
@@ -45,17 +56,19 @@ class ContractServiceTest {
         final var root = QStaff.staff;
         final var jobRoles = root.job.jobRoles;
         final var jobRole = QJobRole.jobRole;
-        StreamSupport.stream(staffRepository.findAll(
-                JPAExpressions.selectOne().from(jobRoles, jobRole).where(jobRole.role.code.eq("worker")).exists())
-                .spliterator(), false).forEach(staff -> {
+        StreamSupport.stream(staffRepository
+                .findAll(root.job.department.eq(cashier.getDepartment())
+                        .and(JPAExpressions.selectOne().from(jobRoles, jobRole).where(jobRole.role.code.eq("worker"))
+                                .exists()))
+                .spliterator(), false).forEach(worker -> {
                     final var contract = new Contract();
                     contract.setStatus(status);
                     contract.setPartyAId(partyA.getId());
                     contract.setPartyAType(partyAType);
-                    contract.setPartyBId(staff.getPerson().getId());
+                    contract.setPartyBId(worker.getPerson().getId());
                     contract.setPartyBType(partyBType);
-                    contract.setBelongsTo(staff.getJob().getDepartment().getOrganization().getId());
-                    contract.setControlledBy(staff.getJob().getDepartment().getId());
+                    contract.setBelongsTo(worker.getJob().getDepartment().getOrganization().getId());
+                    contract.setControlledBy(worker.getJob().getDepartment().getId());
                     contract.setCreatedBy("7a238c71-3260-4263-8f30-57b7ea68c29e");
                     contract.setUpdatedBy("7a238c71-3260-4263-8f30-57b7ea68c29e");
                     contractService.save(contract);
