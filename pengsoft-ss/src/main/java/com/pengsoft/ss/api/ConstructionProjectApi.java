@@ -1,10 +1,20 @@
 package com.pengsoft.ss.api;
 
+import java.util.List;
+
+import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.ConstructionProject;
+import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.facade.ConstructionProjectFacade;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
+import com.pengsoft.support.util.QueryDslUtils;
+import com.querydsl.core.types.Predicate;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,6 +35,28 @@ public class ConstructionProjectApi extends EntityApi<ConstructionProjectFacade,
         if (file != null && !file.isEmpty()) {
             getService().importData(file);
         }
+    }
+
+    @Override
+    public Page<ConstructionProject> findPage(Predicate predicate, Pageable pageable) {
+        return super.findPage(getPredicate(predicate), pageable);
+    }
+
+    @Override
+    public List<ConstructionProject> findAll(Predicate predicate, Sort sort) {
+        return super.findAll(getPredicate(predicate), sort);
+    }
+
+    private Predicate getPredicate(Predicate predicate) {
+        final var root = QConstructionProject.constructionProject;
+        if (SecurityUtils.hasAnyRole("ru_manager")) {
+            predicate = QueryDslUtils.merge(predicate, root.ruManager.eq(SecurityUtilsExt.getStaff()));
+        }
+
+        if (SecurityUtils.hasAnyRole("bu_manager")) {
+            predicate = QueryDslUtils.merge(predicate, root.buManager.eq(SecurityUtilsExt.getStaff()));
+        }
+        return predicate;
     }
 
 }

@@ -11,7 +11,7 @@ import java.lang.reflect.ParameterizedType;
 public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
 
     /**
-     * Return the generic type of the class's superclass.
+     * Returns the generic type of the class's superclass.
      *
      * @param clazz the class
      * @param index the index of arguments.

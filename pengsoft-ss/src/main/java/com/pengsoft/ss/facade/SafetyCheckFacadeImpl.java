@@ -1,9 +1,14 @@
 package com.pengsoft.ss.facade;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.ss.domain.QSafetyCheckFile;
 import com.pengsoft.ss.domain.SafetyCheck;
@@ -13,6 +18,8 @@ import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.AssetService;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -60,6 +67,31 @@ public class SafetyCheckFacadeImpl extends EntityFacadeImpl<SafetyCheckService, 
     public void delete(SafetyCheck entity) {
         safetyCheckFileService.delete(entity.getFiles());
         super.delete(entity);
+    }
+
+    @Override
+    public long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
+            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
+        return countByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime, endTime);
+    }
+
+    @Override
+    public Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
+            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime,
+            Pageable pageable) {
+        return findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime, endTime, pageable);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().getDays(projectIds, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().statistic(projectIds, startTime, endTime);
     }
 
 }

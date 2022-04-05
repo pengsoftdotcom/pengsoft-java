@@ -68,10 +68,10 @@ public class SafetyTraining extends EntityImpl implements Codeable {
     private boolean allWorkers = true;
 
     @NotNull
-    private LocalDateTime estimatedStartTime = DateUtils.beginningOfToday().plusHours(9);
+    private LocalDateTime estimatedStartTime = DateUtils.atStartOfToday().plusHours(9);
 
     @NotNull
-    private LocalDateTime estimatedEndTime = DateUtils.beginningOfToday().plusHours(10);
+    private LocalDateTime estimatedEndTime = DateUtils.atStartOfToday().plusHours(10);
 
     private LocalDateTime submittedAt;
 

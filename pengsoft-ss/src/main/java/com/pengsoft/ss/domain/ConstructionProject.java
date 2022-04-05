@@ -2,8 +2,9 @@ package com.pengsoft.ss.domain;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.pengsoft.basedata.domain.Organization;
@@ -35,7 +36,6 @@ public class ConstructionProject extends EntityImpl implements Codeable {
 
     private static final long serialVersionUID = 3844774310596073097L;
 
-    @NotBlank
     @Size(max = 255)
     private String code;
 
@@ -43,33 +43,38 @@ public class ConstructionProject extends EntityImpl implements Codeable {
     @Size(max = 255)
     private String name;
 
+    @Min(1)
+    @Max(28)
+    private int payday = 20;
+
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Organization regulatoryUnit;
 
-    @NotNull
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Staff ruManager;
+
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Organization owner;
 
-    private String ownerManager;
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Staff ownerManager;
 
-    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Organization supervisionUnit;
 
-    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Staff suManager;
 
-    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Organization buildingUnit;
 
-    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Staff buManager;

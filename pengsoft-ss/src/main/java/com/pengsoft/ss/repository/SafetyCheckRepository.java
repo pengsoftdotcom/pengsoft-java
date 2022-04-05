@@ -1,15 +1,23 @@
 package com.pengsoft.ss.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.ss.domain.QSafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
@@ -30,13 +38,71 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
     }
 
     /**
-     * Returns an {@link Optional} of a {@link SafetyCheck}
-     * with the given
-     * code.
+     * Returns an {@link Optional} of a {@link SafetyCheck} with the given code.
      *
      * @param code {@link SafetyCheck}'s code
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     Optional<SafetyCheck> findOneByCode(@NotBlank String code);
 
+    /**
+     * 返回指定类型编码、状态编码且提交时间在指定时间段内的安全检查数
+     * 
+     * @param typeCode   类型编码
+     * @param statusCode 状态编码
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode, @NotBlank String statusCode,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
+    /**
+     * 返回指定类型编码、状态编码且提交时间在指定时间段内的安全检查分页数据
+     * 
+     * @param typeCode   类型编码
+     * @param statusCode 状态编码
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     * @param pageable   分页参数
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
+            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime,
+            Pageable pageable);
+
+    /**
+     * 查询指定时间段内的工程项目的安全检查天数
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select project, count(1) count from (
+                select project_id project, extract(DAY from submitted_at) as day, count(1) count
+                  from safety_check where project_id in (:projectIds) and submitted_at between :startTime and :endTime
+                  group by project_id, day
+              ) a group by project
+                    """, nativeQuery = true)
+    List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime);
+
+    /**
+     * 查询指定时间段内的工程项目的安全检查统计数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select project_id project, b.code "type", c.code status, count(1) count
+              from safety_check a
+                left join dictionary_item b on a.type_id = b.id
+                left join dictionary_item c on a.status_id = c.id
+              where a.project_id in (:projectIds) and a.submitted_at between :startTime and :endTime
+              group by project_id, "type", status
+                """, nativeQuery = true)
+    List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime);
 }

@@ -1,10 +1,14 @@
 package com.pengsoft.ss.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheckFile;
@@ -19,6 +23,8 @@ import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -85,6 +91,32 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
     @Override
     public Optional<SafetyCheck> findOneByCode(@NotBlank final String code) {
         return getRepository().findOneByCode(code);
+    }
+
+    @Override
+    public long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(String typeCode, String statusCode,
+            LocalDateTime startTime, LocalDateTime endTime) {
+        return getRepository().countByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime,
+                endTime);
+    }
+
+    @Override
+    public Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(String typeCode, String statusCode,
+            LocalDateTime startTime, LocalDateTime endTime, Pageable pageable) {
+        return getRepository().findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime,
+                endTime, pageable);
+    }
+
+    @Override
+    public List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().getDays(projectIds, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().statistic(projectIds, startTime, endTime);
     }
 
     @Override

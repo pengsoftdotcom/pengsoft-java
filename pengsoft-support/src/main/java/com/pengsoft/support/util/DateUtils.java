@@ -58,7 +58,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             .ofPattern(DateUtils.DEFAULT_DATETIME_PATTERN);
 
     /**
-     * return current {@link LocalDateTime} of default {@link ZoneId}
+     * Returns current {@link LocalDateTime} of default {@link ZoneId}
      *
      * @return {@link LocalDateTime}
      */
@@ -67,7 +67,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * return current {@link LocalDateTime} of specified {@link ZoneId}
+     * Returns current {@link LocalDateTime} of specified {@link ZoneId}
      *
      * @param zoneId {@link ZoneId}
      * @return {@link LocalDateTime}
@@ -77,7 +77,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * return current {@link LocalDate} of {@link ZoneId}
+     * Returns current {@link LocalDate} of {@link ZoneId}
      *
      * @return {@link LocalDate}
      */
@@ -86,7 +86,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * return current {@link LocalDate} of specified {@link ZoneId}
+     * Returns current {@link LocalDate} of specified {@link ZoneId}
      *
      * @param zoneId {@link ZoneId}
      * @return {@link LocalDate}
@@ -176,25 +176,51 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     }
 
     /**
-     * return the beginning {@link LocalDateTime} of today
-     *
-     * @return {@link LocalDateTime}
+     * Returns the start of the current year.
      */
-    public static LocalDateTime beginningOfToday() {
-        return DateUtils.currentDateTime().withHour(0).withMinute(0).withSecond(0).withNano(0);
+    public static LocalDateTime atStartOfCurrentYear() {
+        return LocalDateTime.of(currentDate().getYear(), 1, 1, 0, 0, 0);
     }
 
     /**
-     * return the beginning {@link LocalDateTime} of tomorrow
-     *
-     * @return {@link LocalDateTime}
+     * Returns the end of the current year.
      */
-    public static LocalDateTime beginningOfTomorrow() {
-        return DateUtils.beginningOfToday().plusDays(1);
+    public static LocalDateTime atEndOfCurrentYear() {
+        return LocalDateTime.of(currentDate().getYear(), 12, 31, 23, 59, 59);
     }
 
     /**
-     * return the {@link Date} of specified {@link LocalDateTime}
+     * Returns the start of the current month.
+     */
+    public static LocalDateTime atStartOfCurrentMonth() {
+        final var today = currentDate();
+        return LocalDateTime.of(today.getYear(), today.getMonthValue(), 1, 0, 0, 0);
+    }
+
+    /**
+     * Returns the end of the current month.
+     */
+    public static LocalDateTime atEndOfCurrentMonth() {
+        final var today = currentDate();
+        return LocalDateTime.of(today.getYear(), today.getMonthValue(), today.lengthOfMonth(), 23, 59, 59);
+    }
+
+    /**
+     * Returns the start of today.
+     */
+    public static LocalDateTime atStartOfToday() {
+        return LocalDateTime.of(currentDate(), LocalTime.MIN);
+    }
+
+    /**
+     * Returns the end of today.
+     */
+    public static LocalDateTime atEndOfToday() {
+        return LocalDateTime.of(currentDate(), LocalTime.MAX);
+    }
+
+    /**
+     * Returns the {@link Date} of specified {@link LocalDateTime}
      *
      * @return {@link Date}
      */

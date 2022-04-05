@@ -1,11 +1,13 @@
 package com.pengsoft.ss.api;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.pengsoft.basedata.domain.Job;
@@ -153,6 +155,20 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     public void deleteFileByAsset(@RequestParam(value = "id", required = false) SafetyCheck check,
             @RequestParam("asset.id") Asset asset) {
         getService().deleteFileByAsset(check, asset);
+    }
+
+    @GetMapping("get-days")
+    public List<Map<String, Object>> getDays(@RequestParam("project.id") List<String> projectIds,
+            @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().getDays(projectIds, startTime, endTime);
+    }
+
+    @GetMapping("statistic")
+    public List<Map<String, Object>> statistic(@RequestParam("project.id") List<String> projectIds,
+            @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().statistic(projectIds, startTime, endTime);
     }
 
 }
