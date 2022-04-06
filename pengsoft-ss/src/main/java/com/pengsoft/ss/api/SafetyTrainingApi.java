@@ -127,7 +127,7 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
     }
 
     private void setProject(final SafetyTraining training, final Job job) {
-        staffService.findOne(QStaff.staff.job.eq(job)).ifPresent(staff -> projectService
+        staffService.findOne(QStaff.staff.job.id.eq(job.getId())).ifPresent(staff -> projectService
                 .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
                 .ifPresent(training::setProject));
     }

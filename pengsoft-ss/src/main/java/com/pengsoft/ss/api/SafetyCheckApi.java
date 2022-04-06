@@ -131,7 +131,7 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     private void setProject(final SafetyCheck check, final Job job, final boolean isBu) {
         final var qProject = QConstructionProject.constructionProject;
         final var qJob = QStaff.staff.job;
-        staffService.findOne(qJob.eq(job)).ifPresent(staff -> projectService
+        staffService.findOne(qJob.id.eq(job.getId())).ifPresent(staff -> projectService
                 .findOne(isBu ? qProject.buManager.id.eq(staff.getId()) : qProject.suManager.id.eq(staff.getId()))
                 .ifPresent(check::setProject));
     }
