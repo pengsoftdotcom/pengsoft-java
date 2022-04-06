@@ -81,8 +81,10 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
     @Override
     public void invoke(ConstructionProjectData data, AnalysisContext context) {
         if (context.readRowHolder().getRowIndex() == 3) {
-            constructionProject = new ConstructionProject();
-            final String code = StringUtils.replace(data.getCode(), "\s", "");
+            final var name = StringUtils.replace(data.getName(), "\s", "");
+            constructionProject = constructionProjectService.findOneByName(name).orElse(new ConstructionProject(name));
+
+            final var code = StringUtils.replace(data.getCode(), "\s", "");
             if (StringUtils.isBlank(code)) {
                 final var entityName = ConstructionProject.class.getSimpleName();
                 final var codingRule = codingRuleRepository
@@ -91,9 +93,9 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
                 final var generator = applicationContext.getBean(codingRule.getGenerator(), CodingGenerator.class);
                 constructionProject.setCode(generator.generate(codingRule));
             } else {
-                constructionProject.setCode(code);
+                constructionProject = constructionProjectService.findOneByCode(code)
+                        .orElse(new ConstructionProject(code, name));
             }
-            constructionProject.setName(StringUtils.replace(data.getName(), "\s", ""));
 
             handleRegulatoryUnitRelatedData(data);
             handleOwnerRelatedData(data);
@@ -139,11 +141,9 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
 
         final var ownerManagerName = StringUtils.replace(data.getOwnerManager(), "\s", "");
         final var ownerManagerMobile = StringUtils.replace(data.getOwnerManagerMobile(), "\s", "");
-        if (StringUtils.isNotBlank(ownerManagerMobile)) {
-            final var person = savePerson(ownerManagerName, ownerManagerMobile);
-            final var ownerManager = saveStaff(person, ownerManagerJob);
-            constructionProject.setOwnerManager(ownerManager);
-        }
+        final var person = savePerson(ownerManagerName, ownerManagerMobile);
+        final var ownerManager = saveStaff(person, ownerManagerJob);
+        constructionProject.setOwnerManager(ownerManager);
     }
 
     private void handleSupervisionUnitRelatedData(ConstructionProjectData data) {
@@ -237,7 +237,8 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
     }
 
     private Person savePerson(String name, String mobile) {
-        final var person = personService.findOneByMobile(mobile).orElse(new Person());
+        final var person = StringUtils.isBlank(mobile) ? new Person()
+                : personService.findOneByMobile(mobile).orElse(new Person());
         if (StringUtils.isBlank(person.getId())) {
             person.setName(name);
             person.setMobile(mobile);

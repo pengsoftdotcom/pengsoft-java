@@ -40,4 +40,12 @@ public interface ConstructionProjectRepository
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     Optional<ConstructionProject> findOneByCode(@NotBlank String code);
 
+    /**
+     * Returns an {@link Optional} of a {@link ConstructionProject} with the given
+     * name.
+     *
+     * @param name {@link ConstructionProject}'s name
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    Optional<ConstructionProject> findOneByName(@NotBlank String name);
 }

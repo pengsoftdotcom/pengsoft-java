@@ -23,4 +23,12 @@ public interface ConstructionProjectService extends EntityService<ConstructionPr
      */
     Optional<ConstructionProject> findOneByCode(@NotBlank String code);
 
+    /**
+     * Returns an {@link Optional} of a {@link ConstructionProject} with the given
+     * name.
+     * 
+     * @param name {@link ConstructionProject}'s name
+     */
+    Optional<ConstructionProject> findOneByName(@NotBlank String name);
+
 }

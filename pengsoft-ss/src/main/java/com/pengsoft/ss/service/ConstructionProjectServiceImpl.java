@@ -39,4 +39,9 @@ public class ConstructionProjectServiceImpl
         return getRepository().findOneByCode(code);
     }
 
+    @Override
+    public Optional<ConstructionProject> findOneByName(@NotBlank String name) {
+        return getRepository().findOneByName(name);
+    }
+
 }

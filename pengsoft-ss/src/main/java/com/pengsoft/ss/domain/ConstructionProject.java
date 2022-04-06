@@ -79,4 +79,13 @@ public class ConstructionProject extends EntityImpl implements Codeable {
     @NotFound(action = NotFoundAction.IGNORE)
     private Staff buManager;
 
+    public ConstructionProject(String name) {
+        setName(name);
+    }
+
+    public ConstructionProject(String code, String name) {
+        setCode(code);
+        setName(name);
+    }
+
 }

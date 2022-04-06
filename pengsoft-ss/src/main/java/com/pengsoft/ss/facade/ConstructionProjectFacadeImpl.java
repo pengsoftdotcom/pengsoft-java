@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 
 import com.alibaba.excel.EasyExcel;
 import com.pengsoft.basedata.domain.Department;
@@ -192,6 +193,11 @@ public class ConstructionProjectFacadeImpl extends
     @Override
     public Optional<ConstructionProject> findOneByCode(String code) {
         return getService().findOneByCode(code);
+    }
+
+    @Override
+    public Optional<ConstructionProject> findOneByName(@NotBlank String name) {
+        return getService().findOneByName(name);
     }
 
 }
