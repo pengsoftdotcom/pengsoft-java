@@ -51,7 +51,8 @@ public class PayrollDetailApi extends EntityApi<PayrollDetailService, PayrollDet
     @Authorized
     @GetMapping("find-page-of-mine")
     public Page<PayrollDetail> findPageOfMine(Predicate predicate, Pageable pageable) {
-        predicate = QueryDslUtils.merge(predicate, QPayrollDetail.payrollDetail.staff.eq(SecurityUtilsExt.getStaff()));
+        predicate = QueryDslUtils.merge(predicate,
+                QPayrollDetail.payrollDetail.staff.id.eq(SecurityUtilsExt.getStaffId()));
         return super.findPage(predicate, pageable);
     }
 

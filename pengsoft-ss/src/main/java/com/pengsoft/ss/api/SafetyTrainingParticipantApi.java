@@ -44,13 +44,13 @@ public class SafetyTrainingParticipantApi extends
         final var staff = SecurityUtilsExt.getStaff();
         final var root = QSafetyTrainingParticipant.safetyTrainingParticipant;
         if (SecurityUtils.hasAnyRole("bu_manager'")) {
-            predicate = QueryDslUtils.merge(predicate, root.training.project.buManager.eq(staff));
+            predicate = QueryDslUtils.merge(predicate, root.training.project.buManager.id.eq(staff.getId()));
         }
         if (SecurityUtils.hasAnyRole("security_officer")) {
-            predicate = QueryDslUtils.merge(predicate, root.training.trainer.eq(staff));
+            predicate = QueryDslUtils.merge(predicate, root.training.trainer.id.eq(staff.getId()));
         }
         if (SecurityUtils.hasAnyRole("worker")) {
-            predicate = QueryDslUtils.merge(predicate, root.staff.eq(staff));
+            predicate = QueryDslUtils.merge(predicate, root.staff.id.eq(staff.getId()));
         }
         return super.findPage(predicate, pageable);
     }

@@ -44,6 +44,13 @@ public class SecurityUtilsExt {
     }
 
     /**
+     * Returns current staff's id.
+     */
+    public static String getStaffId() {
+        return Optional.ofNullable(getStaff()).map(Staff::getId).orElse(null);
+    }
+
+    /**
      * Returns the person's primary job.
      */
     public static Job getPrimaryJob() {

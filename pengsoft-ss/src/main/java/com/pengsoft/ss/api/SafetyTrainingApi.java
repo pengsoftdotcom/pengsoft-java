@@ -29,6 +29,7 @@ import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.JPAExpressions;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -105,17 +106,20 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
     @GetMapping("find-one-with-files")
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyTraining entity) {
         final var training = super.findOne(entity);
-        final var job = SecurityUtilsExt.getPrimaryJob();
-        if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
-            training.setTrainer(SecurityUtilsExt.getStaff());
-            setProject(training, job.getParent());
-        }
-        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
-            training.setTrainer(SecurityUtilsExt.getStaff());
-            setProject(training, job);
-        }
-        if (training.getProject() != null) {
-            training.setAddress(training.getProject().getBuManager().getJob().getDepartment().getShortName() + "项目部");
+        if (StringUtils.isBlank(training.getId())) {
+            final var job = SecurityUtilsExt.getPrimaryJob();
+            if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
+                training.setTrainer(SecurityUtilsExt.getStaff());
+                setProject(training, job.getParent());
+            }
+            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
+                training.setTrainer(SecurityUtilsExt.getStaff());
+                setProject(training, job);
+            }
+            if (training.getProject() != null) {
+                training.setAddress(
+                        training.getProject().getBuManager().getJob().getDepartment().getShortName() + "项目部");
+            }
         }
         Map<String, Object> result = objectMapper.convertValue(training, type);
         result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
@@ -124,7 +128,8 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
 
     private void setProject(final SafetyTraining training, final Job job) {
         staffService.findOne(QStaff.staff.job.eq(job)).ifPresent(staff -> projectService
-                .findOne(QConstructionProject.constructionProject.buManager.eq(staff)).ifPresent(training::setProject));
+                .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
+                .ifPresent(training::setProject));
     }
 
     @Override

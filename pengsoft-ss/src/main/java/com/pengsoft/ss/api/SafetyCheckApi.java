@@ -99,25 +99,23 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     @GetMapping("find-one-with-files")
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyCheck entity) {
         final var check = super.findOne(entity);
-        if (check.getType() == null) {
+        if (StringUtils.isBlank(check.getId())) {
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_type", null, "safety")
                     .ifPresent(check::setType);
-        }
-        if (check.getStatus() == null) {
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
-        }
-        final var job = SecurityUtilsExt.getPrimaryJob();
-        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SUPERVISION_ENGINEER, ROL_SECURITY_OFFICER)) {
-            check.setChecker(SecurityUtilsExt.getStaff());
-            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
-                setProject(check, job, true);
-            }
-            if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
-                setProject(check, job.getParent(), true);
-            }
-            if (SecurityUtils.hasAnyRole(ROL_SUPERVISION_ENGINEER)) {
-                setProject(check, job.getParent(), false);
+            final var job = SecurityUtilsExt.getPrimaryJob();
+            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SUPERVISION_ENGINEER, ROL_SECURITY_OFFICER)) {
+                check.setChecker(SecurityUtilsExt.getStaff());
+                if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
+                    setProject(check, job, true);
+                }
+                if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
+                    setProject(check, job.getParent(), true);
+                }
+                if (SecurityUtils.hasAnyRole(ROL_SUPERVISION_ENGINEER)) {
+                    setProject(check, job.getParent(), false);
+                }
             }
         }
         Map<String, Object> result = objectMapper.convertValue(check, type);
@@ -134,7 +132,7 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         final var qProject = QConstructionProject.constructionProject;
         final var qJob = QStaff.staff.job;
         staffService.findOne(qJob.eq(job)).ifPresent(staff -> projectService
-                .findOne(isBu ? qProject.buManager.eq(staff) : qProject.suManager.eq(staff))
+                .findOne(isBu ? qProject.buManager.id.eq(staff.getId()) : qProject.suManager.id.eq(staff.getId()))
                 .ifPresent(check::setProject));
     }
 

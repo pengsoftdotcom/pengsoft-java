@@ -30,7 +30,8 @@ public class SupplierConsumerFacadeImpl extends EntityFacadeImpl<SupplierConsume
             throw new IllegalArgumentException("The supplier and consumer cannot be the same.");
         }
         final var root = QSupplierConsumer.supplierConsumer;
-        final var source = findOne(root.supplier.eq(target.getSupplier()).and(root.supplier.eq(target.getConsumer())));
+        final var source = findOne(root.supplier.id.eq(target.getSupplier().getId())
+                .and(root.supplier.id.eq(target.getConsumer().getId())));
         if (source.isPresent()) {
             return source.get();
         } else {
