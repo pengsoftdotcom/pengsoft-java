@@ -12,6 +12,7 @@ import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.util.QueryDslUtils;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 
 import org.springframework.data.domain.Page;
@@ -55,10 +56,14 @@ public class ConstructionProjectApi extends EntityApi<ConstructionProjectFacade,
             final var staff = QStaff.staff;
             predicate = QueryDslUtils.merge(predicate, JPAExpressions.select(root).leftJoin(root.ruManager, staff)
                     .where(staff.job.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        }
-
-        if (SecurityUtils.hasAnyRole("bu_manager")) {
+        } else if (SecurityUtils.hasAnyRole("owner_manager")) {
+            predicate = QueryDslUtils.merge(predicate, root.ownerManager.id.eq(SecurityUtilsExt.getStaffId()));
+        } else if (SecurityUtils.hasAnyRole("su_manager")) {
+            predicate = QueryDslUtils.merge(predicate, root.suManager.id.eq(SecurityUtilsExt.getStaffId()));
+        } else if (SecurityUtils.hasAnyRole("bu_manager")) {
             predicate = QueryDslUtils.merge(predicate, root.buManager.id.eq(SecurityUtilsExt.getStaffId()));
+        } else {
+            predicate = Expressions.FALSE.isTrue();
         }
         return predicate;
     }
