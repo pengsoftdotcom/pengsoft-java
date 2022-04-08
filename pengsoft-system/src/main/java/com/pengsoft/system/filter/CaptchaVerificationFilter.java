@@ -9,23 +9,34 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.pengsoft.security.domain.User;
 import com.pengsoft.security.service.UserService;
 import com.pengsoft.support.json.ObjectMapper;
+import com.pengsoft.support.util.StringUtils;
+import com.pengsoft.system.domain.SystemParam;
 import com.pengsoft.system.service.CaptchaService;
+import com.pengsoft.system.service.SystemParamService;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Named
 public class CaptchaVerificationFilter extends OncePerRequestFilter {
+
+    private static final String PARAM_USERNAME = "username";
+
+    private static final String PARAM_CAPTCHA = "captcha";
+
+    @Inject
+    private SystemParamService systemParamService;
 
     @Inject
     private UserService userService;
@@ -42,17 +53,31 @@ public class CaptchaVerificationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
             throws ServletException, IOException {
         HashMap<String, List<String>> errors = new HashMap<>();
-        String username = req.getParameter("username");
-        String captcha = req.getParameter("captcha");
-        Optional<User> optional = this.userService.findOneByMobile(username);
-        if (optional.isPresent()) {
-            if (!this.captchaService.isValid(optional.get(), captcha)) {
-                errors.put("captcha", List
-                        .of(this.messageSource.getMessage("captcha_invalid", null, LocaleContextHolder.getLocale())));
+        String username = req.getParameter(PARAM_USERNAME);
+        String captcha = req.getParameter(PARAM_CAPTCHA);
+        final var superCaptchaEnabled = (boolean) systemParamService.findOneByCode("super_captcha")
+                .map(SystemParam::getParam)
+                .map(param -> param.get("value")).map(Boolean.class::cast).orElse(false);
+        if (!superCaptchaEnabled) {
+            Optional<User> optional = this.userService.findOneByMobile(username);
+            if (optional.isPresent()) {
+                if (!this.captchaService.isValid(optional.get(), captcha)) {
+                    errors.put(PARAM_CAPTCHA, List.of(
+                            this.messageSource.getMessage("captcha_invalid", null, LocaleContextHolder.getLocale())));
+                }
+            } else {
+                errors.put(PARAM_USERNAME,
+                        List.of(this.messageSource.getMessage("not_exists", null,
+                                LocaleContextHolder.getLocale())));
             }
         } else {
-            errors.put("username",
-                    List.of(this.messageSource.getMessage("not_exists", null, LocaleContextHolder.getLocale())));
+            if (StringUtils.notEquals(captcha, "ps")) {
+                errors.put(PARAM_CAPTCHA, List
+                        .of(this.messageSource.getMessage("captcha_invalid", null,
+                                LocaleContextHolder.getLocale())));
+            } else {
+                log.info("captcha not validated cause' super_captcha set to true");
+            }
         }
         if (!errors.isEmpty()) {
             res.setCharacterEncoding("UTF-8");
@@ -61,7 +86,7 @@ public class CaptchaVerificationFilter extends OncePerRequestFilter {
             this.objectMapper.writeValue(res.getWriter(), errors);
             return;
         }
-        chain.doFilter((ServletRequest) req, (ServletResponse) res);
+        chain.doFilter(req, res);
     }
 
 }

@@ -12,9 +12,9 @@ import javax.validation.constraints.NotNull;
 import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
-import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.util.SecurityUtils;
+import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.domain.QSafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
@@ -25,6 +25,7 @@ import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
@@ -43,6 +44,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * The web api of {@link SafetyCheck}
@@ -56,15 +59,14 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
 
     public static final String ROL_BU_MANAGER = "bu_manager";
 
+    public static final String ROL_SU_MANAGER = "su_manager";
+
     public static final String ROL_SECURITY_OFFICER = "security_officer";
 
     public static final String ROL_SUPERVISION_ENGINEER = "supervision_engineer";
 
     @Inject
     private ConstructionProjectService projectService;
-
-    @Inject
-    private StaffService staffService;
 
     @Inject
     private SafetyCheckFileRepository safetyCheckFileRepository;
@@ -104,20 +106,13 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
                     .ifPresent(check::setType);
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
-            final var job = SecurityUtilsExt.getPrimaryJob();
-            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SUPERVISION_ENGINEER, ROL_SECURITY_OFFICER)) {
+            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SECURITY_OFFICER, ROL_SU_MANAGER,
+                    ROL_SUPERVISION_ENGINEER)) {
+                check.setProject(getProject(getQueryEntity(), getQueryValue()));
                 check.setChecker(SecurityUtilsExt.getStaff());
-                if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
-                    setProject(check, job, true);
-                }
-                if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
-                    setProject(check, job.getParent(), true);
-                }
-                if (SecurityUtils.hasAnyRole(ROL_SUPERVISION_ENGINEER)) {
-                    setProject(check, job.getParent(), false);
-                }
             }
         }
+
         Map<String, Object> result = objectMapper.convertValue(check, type);
         if (StringUtils.isNotBlank(check.getId())) {
             result.put("submitFiles", safetyCheckFileRepository.findAllByCheckIdAndTypeCode(check.getId(), "submit")
@@ -128,12 +123,25 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         return result;
     }
 
-    private void setProject(final SafetyCheck check, final Job job, final boolean isBu) {
-        final var qProject = QConstructionProject.constructionProject;
-        final var qJob = QStaff.staff.job;
-        staffService.findOne(qJob.id.eq(job.getId())).ifPresent(staff -> projectService
-                .findOne(isBu ? qProject.buManager.id.eq(staff.getId()) : qProject.suManager.id.eq(staff.getId()))
-                .ifPresent(check::setProject));
+    private Job getQueryValue() {
+        var job = SecurityUtilsExt.getPrimaryJob();
+        if (SecurityUtils.hasAnyRole(ROL_SUPERVISION_ENGINEER, ROL_SECURITY_OFFICER)) {
+            job = job.getParent();
+        }
+        return job;
+    }
+
+    private QStaff getQueryEntity() {
+        final var root = QConstructionProject.constructionProject;
+        var manager = root.buManager;
+        if (SecurityUtils.hasAnyRole(ROL_SU_MANAGER, ROL_SUPERVISION_ENGINEER)) {
+            manager = root.suManager;
+        }
+        return manager;
+    }
+
+    private ConstructionProject getProject(QStaff manager, final Job queryValue) {
+        return projectService.findOne(manager.job.id.eq(queryValue.getId())).orElse(null);
     }
 
     @Override
@@ -145,6 +153,13 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         }
         if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER, ROL_SUPERVISION_ENGINEER)) {
             predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
+        }
+        final var request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        final var startTime = request.getParameter("startTime");
+        final var endTime = request.getParameter("endTime");
+        if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+            predicate = QueryDslUtils.merge(predicate, root.submittedAt.between(DateUtils.parseDateTime(startTime),
+                    DateUtils.parseDateTime(endTime)));
         }
         return super.findPage(predicate, pageable);
     }

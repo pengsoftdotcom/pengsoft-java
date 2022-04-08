@@ -38,12 +38,11 @@ public class SafetyTrainingConfirmMessageBuilder extends AbstractMessageBuilder 
     public Map<String, List<Message>> build(Object[] args, Object result, String[] types) {
         final var messages = super.build(args, result, types);
         final var training = (SafetyTraining) args[0];
-        messages.entrySet().stream().flatMap(entry -> entry.getValue().stream()).forEach(message -> {
-            message.setParams(Map.of(
-                    "subject", training.getSubject(),
-                    "estimatedStartTime", DateUtils.formatDateTime(training.getEstimatedStartTime()),
-                    "address", training.getAddress()));
-        });
+        messages.entrySet().stream().flatMap(entry -> entry.getValue().stream())
+                .forEach(message -> message.setParams(Map.of(
+                        "subject", training.getSubject(),
+                        "estimatedStartTime", DateUtils.formatDateTime(training.getEstimatedStartTime()),
+                        "address", training.getAddress())));
         return messages;
     }
 

@@ -23,7 +23,7 @@ import com.pengsoft.support.validation.CharTypes;
 @CharTypes(allowed = { CharType.DIGIT, CharType.LOWERCASE_LETTER, CharType.UPPERCASE_LETTER, CharType.PUNCTUATION,
         CharType.SEPARATOR }, count = 2, message = "{CharTypes.password}")
 @NotBlank
-@Size(min = 6, max = 20)
+@Size(min = 6, max = 36)
 @Documented
 @Constraint(validatedBy = {})
 @Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
