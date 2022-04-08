@@ -121,7 +121,7 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
 
     @Override
     protected Sort getDefaultSort() {
-        return Sort.by(Direction.DESC, "code");
+        return Sort.by(Direction.DESC, "submittedAt", "handledAt");
     }
 
 }
