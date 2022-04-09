@@ -70,12 +70,11 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
     @Query(value = """
             select
               project_id project,
-              c.code status,
+              b.code status,
               case when a.handled_at is null then false else true end handled,
               count(1) count
             from safety_check a
-              left join dictionary_item b on a.type_id = b.id
-              left join dictionary_item c on a.status_id = c.id
+              left join dictionary_item b on a.status_id = b.id
             where a.project_id in (:projectIds) and a.submitted_at between :startTime and :endTime
             group by project_id, status, handled
                       """, nativeQuery = true)
