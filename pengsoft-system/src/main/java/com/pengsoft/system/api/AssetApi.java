@@ -30,22 +30,21 @@ public class AssetApi extends EntityApi<AssetService, Asset, String> {
     @Inject
     private StorageService storageService;
 
-    @PostMapping({ "upload" })
+    @PostMapping("upload")
     public List<Asset> upload(@RequestParam("file") List<MultipartFile> files,
-            @RequestParam(defaultValue = "false") boolean locked, @RequestParam(defaultValue = "600") int width,
-            @RequestParam(defaultValue = "600") int height) {
-        return getService().save(this.storageService.upload(files, locked, width, height));
+            @RequestParam(defaultValue = "false") boolean locked, @RequestParam(defaultValue = "true") boolean zoomed,
+            @RequestParam(defaultValue = "800") int width, @RequestParam(defaultValue = "800") int height) {
+        return getService().save(this.storageService.upload(files, locked, zoomed, width, height));
     }
 
-    @GetMapping({ "download" })
-    public String download(@RequestParam("id") Asset asset, @RequestParam(defaultValue = "600") int width,
-            @RequestParam(defaultValue = "600") int height) {
+    @GetMapping("download")
+    public String download(@RequestParam("id") Asset asset, @RequestParam(defaultValue = "true") boolean zoomed,
+            @RequestParam(defaultValue = "800") int width, @RequestParam(defaultValue = "800") int height) {
         asset = this.storageService.download(asset);
-        if (asset.getContentType().startsWith("image")) {
+        if (storageService.isImage(asset.getContentType()) && zoomed) {
             try (ByteArrayOutputStream os = new ByteArrayOutputStream();
                     ByteArrayInputStream is = new ByteArrayInputStream(asset.getData());) {
-                Thumbnails.of(is).outputFormat("jpg").size(width, height)
-                        .toOutputStream(os);
+                Thumbnails.of(is).outputFormat("jpg").size(width, height).toOutputStream(os);
                 return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(os.toByteArray());
             } catch (Exception e) {
                 throw new BusinessException("asset.download.failed", e.getMessage());

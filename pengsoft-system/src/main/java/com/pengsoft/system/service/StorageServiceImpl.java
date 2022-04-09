@@ -21,6 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.SneakyThrows;
 import net.coobird.thumbnailator.Thumbnails;
 
+/**
+ * 基于阿里云OSS实现的存储服务
+ * 
+ * @author peng.dang@pengsoft.com
+ * @since 1.0.0
+ */
 public class StorageServiceImpl implements StorageService {
 
     private StorageServiceProperties properties;
@@ -66,7 +72,7 @@ public class StorageServiceImpl implements StorageService {
 
     @SneakyThrows
     @Override
-    public Asset upload(MultipartFile file, boolean locked, int width, int height) {
+    public Asset upload(MultipartFile file, boolean locked, boolean zoomed, int width, int height) {
         var is = file.getInputStream();
         final var os = new ByteArrayOutputStream();
         final var bucket = getBucket(locked);
@@ -75,7 +81,7 @@ public class StorageServiceImpl implements StorageService {
         final var parts = Optional.ofNullable(contentType).orElse("unkown/unkown").split("/");
         final var isImage = "image".equals(parts[0]);
         final var extension = parts[1];
-        if (isImage) {
+        if (isImage && zoomed) {
             Thumbnails.of(is).outputFormat(extension).size(width, height).toOutputStream(os);
             byte[] bytes = os.toByteArray();
             is = new ByteArrayInputStream(bytes);
