@@ -161,8 +161,11 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
             predicate = QueryDslUtils.merge(predicate, root.submittedAt.between(DateUtils.parseDateTime(startTime),
                     DateUtils.parseDateTime(endTime)));
         }
-        final var handled = Boolean.parseBoolean(request.getParameter("handled"));
-        predicate = QueryDslUtils.merge(predicate, handled ? root.handledAt.isNotNull() : root.handledAt.isNull());
+        final var handled = request.getParameter("handled");
+        if (StringUtils.isNotBlank(handled)) {
+            predicate = QueryDslUtils.merge(predicate,
+                    Boolean.parseBoolean(handled) ? root.handledAt.isNotNull() : root.handledAt.isNull());
+        }
         return super.findPage(predicate, pageable);
     }
 
