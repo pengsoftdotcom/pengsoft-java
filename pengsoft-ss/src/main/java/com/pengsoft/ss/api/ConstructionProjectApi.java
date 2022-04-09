@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QConstructionProject;
@@ -62,7 +63,7 @@ public class ConstructionProjectApi extends EntityApi<ConstructionProjectFacade,
             predicate = QueryDslUtils.merge(predicate, root.suManager.id.eq(SecurityUtilsExt.getStaffId()));
         } else if (SecurityUtils.hasAnyRole("bu_manager")) {
             predicate = QueryDslUtils.merge(predicate, root.buManager.id.eq(SecurityUtilsExt.getStaffId()));
-        } else {
+        } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {
             predicate = Expressions.FALSE.isTrue();
         }
         return predicate;
