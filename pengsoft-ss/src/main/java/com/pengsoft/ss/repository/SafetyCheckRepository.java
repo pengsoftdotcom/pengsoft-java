@@ -15,8 +15,6 @@ import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -44,32 +42,6 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     Optional<SafetyCheck> findOneByCode(@NotBlank String code);
-
-    /**
-     * 返回指定类型编码、状态编码且提交时间在指定时间段内的安全检查数
-     * 
-     * @param typeCode   类型编码
-     * @param statusCode 状态编码
-     * @param startTime  开始时间
-     * @param endTime    结束时间
-     */
-    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode, @NotBlank String statusCode,
-            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
-
-    /**
-     * 返回指定类型编码、状态编码且提交时间在指定时间段内的安全检查分页数据
-     * 
-     * @param typeCode   类型编码
-     * @param statusCode 状态编码
-     * @param startTime  开始时间
-     * @param endTime    结束时间
-     * @param pageable   分页参数
-     */
-    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
-            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime,
-            Pageable pageable);
 
     /**
      * 查询指定时间段内的工程项目的安全检查天数

@@ -14,9 +14,6 @@ import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.support.service.EntityService;
 import com.pengsoft.system.domain.Asset;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 /**
  * The service interface of {@link SafetyCheck}.
  *
@@ -50,30 +47,6 @@ public interface SafetyCheckService extends EntityService<SafetyCheck, String> {
      * @param code {@link SafetyCheck}'s code
      */
     Optional<SafetyCheck> findOneByCode(@NotBlank String code);
-
-    /**
-     * 返回指定类型编码、状态编码且提交时间在指定时间段内的安全检查数
-     * 
-     * @param typeCode   类型编码
-     * @param statusCode 状态编码
-     * @param startTime  开始时间
-     * @param endTime    结束时间
-     */
-    long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode, @NotBlank String statusCode,
-            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
-
-    /**
-     * 返回指定类型编码、状态编码且提交时间在指定时间段内的安全检查分页数据
-     * 
-     * @param typeCode   类型编码
-     * @param statusCode 状态编码
-     * @param startTime  开始时间
-     * @param endTime    结束时间
-     * @param pageable   分页参数
-     */
-    Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
-            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime,
-            Pageable pageable);
 
     /**
      * 查询指定时间段内的工程项目的安全检查天数

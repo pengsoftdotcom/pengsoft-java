@@ -102,8 +102,6 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyCheck entity) {
         final var check = super.findOne(entity);
         if (StringUtils.isBlank(check.getId())) {
-            dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_type", null, "safety")
-                    .ifPresent(check::setType);
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
             if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SECURITY_OFFICER, ROL_SU_MANAGER,

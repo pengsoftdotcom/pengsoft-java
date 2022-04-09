@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -18,8 +17,6 @@ import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.AssetService;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -67,19 +64,6 @@ public class SafetyCheckFacadeImpl extends EntityFacadeImpl<SafetyCheckService, 
     public void delete(SafetyCheck entity) {
         safetyCheckFileService.delete(entity.getFiles());
         super.delete(entity);
-    }
-
-    @Override
-    public long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
-            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
-        return countByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime, endTime);
-    }
-
-    @Override
-    public Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(@NotBlank String typeCode,
-            @NotBlank String statusCode, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime,
-            Pageable pageable) {
-        return findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime, endTime, pageable);
     }
 
     @Override

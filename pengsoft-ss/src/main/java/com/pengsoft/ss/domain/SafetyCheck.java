@@ -59,11 +59,6 @@ public class SafetyCheck extends EntityImpl implements Codeable {
     @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
-    private DictionaryItem type;
-
-    @NotNull
-    @ManyToOne
-    @NotFound(action = NotFoundAction.IGNORE)
     private DictionaryItem status;
 
     @NotBlank

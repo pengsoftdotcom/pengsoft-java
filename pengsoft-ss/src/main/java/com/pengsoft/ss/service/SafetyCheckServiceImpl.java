@@ -23,8 +23,6 @@ import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -91,20 +89,6 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
     @Override
     public Optional<SafetyCheck> findOneByCode(@NotBlank final String code) {
         return getRepository().findOneByCode(code);
-    }
-
-    @Override
-    public long countByTypeCodeAndStatusCodeAndSubmittedAtBetween(String typeCode, String statusCode,
-            LocalDateTime startTime, LocalDateTime endTime) {
-        return getRepository().countByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime,
-                endTime);
-    }
-
-    @Override
-    public Page<SafetyCheck> findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(String typeCode, String statusCode,
-            LocalDateTime startTime, LocalDateTime endTime, Pageable pageable) {
-        return getRepository().findPageByTypeCodeAndStatusCodeAndSubmittedAtBetween(typeCode, statusCode, startTime,
-                endTime, pageable);
     }
 
     @Override
