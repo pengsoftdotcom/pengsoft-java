@@ -1,9 +1,13 @@
 package com.pengsoft.ss.facade;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.ss.domain.QSafetyTrainingFile;
 import com.pengsoft.ss.domain.SafetyTraining;
@@ -71,6 +75,18 @@ public class SafetyTrainingFacadeImpl extends EntityFacadeImpl<SafetyTrainingSer
     public void delete(SafetyTraining entity) {
         safetyTraininigFileService.delete(entity.getFiles());
         super.delete(entity);
+    }
+
+    @Override
+    public List<Map<String, Object>> getTrainedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().getTrainedDays(projectIds, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().statistic(projectIds, startTime, endTime);
     }
 
 }

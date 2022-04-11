@@ -1,6 +1,8 @@
 package com.pengsoft.ss.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -57,5 +59,25 @@ public interface SafetyTrainingService extends EntityService<SafetyTraining, Str
      * @param code {@link SafetyTraining}'s code
      */
     Optional<SafetyTraining> findOneByCode(@NotBlank String code);
+
+    /**
+     * 查询指定时间段内的工程项目的安全培训天数
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    List<Map<String, Object>> getTrainedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime);
+
+    /**
+     * 查询指定时间段内的工程项目的安全培训统计数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime);
 
 }

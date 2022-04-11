@@ -13,14 +13,14 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles({ "support", "security", "system", "basedata", "ss" })
-class SafetyCheckRepositoryTest {
+class SafetyTrainingRepositoryTest {
 
     @Inject
-    SafetyCheckRepository repository;
+    SafetyTrainingRepository repository;
 
     @Test
     void getDays() {
-        List<Map<String, Object>> result = repository.getCheckedDays(List.of("24efc508-b6c1-437a-a3dd-dd30212f5e14"),
+        List<Map<String, Object>> result = repository.getTrainedDays(List.of("24efc508-b6c1-437a-a3dd-dd30212f5e14"),
                 DateUtils.atStartOfCurrentYear(),
                 DateUtils.atEndOfCurrentYear());
         System.out.println(result);

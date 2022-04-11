@@ -57,7 +57,7 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
                   group by project_id, day
               ) a group by project
                     """, nativeQuery = true)
-    List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+    List<Map<String, Object>> getCheckedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime);
 
     /**

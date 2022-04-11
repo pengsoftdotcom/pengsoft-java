@@ -1,10 +1,12 @@
 package com.pengsoft.ss.api;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapType;
 import com.pengsoft.basedata.domain.Job;
@@ -149,6 +151,20 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
                     .where(participant.staff.id.eq(staff.getId())).exists());
         }
         return super.findPage(predicate, pageable);
+    }
+
+    @GetMapping("get-trained-days")
+    public List<Map<String, Object>> getTrainedDays(@RequestParam("project.id") List<String> projectIds,
+            @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().getTrainedDays(projectIds, startTime, endTime);
+    }
+
+    @GetMapping("statistic")
+    public List<Map<String, Object>> statistic(@RequestParam("project.id") List<String> projectIds,
+            @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().statistic(projectIds, startTime, endTime);
     }
 
 }

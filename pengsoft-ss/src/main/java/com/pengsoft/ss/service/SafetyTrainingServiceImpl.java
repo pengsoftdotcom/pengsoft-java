@@ -1,12 +1,16 @@
 package com.pengsoft.ss.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.StreamSupport;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.repository.StaffRepository;
@@ -118,6 +122,18 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
     @Override
     public Optional<SafetyTraining> findOneByCode(@NotBlank final String code) {
         return getRepository().findOneByCode(code);
+    }
+
+    @Override
+    public List<Map<String, Object>> getTrainedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().getTrainedDays(projectIds, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().statistic(projectIds, startTime, endTime);
     }
 
     @Override

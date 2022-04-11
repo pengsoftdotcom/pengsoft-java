@@ -67,9 +67,9 @@ public class SafetyCheckFacadeImpl extends EntityFacadeImpl<SafetyCheckService, 
     }
 
     @Override
-    public List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+    public List<Map<String, Object>> getCheckedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime) {
-        return getService().getDays(projectIds, startTime, endTime);
+        return getService().getCheckedDays(projectIds, startTime, endTime);
     }
 
     @Override

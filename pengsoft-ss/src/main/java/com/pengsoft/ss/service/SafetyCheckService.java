@@ -55,7 +55,7 @@ public interface SafetyCheckService extends EntityService<SafetyCheck, String> {
      * @param startTime  开始时间
      * @param endTime    结束时间
      */
-    List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+    List<Map<String, Object>> getCheckedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime);
 
     /**

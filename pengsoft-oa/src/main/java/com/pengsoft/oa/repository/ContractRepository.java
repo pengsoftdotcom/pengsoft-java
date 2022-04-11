@@ -1,10 +1,16 @@
 package com.pengsoft.oa.repository;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.constraints.NotEmpty;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.QContract;
 import com.pengsoft.support.repository.EntityRepository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -15,5 +21,20 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ContractRepository extends EntityRepository<QContract, Contract, String>, OwnedExtRepository {
+
+    /**
+     * 查询指定部门的合同统计数据
+     */
+    @Query(value = """
+            select
+              controlled_by department,
+              b.code status,
+              count(1) count
+            from contract a
+            left join dictionary_item b on a.status_id = b.id
+            where a.controlled_by in ?1
+            group by a.controlled_by, b.code
+                """, nativeQuery = true)
+    List<Map<String, Object>> statisticByDepartmentId(@NotEmpty List<String> departmentIds);
 
 }

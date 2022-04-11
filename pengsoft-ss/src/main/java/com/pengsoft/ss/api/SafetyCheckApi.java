@@ -173,11 +173,11 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         getService().deleteFileByAsset(check, asset);
     }
 
-    @GetMapping("get-days")
-    public List<Map<String, Object>> getDays(@RequestParam("project.id") List<String> projectIds,
+    @GetMapping("get-checked-days")
+    public List<Map<String, Object>> getCheckedDays(@RequestParam("project.id") List<String> projectIds,
             @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime) {
-        return getService().getDays(projectIds, startTime, endTime);
+        return getService().getCheckedDays(projectIds, startTime, endTime);
     }
 
     @GetMapping("statistic")

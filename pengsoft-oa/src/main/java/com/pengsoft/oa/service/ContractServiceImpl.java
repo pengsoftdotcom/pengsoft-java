@@ -1,7 +1,12 @@
 package com.pengsoft.oa.service;
 
-import javax.inject.Inject;
+import java.util.List;
+import java.util.Map;
 
+import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
+
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.repository.ContractRepository;
 import com.pengsoft.security.util.SecurityUtils;
@@ -39,6 +44,11 @@ public class ContractServiceImpl extends EntityServiceImpl<ContractRepository, C
         contract.setConfirmedAt(DateUtils.currentDateTime());
         contract.setConfirmedBy(SecurityUtils.getUserId());
         save(contract);
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByDepartment(@NotEmpty List<Department> departments) {
+        return getRepository().statisticByDepartmentId(departments.stream().map(Department::getId).toList());
     }
 
 }

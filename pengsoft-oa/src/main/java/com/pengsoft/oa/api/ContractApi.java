@@ -9,6 +9,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.type.MapType;
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.service.OrganizationService;
 import com.pengsoft.basedata.service.PersonService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
@@ -203,6 +204,12 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
 
         }
         return Base64Utils.encodeToString(asset.getData());
+    }
+
+    @GetMapping("statistic-by-department")
+    public List<Map<String, Object>> statisticByDepartment(
+            @RequestParam(value = "department.id", required = false) List<Department> departments) {
+        return getService().statisticByDepartment(departments);
     }
 
 }

@@ -1,9 +1,12 @@
 package com.pengsoft.oa.facade;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.ContractPicture;
 import com.pengsoft.oa.service.ContractPictureService;
@@ -94,6 +97,11 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
     @Override
     public void confirm(Contract contract) {
         getService().confirm(contract);
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByDepartment(@NotEmpty List<Department> departments) {
+        return getService().statisticByDepartment(departments);
     }
 
 }

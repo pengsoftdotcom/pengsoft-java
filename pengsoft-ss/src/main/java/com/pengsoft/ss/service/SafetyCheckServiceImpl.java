@@ -92,9 +92,9 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
     }
 
     @Override
-    public List<Map<String, Object>> getDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+    public List<Map<String, Object>> getCheckedDays(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime) {
-        return getRepository().getDays(projectIds, startTime, endTime);
+        return getRepository().getCheckedDays(projectIds, startTime, endTime);
     }
 
     @Override
