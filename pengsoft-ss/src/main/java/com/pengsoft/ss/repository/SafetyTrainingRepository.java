@@ -72,7 +72,7 @@ public interface SafetyTrainingRepository extends EntityRepository<QSafetyTraini
             select
               project_id project,
               count(1) count
-            from safety_check a
+            from safety_training a
             where a.project_id in (:projectIds) and a.submitted_at between :startTime and :endTime
             group by project_id
                       """, nativeQuery = true)
