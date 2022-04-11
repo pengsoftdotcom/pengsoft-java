@@ -13,7 +13,9 @@ import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
+import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.domain.QSafetyTraining;
 import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
@@ -24,11 +26,13 @@ import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.QueryDslUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 
 import org.apache.commons.lang3.StringUtils;
@@ -42,6 +46,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * The web api of {@link SafetyTraining}
@@ -136,21 +142,50 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
 
     @Override
     public Page<SafetyTraining> findPage(Predicate predicate, Pageable pageable) {
-        final var staff = SecurityUtilsExt.getStaff();
         final var root = QSafetyTraining.safetyTraining;
-        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
+        predicate = getAuthorityPredicate(predicate, root);
+        predicate = getQueryPredicate(predicate, root);
+        return super.findPage(predicate, pageable);
+    }
+
+    private Predicate getQueryPredicate(Predicate predicate, final QSafetyTraining root) {
+        final var request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        final var startTime = request.getParameter("startTime");
+        final var endTime = request.getParameter("endTime");
+        if (StringUtils.isNotBlank(startTime) && StringUtils.isNotBlank(endTime)) {
+            predicate = QueryDslUtils.merge(predicate, root.submittedAt.between(DateUtils.parseDateTime(startTime),
+                    DateUtils.parseDateTime(endTime)));
+        }
+        return predicate;
+    }
+
+    private Predicate getAuthorityPredicate(Predicate predicate, QSafetyTraining root) {
+        final var staff = SecurityUtilsExt.getStaff();
+        final var qStaff = QStaff.staff;
+
+        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_RU_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate,
+                    JPAExpressions.select(root).leftJoin(root.project.ruManager, qStaff)
+                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_OWNER_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate,
+                    JPAExpressions.select(root).leftJoin(root.project.ownerManager, qStaff)
+                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate, root.project.suManager.id.eq(staff.getId()));
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER)) {
             predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
-        }
-        if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SECURITY_OFFICER)) {
             predicate = QueryDslUtils.merge(predicate, root.trainer.id.eq(staff.getId()));
-        }
-        if (SecurityUtils.hasAnyRole(ROL_WORKER)) {
+        } else if (SecurityUtils.hasAnyRole(ROL_WORKER)) {
             final var participants = QSafetyTraining.safetyTraining.participants;
             final var participant = QSafetyTrainingParticipant.safetyTrainingParticipant;
             predicate = QueryDslUtils.merge(predicate, JPAExpressions.selectOne().from(participants, participant)
                     .where(participant.staff.id.eq(staff.getId())).exists());
+        } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {
+            predicate = Expressions.FALSE.isTrue();
         }
-        return super.findPage(predicate, pageable);
+        return predicate;
     }
 
     @GetMapping("get-trained-days")

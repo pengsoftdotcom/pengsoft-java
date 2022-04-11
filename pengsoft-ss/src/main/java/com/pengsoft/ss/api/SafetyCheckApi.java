@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.type.MapLikeType;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QConstructionProject;
@@ -33,6 +34,8 @@ import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.DictionaryItemService;
 import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.JPAExpressions;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,14 +59,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/ss/safety-check")
 public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, String> {
-
-    public static final String ROL_BU_MANAGER = "bu_manager";
-
-    public static final String ROL_SU_MANAGER = "su_manager";
-
-    public static final String ROL_SECURITY_OFFICER = "security_officer";
-
-    public static final String ROL_SUPERVISION_ENGINEER = "supervision_engineer";
 
     @Inject
     private ConstructionProjectService projectService;
@@ -104,8 +99,8 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         if (StringUtils.isBlank(check.getId())) {
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
-            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER, ROL_SECURITY_OFFICER, ROL_SU_MANAGER,
-                    ROL_SUPERVISION_ENGINEER)) {
+            if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SECURITY_OFFICER,
+                    ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
                 check.setProject(getProject(getQueryEntity(), getQueryValue()));
                 check.setChecker(SecurityUtilsExt.getStaff());
             }
@@ -123,7 +118,8 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
 
     private Job getQueryValue() {
         var job = SecurityUtilsExt.getPrimaryJob();
-        if (SecurityUtils.hasAnyRole(ROL_SUPERVISION_ENGINEER, ROL_SECURITY_OFFICER)) {
+        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SUPERVISION_ENGINEER,
+                ConstructionProject.ROL_SECURITY_OFFICER)) {
             job = job.getParent();
         }
         return job;
@@ -132,7 +128,8 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     private QStaff getQueryEntity() {
         final var root = QConstructionProject.constructionProject;
         var manager = root.buManager;
-        if (SecurityUtils.hasAnyRole(ROL_SU_MANAGER, ROL_SUPERVISION_ENGINEER)) {
+        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER,
+                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
             manager = root.suManager;
         }
         return manager;
@@ -144,14 +141,13 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
 
     @Override
     public Page<SafetyCheck> findPage(Predicate predicate, Pageable pageable) {
-        final var staff = SecurityUtilsExt.getStaff();
         final var root = QSafetyCheck.safetyCheck;
-        if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
-            predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
-        }
-        if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER, ROL_SUPERVISION_ENGINEER)) {
-            predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
-        }
+        predicate = getAuthorityPredicate(predicate, root);
+        predicate = getQueryPredicate(predicate, root);
+        return super.findPage(predicate, pageable);
+    }
+
+    private Predicate getQueryPredicate(Predicate predicate, final QSafetyCheck root) {
         final var request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
         final var startTime = request.getParameter("startTime");
         final var endTime = request.getParameter("endTime");
@@ -164,7 +160,32 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
             predicate = QueryDslUtils.merge(predicate,
                     Boolean.parseBoolean(handled) ? root.handledAt.isNotNull() : root.handledAt.isNull());
         }
-        return super.findPage(predicate, pageable);
+        return predicate;
+    }
+
+    private Predicate getAuthorityPredicate(Predicate predicate, QSafetyCheck root) {
+        final var staff = SecurityUtilsExt.getStaff();
+        final var qStaff = QStaff.staff;
+
+        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_RU_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate,
+                    JPAExpressions.select(root).leftJoin(root.project.ruManager, qStaff)
+                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_OWNER_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate,
+                    JPAExpressions.select(root).leftJoin(root.project.ownerManager, qStaff)
+                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate, root.project.suManager.id.eq(staff.getId()));
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER)) {
+            predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SECURITY_OFFICER,
+                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
+            predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
+        } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {
+            predicate = Expressions.FALSE.isTrue();
+        }
+        return predicate;
     }
 
     @DeleteMapping("delete-file-by-asset")

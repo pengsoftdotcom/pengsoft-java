@@ -16,6 +16,8 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 
 /**
  * Handle API data authorities from outside callers.
@@ -24,6 +26,7 @@ import org.aspectj.lang.reflect.MethodSignature;
  * @since 1.0.0
  */
 @Named
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @Aspect
 public class HandleDataAuthorityAspect {
 
