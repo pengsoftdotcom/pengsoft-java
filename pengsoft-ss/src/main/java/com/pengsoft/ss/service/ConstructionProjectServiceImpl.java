@@ -8,6 +8,7 @@ import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.repository.ConstructionProjectRepository;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
+import com.pengsoft.support.util.StringUtils;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,9 @@ public class ConstructionProjectServiceImpl
                 throw getExceptions().constraintViolated("code", "exists", target.getCode());
             }
         });
+        if (StringUtils.isBlank(target.getShortName())) {
+            target.setShortName(target.getName());
+        }
         return super.save(target);
     }
 

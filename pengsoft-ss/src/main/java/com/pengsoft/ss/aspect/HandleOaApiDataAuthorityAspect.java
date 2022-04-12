@@ -53,7 +53,8 @@ public class HandleOaApiDataAuthorityAspect {
         final var request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
         final var projectId = request.getParameter("project.id");
         final var args = Arrays.stream(jp.getArgs()).map(arg -> {
-            if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_RU_MANAGER) && StringUtils.isNotBlank(projectId)
+            if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_RU_MANAGER, ConstructionProject.ROL_OWNER_MANAGER)
+                    && StringUtils.isNotBlank(projectId)
                     && arg instanceof Predicate predicate) {
                 final var predicates = new ArrayList<Predicate>();
                 predicates.add(getAuthorityPredicate(jp, projectId));

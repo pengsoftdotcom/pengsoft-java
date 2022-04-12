@@ -1,5 +1,7 @@
 package com.pengsoft.ss.domain;
 
+import java.time.LocalDate;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Max;
@@ -55,9 +57,16 @@ public class ConstructionProject extends EntityImpl implements Codeable {
     @Size(max = 255)
     private String name;
 
+    @Size(max = 255)
+    private String shortName;
+
     @Min(1)
     @Max(28)
     private int payday = 20;
+
+    private LocalDate startedAt;
+
+    private LocalDate completedAt;
 
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
