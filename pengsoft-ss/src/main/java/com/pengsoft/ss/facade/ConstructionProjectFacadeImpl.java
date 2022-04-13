@@ -2,6 +2,7 @@ package com.pengsoft.ss.facade;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -198,6 +199,11 @@ public class ConstructionProjectFacadeImpl extends
     @Override
     public Optional<ConstructionProject> findOneByName(@NotBlank String name) {
         return getService().findOneByName(name);
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByStatus() {
+        return getService().statisticByStatus();
     }
 
 }

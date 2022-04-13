@@ -79,4 +79,26 @@ public interface SafetyTrainingRepository extends EntityRepository<QSafetyTraini
     List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime);
 
+    /**
+     * 查询培训人指定时间段内的工程项目的安全培训统计数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param trainerIds 培训人ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select project, trainer, count(1) from (
+              select
+                project_id project,
+                trainer_id trainer,
+                extract(DAY from submitted_at) as day,
+                count(1) count
+              from safety_training where project_id in (:projectIds) and trainer_id in (:trainerIds) and submitted_at between :startTime and :endTime
+              group by project, trainer, day
+            ) a group by project, trainer
+                          """, nativeQuery = true)
+    List<Map<String, Object>> statisticByTrainer(@NotEmpty List<String> projectIds, @NotEmpty List<String> trainerIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
 }

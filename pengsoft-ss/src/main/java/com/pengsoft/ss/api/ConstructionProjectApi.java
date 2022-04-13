@@ -1,6 +1,7 @@
 package com.pengsoft.ss.api;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
@@ -19,6 +20,7 @@ import com.querydsl.jpa.JPAExpressions;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -67,6 +69,11 @@ public class ConstructionProjectApi extends EntityApi<ConstructionProjectFacade,
             predicate = Expressions.FALSE.isTrue();
         }
         return predicate;
+    }
+
+    @GetMapping("statistic-by-status")
+    public List<Map<String, Object>> statisticByStatus() {
+        return getService().statisticByStatus();
     }
 
 }

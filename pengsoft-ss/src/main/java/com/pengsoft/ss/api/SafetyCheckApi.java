@@ -196,16 +196,21 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
 
     @GetMapping("get-checked-days")
     public List<Map<String, Object>> getCheckedDays(@RequestParam("project.id") List<String> projectIds,
-            @NotNull LocalDateTime startTime,
-            @NotNull LocalDateTime endTime) {
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
         return getService().getCheckedDays(projectIds, startTime, endTime);
     }
 
     @GetMapping("statistic")
     public List<Map<String, Object>> statistic(@RequestParam("project.id") List<String> projectIds,
-            @NotNull LocalDateTime startTime,
-            @NotNull LocalDateTime endTime) {
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
         return getService().statistic(projectIds, startTime, endTime);
+    }
+
+    @GetMapping("statistic-by-checker")
+    public List<Map<String, Object>> statisticByChecker(@RequestParam("project.id") List<String> projectIds,
+            @RequestParam("checker.id") List<String> checkerIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().statisticByChecker(projectIds, checkerIds, startTime, endTime);
     }
 
 }

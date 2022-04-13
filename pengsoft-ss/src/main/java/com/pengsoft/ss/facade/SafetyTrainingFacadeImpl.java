@@ -89,4 +89,10 @@ public class SafetyTrainingFacadeImpl extends EntityFacadeImpl<SafetyTrainingSer
         return getService().statistic(projectIds, startTime, endTime);
     }
 
+    @Override
+    public List<Map<String, Object>> statisticByTrainer(@NotEmpty List<String> projectIds,
+            @NotEmpty List<String> trainerIds, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
+        return getService().statisticByTrainer(projectIds, trainerIds, startTime, endTime);
+    }
+
 }

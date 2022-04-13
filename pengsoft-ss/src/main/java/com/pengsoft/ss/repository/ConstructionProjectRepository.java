@@ -1,5 +1,7 @@
 package com.pengsoft.ss.repository;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.persistence.QueryHint;
@@ -10,6 +12,7 @@ import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.stereotype.Repository;
@@ -48,4 +51,19 @@ public interface ConstructionProjectRepository
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     Optional<ConstructionProject> findOneByName(@NotBlank String name);
+
+    /**
+     * 按状态统计
+     */
+    @Query(value = """
+            select
+              b.code,
+              a.count
+            from (
+              select status_id, count(1)
+              from construction_project
+              group by status_id
+            ) a left join dictionary_item b on a.status_id = b.id
+                  """, nativeQuery = true)
+    List<Map<String, Object>> statisticByStatus();
 }

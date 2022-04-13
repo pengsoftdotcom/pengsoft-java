@@ -1,5 +1,7 @@
 package com.pengsoft.ss.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.constraints.NotBlank;
@@ -30,5 +32,10 @@ public interface ConstructionProjectService extends EntityService<ConstructionPr
      * @param name {@link ConstructionProject}'s name
      */
     Optional<ConstructionProject> findOneByName(@NotBlank String name);
+
+    /**
+     * 按状态统计
+     */
+    List<Map<String, Object>> statisticByStatus();
 
 }

@@ -80,4 +80,15 @@ public interface SafetyTrainingService extends EntityService<SafetyTraining, Str
     List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime);
 
+    /**
+     * 查询培训人指定时间段内的工程项目的安全培训统计数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param trainerIds 培训人ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    List<Map<String, Object>> statisticByTrainer(@NotEmpty List<String> projectIds, @NotEmpty List<String> trainerIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
 }

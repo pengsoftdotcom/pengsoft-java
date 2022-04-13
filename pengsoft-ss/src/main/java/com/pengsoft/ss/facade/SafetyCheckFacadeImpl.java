@@ -78,4 +78,10 @@ public class SafetyCheckFacadeImpl extends EntityFacadeImpl<SafetyCheckService, 
         return getService().statistic(projectIds, startTime, endTime);
     }
 
+    @Override
+    public List<Map<String, Object>> statisticByChecker(@NotEmpty List<String> projectIds,
+            @NotEmpty List<String> checkerIds, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
+        return getService().statisticByChecker(projectIds, checkerIds, startTime, endTime);
+    }
+
 }

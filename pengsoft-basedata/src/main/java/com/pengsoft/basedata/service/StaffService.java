@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.Staff;
@@ -57,5 +58,13 @@ public interface StaffService extends EntityService<Staff, String> {
      * @param jobs The {@link Staff}'s job
      */
     List<Staff> findAllByJobIn(@NotEmpty List<Job> jobs);
+
+    /**
+     * 根据指定的部门和角色查询员工
+     * 
+     * @param department 部门
+     * @param roleCodes  角色编码
+     */
+    List<Staff> findAllByDepartmentAndRoleCodes(@NotNull Department department, @NotEmpty String... roleCodes);
 
 }

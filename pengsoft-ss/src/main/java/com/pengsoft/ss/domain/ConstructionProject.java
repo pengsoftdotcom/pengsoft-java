@@ -13,6 +13,7 @@ import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.support.domain.Codeable;
 import com.pengsoft.support.domain.EntityImpl;
+import com.pengsoft.system.domain.DictionaryItem;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -63,6 +64,10 @@ public class ConstructionProject extends EntityImpl implements Codeable {
     @Min(1)
     @Max(28)
     private int payday = 20;
+
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private DictionaryItem status;
 
     private LocalDate startedAt;
 

@@ -104,6 +104,12 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
     }
 
     @Override
+    public List<Map<String, Object>> statisticByChecker(@NotEmpty List<String> projectIds,
+            @NotEmpty List<String> checkerIds, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
+        return getRepository().statisticByChecker(projectIds, checkerIds, startTime, endTime);
+    }
+
+    @Override
     protected Sort getDefaultSort() {
         return Sort.by(Direction.DESC, "submittedAt", "handledAt");
     }

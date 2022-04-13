@@ -1,5 +1,7 @@
 package com.pengsoft.ss.service;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.constraints.NotBlank;
@@ -46,6 +48,11 @@ public class ConstructionProjectServiceImpl
     @Override
     public Optional<ConstructionProject> findOneByName(@NotBlank String name) {
         return getRepository().findOneByName(name);
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByStatus() {
+        return getRepository().statisticByStatus();
     }
 
 }

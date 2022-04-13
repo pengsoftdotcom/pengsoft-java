@@ -190,16 +190,21 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
 
     @GetMapping("get-trained-days")
     public List<Map<String, Object>> getTrainedDays(@RequestParam("project.id") List<String> projectIds,
-            @NotNull LocalDateTime startTime,
-            @NotNull LocalDateTime endTime) {
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
         return getService().getTrainedDays(projectIds, startTime, endTime);
     }
 
     @GetMapping("statistic")
     public List<Map<String, Object>> statistic(@RequestParam("project.id") List<String> projectIds,
-            @NotNull LocalDateTime startTime,
-            @NotNull LocalDateTime endTime) {
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
         return getService().statistic(projectIds, startTime, endTime);
+    }
+
+    @GetMapping("statistic-by-trainer")
+    public List<Map<String, Object>> statisticByTrainer(@RequestParam("project.id") List<String> projectIds,
+            @RequestParam("trainer.id") List<String> trainerIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
+        return getService().statisticByTrainer(projectIds, trainerIds, startTime, endTime);
     }
 
 }

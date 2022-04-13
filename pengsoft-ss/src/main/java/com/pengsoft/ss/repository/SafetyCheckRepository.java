@@ -80,4 +80,26 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
                       """, nativeQuery = true)
     List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime);
+
+    /**
+     * 查询检查人指定时间段内的工程项目的安全检查统计数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param checkerIds 检查人ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select project, checker, count(1) from (
+              select
+                project_id project,
+                checker_id checker,
+                extract(DAY from submitted_at) as day,
+                count(1) count
+              from safety_check where project_id in (:projectIds) and checker_id in (:checkerIds) and submitted_at between :startTime and :endTime
+              group by project, checker, day
+            ) a group by project, checker
+                          """, nativeQuery = true)
+    List<Map<String, Object>> statisticByChecker(@NotEmpty List<String> projectIds, @NotEmpty List<String> checkerIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
 }
