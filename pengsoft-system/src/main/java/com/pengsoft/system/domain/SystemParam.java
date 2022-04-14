@@ -31,7 +31,9 @@ import lombok.Setter;
 @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
 public class SystemParam extends EntityImpl implements Codeable {
 
-    @Size(max = 255)
+    private static final long serialVersionUID = -1546350489173233397L;
+
+	@Size(max = 255)
     @NotBlank
     private String code;
 

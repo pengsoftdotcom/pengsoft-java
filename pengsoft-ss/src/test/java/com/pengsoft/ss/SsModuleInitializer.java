@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import com.pengsoft.security.facade.AuthorityFacade;
 import com.pengsoft.security.service.RoleService;
 import com.pengsoft.ss.domain.ConstructionProject;
+import com.pengsoft.ss.domain.QualityCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
@@ -27,7 +28,8 @@ class SsModuleInitializer {
 
     @Test
     void initRolesAndAuthorities() {
-        List.of(ConstructionProject.class, SafetyTraining.class, SafetyTrainingParticipant.class, SafetyCheck.class)
+        List.of(ConstructionProject.class, SafetyTraining.class, SafetyTrainingParticipant.class, SafetyCheck.class,
+                QualityCheck.class)
                 .forEach(entityClass -> {
                     service.saveEntityAdmin(entityClass);
                     facade.saveEntityAdminAuthorities(entityClass);
