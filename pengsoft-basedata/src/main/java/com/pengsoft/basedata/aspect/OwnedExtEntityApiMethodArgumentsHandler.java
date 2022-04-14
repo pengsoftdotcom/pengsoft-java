@@ -41,7 +41,9 @@ public class OwnedExtEntityApiMethodArgumentsHandler extends OwnedEntityApiMetho
     @Override
     protected Predicate exchange(final Class<? extends OwnedEntityImpl> entityClass, Authorized authorized,
             final Predicate predicate) {
-        if (isReadable(authorized, entityClass) || hasAdminRole(entityClass)) {
+        final var query = predicate.toString();
+        if (isReadable(authorized, entityClass) || hasAdminRole(entityClass)
+                || query.contains("controlledBy") || query.contains("belongsTo")) {
             return predicate;
         } else {
             if (OwnedExtEntityImpl.class.isAssignableFrom(entityClass)) {

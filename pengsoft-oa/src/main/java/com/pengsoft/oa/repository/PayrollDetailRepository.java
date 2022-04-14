@@ -9,7 +9,6 @@ import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.PayrollDetail;
 import com.pengsoft.oa.domain.QPayrollDetail;
 import com.pengsoft.support.repository.EntityRepository;
-import com.querydsl.core.types.dsl.StringPath;
 
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
@@ -28,18 +27,18 @@ public interface PayrollDetailRepository
     @Override
     default void customize(QuerydslBindings bindings, QPayrollDetail root) {
         EntityRepository.super.customize(bindings, root);
-        bindings.bind(root.payroll.code).first(StringPath::contains);
     }
 
     /**
-     * Whether exists a {@link PayrollDetail} with the given payroll record code and
-     * staff id.
+     * Whether exists a {@link PayrollDetail} with the given payroll record year,
+     * month and staff id.
      * 
-     * @param payrollCode The payroll record code
-     * @param staffId     The staff id
+     * @param year    The payroll record year
+     * @param month   The payroll record month
+     * @param staffId The staff id
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    boolean existsByPayrollCodeAndStaffId(@NotBlank String payrollCode, @NotBlank String staffId);
+    boolean existsByPayrollYearAndPayrollMonthAndStaffId(int year, int month, @NotBlank String staffId);
 
     /**
      * Returns the number of payroll details with given payroll record id.

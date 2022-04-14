@@ -70,7 +70,8 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
         final var staff = staffRepository.findOneByPersonIdAndJobId(person.getId(), job.getId())
                 .orElseThrow(() -> exceptions.entityNotExists(Staff.class, data.getIdentityCardNumber()));
         detail.setStaff(staff);
-        if (!payrollDetailService.existsByRecordCodeAndStaff(payroll.getCode(), staff)) {
+        if (!payrollDetailService.existsByPayrollYearAndPayrollMonthAndStaff(payroll.getYear(), payroll.getMonth(),
+                staff)) {
             payrollDetails.add(detail);
         }
     }

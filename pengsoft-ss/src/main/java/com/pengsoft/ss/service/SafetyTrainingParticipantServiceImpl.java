@@ -1,5 +1,12 @@
 package com.pengsoft.ss.service;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
 import com.pengsoft.ss.repository.SafetyTrainingParticipantRepository;
@@ -39,6 +46,12 @@ public class SafetyTrainingParticipantServiceImpl extends
         participant.setReason(reason);
         participant.setConfirmedAt(DateUtils.currentDateTime());
         save(participant);
+    }
+
+    @Override
+    public List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().statistic(projectIds, startTime, endTime);
     }
 
 }

@@ -1,9 +1,14 @@
 package com.pengsoft.oa.service;
 
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.alibaba.excel.EasyExcel;
 import com.pengsoft.basedata.domain.JobRole;
@@ -62,13 +67,13 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
 
     @Override
     public PayrollRecord save(PayrollRecord target) {
-        findOneByCode(target.getCode()).ifPresent(source -> {
+        findOneByYearAndMonth(target.getYear(), target.getMonth()).ifPresent(source -> {
             if (EntityUtils.notEquals(source, target)) {
-                throw getExceptions().constraintViolated("code", "exists", target.getCode());
+                throw getExceptions().constraintViolated("month", "exists", target.getYear());
             }
         });
         var payroll = super.save(target);
-        if (payroll.getImportedAt() == null) {
+        if (payroll.getSheet() != null && payroll.getImportedAt() == null) {
             final var departmentId = SecurityUtilsExt.getPrimaryDepartmentId();
             final var jobs = jobRoleRepository.findAllByJobDepartmentIdAndRoleCode(departmentId, "worker").stream()
                     .map(JobRole::getJob).toList();
@@ -91,18 +96,29 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
     @Override
     public void delete(PayrollRecord entity) {
         super.delete(entity);
-        assetService.delete(entity.getSheet());
-        assetService.delete(entity.getSignedSheet());
+        if (entity.getSheet() != null) {
+            assetService.delete(entity.getSheet());
+        }
+        if (entity.getSignedSheet() != null) {
+            assetService.delete(entity.getSignedSheet());
+        }
     }
 
     @Override
-    public Optional<PayrollRecord> findOneByCode(String code) {
-        return getRepository().findOneByCodeAndBelongsTo(code, SecurityUtilsExt.getPrimaryOrganizationId());
+    public Optional<PayrollRecord> findOneByYearAndMonth(int year, int month) {
+        return getRepository().findOneByYearAndMonthAndBelongsTo(year, month,
+                SecurityUtilsExt.getPrimaryOrganizationId());
+    }
+
+    @Override
+    public List<Map<String, Object>> statistic(@NotEmpty List<String> organizationIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().statistic(organizationIds, startTime, endTime);
     }
 
     @Override
     protected Sort getDefaultSort() {
-        return Sort.by(Direction.DESC, "code");
+        return Sort.by(Direction.DESC, "year", "month");
     }
 
 }

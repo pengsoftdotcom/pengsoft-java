@@ -6,16 +6,19 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.persistence.Table;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
-import com.pengsoft.support.domain.Codeable;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.system.domain.Asset;
+import com.pengsoft.system.domain.DictionaryItem;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -35,24 +38,30 @@ import lombok.Setter;
 @Setter
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class PayrollRecord extends OwnedExtEntityImpl implements Codeable {
+@Table(indexes = { @Index(name = "payroll_record_belongs_to", columnList = "belongsTo, year, month", unique = true) })
+public class PayrollRecord extends OwnedExtEntityImpl {
 
     private static final long serialVersionUID = -1350196681980716549L;
 
-    @NotBlank
-    @Size(max = 255)
-    private String code;
+    @Min(2022)
+    private int year;
+
+    @Min(1)
+    @Max(12)
+    private int month;
 
     private long paidCount;
 
     private long confirmedCount;
 
-    @NotNull
+    @ManyToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private DictionaryItem status;
+
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset sheet;
 
-    @NotNull
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset signedSheet;
@@ -62,5 +71,11 @@ public class PayrollRecord extends OwnedExtEntityImpl implements Codeable {
     @JsonIgnore
     @OneToMany(mappedBy = "payroll", cascade = CascadeType.REMOVE)
     private List<PayrollDetail> details = new ArrayList<>();
+
+    public PayrollRecord() {
+        final var now = DateUtils.currentDate();
+        setYear(now.getYear());
+        setMonth(now.getMonthValue());
+    }
 
 }

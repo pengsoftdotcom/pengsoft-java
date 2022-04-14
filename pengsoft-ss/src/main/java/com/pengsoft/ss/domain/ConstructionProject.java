@@ -4,8 +4,6 @@ import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -60,10 +58,6 @@ public class ConstructionProject extends EntityImpl implements Codeable {
 
     @Size(max = 255)
     private String shortName;
-
-    @Min(1)
-    @Max(28)
-    private int payday = 20;
 
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)

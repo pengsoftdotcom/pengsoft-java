@@ -68,7 +68,8 @@ public class OwnedEntityApiMethodArgsDataAuthorityHandler implements ApiMethodAr
 
     protected Predicate exchange(Class<? extends OwnedEntityImpl> entityClass, Authorized authorized,
             Predicate predicate) {
-        if (isReadable(authorized, entityClass) || hasAdminRole(entityClass)) {
+        if (isReadable(authorized, entityClass) || hasAdminRole(entityClass)
+                || predicate.toString().contains("createdBy")) {
             return predicate;
         } else {
             final var createdByPath = (StringPath) QueryDslUtils.getPath(entityClass, "createdBy");

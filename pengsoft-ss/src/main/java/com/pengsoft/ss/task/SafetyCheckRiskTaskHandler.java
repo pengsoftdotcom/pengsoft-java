@@ -32,8 +32,8 @@ public class SafetyCheckRiskTaskHandler implements TaskExecutor {
         final var check = (SafetyCheck) args[0];
         if (StringUtils.equals(check.getStatus().getCode(), "risk")) {
             final var task = new Task();
-            task.setName("隐患处理");
-            task.setContent(check.getProject().getName() + "发现隐患，请前往处理!");
+            task.setName("隐患整改");
+            task.setContent(check.getProject().getName() + "发现隐患，请前往整改!");
             task.setTargetPath("/ss/safety-check");
             task.setTargetId(check.getId());
             final var status = dictionaryItemService.findOneByTypeCodeAndParentAndCode("task_status", null, "created")

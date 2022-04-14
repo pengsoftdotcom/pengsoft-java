@@ -48,8 +48,8 @@ public class PayrollDetailServiceImpl extends EntityServiceImpl<PayrollDetailRep
     }
 
     @Override
-    public boolean existsByRecordCodeAndStaff(String recordCode, Staff staff) {
-        return getRepository().existsByPayrollCodeAndStaffId(recordCode, staff.getId());
+    public boolean existsByPayrollYearAndPayrollMonthAndStaff(int year, int month, Staff staff) {
+        return getRepository().existsByPayrollYearAndPayrollMonthAndStaffId(year, month, staff.getId());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class PayrollDetailServiceImpl extends EntityServiceImpl<PayrollDetailRep
 
     @Override
     protected Sort getDefaultSort() {
-        return Sort.by(Direction.DESC, "payroll.code");
+        return Sort.by(Direction.DESC, "payroll.year", "payroll.month");
     }
 
 }

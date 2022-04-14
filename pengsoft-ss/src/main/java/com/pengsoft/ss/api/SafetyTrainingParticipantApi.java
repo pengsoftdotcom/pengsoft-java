@@ -1,5 +1,9 @@
 package com.pengsoft.ss.api;
 
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.util.SecurityUtilsExt;
@@ -16,6 +20,7 @@ import com.querydsl.core.types.Predicate;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -53,6 +58,13 @@ public class SafetyTrainingParticipantApi extends
             predicate = QueryDslUtils.merge(predicate, root.staff.id.eq(staff.getId()));
         }
         return super.findPage(predicate, pageable);
+    }
+
+    @GetMapping("statistic")
+    public List<Map<String, Object>> statistic(
+            @RequestParam(value = "project.id", required = false) List<String> projectIds, LocalDateTime startTime,
+            LocalDateTime endTime) {
+        return getService().statistic(projectIds, startTime, endTime);
     }
 
 }

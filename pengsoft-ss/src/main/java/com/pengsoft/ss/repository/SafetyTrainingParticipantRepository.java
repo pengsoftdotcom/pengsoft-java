@@ -1,14 +1,19 @@
 package com.pengsoft.ss.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
 import com.pengsoft.support.repository.EntityRepository;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 
@@ -37,5 +42,25 @@ public interface SafetyTrainingParticipantRepository
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     List<SafetyTrainingParticipant> findAllByTrainingId(@NotBlank String trainingId);
+
+    /**
+     * 按建筑项目、参与状态统计
+     * 
+     * @param projectIds 建筑项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select project_id project, d.code status, count
+            from (
+              select b.project_id, a.status_id, count(1) count
+              from safety_training_participant a
+                left join safety_training b on a.training_id = b.id
+              where b.project_id in (:projectIds) and b.submitted_at between :startTime and :endTime
+              group by b.project_id, a.status_id
+            ) c left join dictionary_item d on c.status_id = d.id
+                """, nativeQuery = true)
+    List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime);
 
 }
