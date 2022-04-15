@@ -178,9 +178,13 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
                     JPAExpressions.select(root).leftJoin(root.project.ownerManager, qStaff)
                             .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
         } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER)) {
-            predicate = QueryDslUtils.merge(predicate, root.project.suManager.id.eq(staff.getId()));
+            predicate = QueryDslUtils.merge(predicate,
+                    JPAExpressions.select(root).leftJoin(root.project.suManager, qStaff)
+                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
         } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER)) {
-            predicate = QueryDslUtils.merge(predicate, root.project.buManager.id.eq(staff.getId()));
+            predicate = QueryDslUtils.merge(predicate,
+                    JPAExpressions.select(root).leftJoin(root.project.buManager, qStaff)
+                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
         } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SECURITY_OFFICER)) {
             predicate = QueryDslUtils.merge(predicate, root.trainer.id.eq(staff.getId()));
         } else if (SecurityUtils.hasAnyRole(ROL_WORKER)) {
