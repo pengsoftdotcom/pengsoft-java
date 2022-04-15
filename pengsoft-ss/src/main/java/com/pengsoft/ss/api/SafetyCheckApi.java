@@ -123,7 +123,9 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         var job = SecurityUtilsExt.getPrimaryJob();
         if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SUPERVISION_ENGINEER,
                 ConstructionProject.ROL_SECURITY_OFFICER)) {
-            job = job.getParent();
+            while (job.getParent() != null) {
+                job = job.getParent();
+            }
         }
         return job;
     }

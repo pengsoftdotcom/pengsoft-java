@@ -115,10 +115,13 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyTraining entity) {
         final var training = super.findOne(entity);
         if (StringUtils.isBlank(training.getId())) {
-            final var job = SecurityUtilsExt.getPrimaryJob();
+            var job = SecurityUtilsExt.getPrimaryJob();
             if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
                 training.setTrainer(SecurityUtilsExt.getStaff());
-                setProject(training, job.getParent());
+                while (job.getParent() != null) {
+                    job = job.getParent();
+                }
+                setProject(training, job);
             }
             if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
                 training.setTrainer(SecurityUtilsExt.getStaff());

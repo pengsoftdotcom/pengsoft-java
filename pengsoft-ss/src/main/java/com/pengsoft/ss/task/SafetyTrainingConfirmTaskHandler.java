@@ -39,7 +39,7 @@ public class SafetyTrainingConfirmTaskHandler implements TaskExecutor {
         final var participants = safetyTrainingParticipantRepository.findAllByTrainingId(training.getId());
         participants.forEach(participant -> {
             final var task = new Task();
-            task.setName("安全培训确认");
+            task.setName("安全教育培训确认");
             final var params = new HashMap<String, String>();
             params.put("subject", training.getSubject());
             params.put("estimatedStartTime",
