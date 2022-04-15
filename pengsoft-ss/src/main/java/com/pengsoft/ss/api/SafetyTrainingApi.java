@@ -28,6 +28,7 @@ import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.QueryDslUtils;
+import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.task.annotation.TaskHandler;
@@ -35,7 +36,6 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -115,6 +115,9 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyTraining entity) {
         final var training = super.findOne(entity);
         if (StringUtils.isBlank(training.getId())) {
+            if (StringUtils.isBlank(training.getSubject())) {
+                training.setSubject("例行安全教育培训");
+            }
             var job = SecurityUtilsExt.getPrimaryJob();
             if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
                 training.setTrainer(SecurityUtilsExt.getStaff());

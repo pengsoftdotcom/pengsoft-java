@@ -59,7 +59,7 @@ public class SafetyTraining extends EntityImpl implements Codeable {
 
     @Size(max = 255)
     @NotBlank
-    private String subject = "例行安全培训";
+    private String subject;
 
     @NotBlank
     @Length(max = 255)
