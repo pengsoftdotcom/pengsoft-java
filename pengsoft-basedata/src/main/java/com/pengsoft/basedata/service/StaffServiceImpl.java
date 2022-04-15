@@ -21,7 +21,7 @@ import com.querydsl.jpa.JPAExpressions;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 /**
@@ -104,7 +104,7 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
 
     @Override
     protected Sort getDefaultSort() {
-        return Sort.by(Direction.ASC, "job.parentIds", "job.name", "person.mobile");
+        return Sort.by(Order.asc("job.parentIds"), Order.asc("job.sequence"));
     }
 
 }

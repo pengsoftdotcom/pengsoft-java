@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pengsoft.support.domain.Sortable;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -32,7 +33,7 @@ import lombok.Setter;
 @Setter
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class Job extends OwnedExtTreeEntityImpl<Job> {
+public class Job extends OwnedExtTreeEntityImpl<Job> implements Sortable {
 
     private static final long serialVersionUID = 7493173800393786868L;
 
@@ -46,6 +47,8 @@ public class Job extends OwnedExtTreeEntityImpl<Job> {
 
     @Min(1)
     private int quantity = 1;
+
+    private long sequence;
 
     @NotNull
     @ManyToOne
