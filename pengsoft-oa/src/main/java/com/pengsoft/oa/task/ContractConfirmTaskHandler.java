@@ -37,7 +37,7 @@ public class ContractConfirmTaskHandler implements TaskExecutor {
         final var id = ((Contract) args[0]).getId();
         final var contract = contractService.findOne(id)
                 .orElseThrow(() -> exceptions.entityNotExists(Contract.class, id));
-        if (contract.getCreatedAt().isEqual(contract.getUpdatedAt())) {
+        if (contract.getStatus() != null && contract.getStatus().getCode().equals("unconfirmed")) {
             final var task = new Task();
             task.setName("合同确认");
             task.setContent("合同已上传，请前往确认!");

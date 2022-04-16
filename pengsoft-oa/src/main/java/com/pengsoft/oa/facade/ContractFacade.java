@@ -3,7 +3,6 @@ package com.pengsoft.oa.facade;
 import java.util.List;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.oa.domain.Contract;
@@ -26,7 +25,7 @@ public interface ContractFacade extends EntityFacade<ContractService, Contract, 
      * @param contract {@link Contract}
      * @param pictures {@link Asset}
      */
-    Contract saveWithPictures(@Valid Contract contract, @NotEmpty List<Asset> pictures);
+    Contract saveWithPictures(@Valid Contract contract, List<Asset> pictures);
 
     /**
      * delete {@link ContractPicture} by given {@link Asset}

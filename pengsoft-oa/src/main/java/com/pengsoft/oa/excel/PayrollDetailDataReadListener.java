@@ -82,7 +82,8 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
         payroll.setImportedAt(DateUtils.currentDateTime());
         final var paidCount = payrollDetailService.countByPayroll(payroll);
         payroll.setPaidCount(paidCount + payrollDetails.size());
-        payrollDetails.clear();
+        payroll.setDetails(payrollDetails);
+        payrollDetails = new ArrayList<>();
     }
 
 }

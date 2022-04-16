@@ -91,7 +91,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
     @Messaging(builder = "contractConfirmMessageBuilder")
     @PostMapping("save-with-pictures")
     public void saveWithPictures(@RequestBody Contract contract,
-            @RequestParam(value = "picture.id", required = false) List<Asset> pictures) {
+            @RequestParam(value = "picture.id", defaultValue = "") List<Asset> pictures) {
         getService().saveWithPictures(contract, pictures);
     }
 

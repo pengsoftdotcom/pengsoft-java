@@ -39,7 +39,7 @@ class ContractServiceTest {
     PersonRepository personRepository;
 
     @Test
-    @WithUserDetails("13668001277")
+    @WithUserDetails("55555555555")
     void create() {
         final var cashier = staffRepository
                 .findOneByPersonIdAndPrimaryTrue(
@@ -69,8 +69,6 @@ class ContractServiceTest {
                     contract.setPartyBType(partyBType);
                     contract.setBelongsTo(worker.getJob().getDepartment().getOrganization().getId());
                     contract.setControlledBy(worker.getJob().getDepartment().getId());
-                    contract.setCreatedBy("7a238c71-3260-4263-8f30-57b7ea68c29e");
-                    contract.setUpdatedBy("7a238c71-3260-4263-8f30-57b7ea68c29e");
                     contractService.save(contract);
                 });
 

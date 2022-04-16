@@ -11,6 +11,7 @@ import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.ContractPicture;
 import com.pengsoft.oa.service.ContractPictureService;
 import com.pengsoft.oa.service.ContractService;
+import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
@@ -32,6 +33,8 @@ import org.springframework.stereotype.Service;
 public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contract, String>
         implements ContractFacade {
 
+    private static final String CONTRACT_STATUS = "contract_status";
+
     @Inject
     private ContractPictureService contractPictureService;
 
@@ -43,6 +46,9 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
 
     @Override
     public Contract saveWithPictures(Contract contract, List<Asset> pictures) {
+        if (contract.getConfirmedAt() != null) {
+            throw new BusinessException("contract.confirm.already");
+        }
         if (StringUtils.isBlank(contract.getId())) {
             super.save(contract);
         }
@@ -63,14 +69,22 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
         }
         sourcePictures.addAll(createdPictures);
 
-        if (CollectionUtils.isNotEmpty(contract.getPictures())) {
-            final var status = dictionaryItemService
-                    .findOneByTypeCodeAndParentAndCode("contract_status", null, "unconfirmed")
-                    .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "unconfirmed"));
-            contract.setStatus(status);
+        var status = dictionaryItemService
+                .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "confirmed")
+                .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "confirmed"));
+        if (contract.getConfirmedAt() == null) {
+            if (CollectionUtils.isNotEmpty(contract.getPictures())) {
+                status = dictionaryItemService
+                        .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "unconfirmed")
+                        .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "unconfirmed"));
+            } else {
+                status = dictionaryItemService
+                        .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "not_uploaded")
+                        .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "not_uploaded"));
+            }
         }
-        super.save(contract);
-        return contract;
+        contract.setStatus(status);
+        return super.save(contract);
     }
 
     @Override

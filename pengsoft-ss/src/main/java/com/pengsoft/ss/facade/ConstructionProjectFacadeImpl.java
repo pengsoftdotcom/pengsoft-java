@@ -121,49 +121,54 @@ public class ConstructionProjectFacadeImpl extends
 
     private void handleSuperVisionUnitRelatedData(final byte[] bytes, final ConstructionProject constructionProject) {
         final var supervisionUnit = constructionProject.getSupervisionUnit();
-        final var suDepartment = constructionProject.getSuManager().getDepartment();
-        final var suManagerJob = constructionProject.getSuManager().getJob();
+        if (supervisionUnit != null) {
+            final var suDepartment = constructionProject.getSuManager().getDepartment();
+            final var suManagerJob = constructionProject.getSuManager().getJob();
 
-        final var supervisionEngineerPostName = "监理工程师";
-        final var supervisionEngineerJobName = "监理工程师";
-        final var supervisionEngineerRoleCode = "supervision_engineer";
-        final var supervisionEngineerJob = getJob(supervisionUnit, suDepartment, suManagerJob,
-                supervisionEngineerPostName, supervisionEngineerJobName, supervisionEngineerRoleCode);
-        supervisionEngineerDataReadListener.setJob(supervisionEngineerJob);
+            final var supervisionEngineerPostName = "监理工程师";
+            final var supervisionEngineerJobName = "监理工程师";
+            final var supervisionEngineerRoleCode = "supervision_engineer";
+            final var supervisionEngineerJob = getJob(supervisionUnit, suDepartment, suManagerJob,
+                    supervisionEngineerPostName, supervisionEngineerJobName, supervisionEngineerRoleCode);
+            supervisionEngineerDataReadListener.setJob(supervisionEngineerJob);
 
-        EasyExcel.read(new ByteArrayInputStream(bytes), SupervisionEngineerData.class,
-                supervisionEngineerDataReadListener).sheet(1).doRead();
+            EasyExcel.read(new ByteArrayInputStream(bytes), SupervisionEngineerData.class,
+                    supervisionEngineerDataReadListener).sheet(1).doRead();
+        }
     }
 
     private void handleBuildingUnitRelatedData(final byte[] bytes, final ConstructionProject constructionProject) {
         final var buildingUnit = constructionProject.getBuildingUnit();
-        final var buDepartment = constructionProject.getBuManager().getDepartment();
-        final var buManagerJob = constructionProject.getBuManager().getJob();
+        if (buildingUnit != null) {
+            final var buDepartment = constructionProject.getBuManager().getDepartment();
+            final var buManagerJob = constructionProject.getBuManager().getJob();
 
-        final var securityOfficerPostName = "安全员";
-        final var securityOfficerJobName = "安全员";
-        final var securityOfficerRoleCode = "security_officer";
-        final var securityOfficerJob = getJob(buildingUnit, buDepartment, buManagerJob, securityOfficerPostName,
-                securityOfficerJobName, securityOfficerRoleCode);
-        securityOfficerDataReadListener.setJob(securityOfficerJob);
-        EasyExcel.read(new ByteArrayInputStream(bytes), SecurityOfficerData.class, securityOfficerDataReadListener)
-                .sheet(2).doRead();
+            final var securityOfficerPostName = "安全员";
+            final var securityOfficerJobName = "安全员";
+            final var securityOfficerRoleCode = "security_officer";
+            final var securityOfficerJob = getJob(buildingUnit, buDepartment, buManagerJob, securityOfficerPostName,
+                    securityOfficerJobName, securityOfficerRoleCode);
+            securityOfficerDataReadListener.setJob(securityOfficerJob);
+            EasyExcel.read(new ByteArrayInputStream(bytes), SecurityOfficerData.class, securityOfficerDataReadListener)
+                    .sheet(2).doRead();
 
-        final var cashierPostName = "发薪员";
-        final var cashierJobName = "发薪员";
-        final var cashierRoleCode = "cashier";
-        final var cashierJob = getJob(buildingUnit, buDepartment, buManagerJob, cashierPostName, cashierJobName,
-                cashierRoleCode);
-        cashierDataReadListener.setJob(cashierJob);
-        EasyExcel.read(new ByteArrayInputStream(bytes), CashierData.class, cashierDataReadListener).sheet(3).doRead();
+            final var cashierPostName = "发薪员";
+            final var cashierJobName = "发薪员";
+            final var cashierRoleCode = "cashier";
+            final var cashierJob = getJob(buildingUnit, buDepartment, buManagerJob, cashierPostName, cashierJobName,
+                    cashierRoleCode);
+            cashierDataReadListener.setJob(cashierJob);
+            EasyExcel.read(new ByteArrayInputStream(bytes), CashierData.class, cashierDataReadListener).sheet(3)
+                    .doRead();
 
-        final var workerPostName = "工人";
-        final var workerJobName = "工人";
-        final var workerRoleCode = "worker";
-        final var workerJob = getJob(buildingUnit, buDepartment, buManagerJob, workerPostName, workerJobName,
-                workerRoleCode);
-        workerDataReadListener.setJob(workerJob);
-        EasyExcel.read(new ByteArrayInputStream(bytes), WorkerData.class, workerDataReadListener).sheet(4).doRead();
+            final var workerPostName = "工人";
+            final var workerJobName = "工人";
+            final var workerRoleCode = "worker";
+            final var workerJob = getJob(buildingUnit, buDepartment, buManagerJob, workerPostName, workerJobName,
+                    workerRoleCode);
+            workerDataReadListener.setJob(workerJob);
+            EasyExcel.read(new ByteArrayInputStream(bytes), WorkerData.class, workerDataReadListener).sheet(4).doRead();
+        }
     }
 
     private Job getJob(final Organization buildingUnit, final Department buDepartment, final Job buManagerJob,

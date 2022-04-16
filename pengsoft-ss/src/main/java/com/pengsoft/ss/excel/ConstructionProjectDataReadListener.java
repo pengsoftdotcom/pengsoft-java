@@ -108,67 +108,73 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
 
     private void handleRegulatoryUnitRelatedData(ConstructionProjectData data) {
         final var regulatoryUnitName = StringUtils.replace(data.getRegulatoryUnit(), "\s", "");
-        final var regulatoryUnit = saveOrganization(regulatoryUnitName);
-        constructionProject.setRegulatoryUnit(regulatoryUnit);
+        if (StringUtils.isNotBlank(regulatoryUnitName)) {
+            final var regulatoryUnit = saveOrganization(regulatoryUnitName);
+            constructionProject.setRegulatoryUnit(regulatoryUnit);
 
-        final var ruManagerName = StringUtils.replace(data.getRuManager(), "\s", "");
-        final var ruManagerMobile = StringUtils.replace(data.getRuManagerMobile(), "\s", "");
-        final var person = savePerson(ruManagerName, ruManagerMobile);
+            final var ruManagerName = StringUtils.replace(data.getRuManager(), "\s", "");
+            final var ruManagerMobile = StringUtils.replace(data.getRuManagerMobile(), "\s", "");
+            final var person = savePerson(ruManagerName, ruManagerMobile);
 
-        final var root = QStaff.staff;
-        final var jobRole = QJobRole.jobRole;
-        final var ruManager = staffService
-                .findOne(root.person.eq(person)
-                        .and(JPAExpressions.selectOne().from(root.job.jobRoles, jobRole)
-                                .where(jobRole.role.code.eq("ru_manager")).exists()))
-                .orElseThrow(() -> exceptions.entityNotExists(Staff.class, "ru_manager"));
-        constructionProject.setRuManager(ruManager);
+            final var root = QStaff.staff;
+            final var jobRole = QJobRole.jobRole;
+            final var ruManager = staffService
+                    .findOne(root.person.eq(person)
+                            .and(JPAExpressions.selectOne().from(root.job.jobRoles, jobRole)
+                                    .where(jobRole.role.code.eq("ru_manager")).exists()))
+                    .orElseThrow(() -> exceptions.entityNotExists(Staff.class, "ru_manager"));
+            constructionProject.setRuManager(ruManager);
+        }
     }
 
     private void handleOwnerRelatedData(ConstructionProjectData data) {
         final var ownerName = StringUtils.replace(data.getOwner(), "\s", "");
-        final var owner = saveOrganization(ownerName);
-        constructionProject.setOwner(owner);
+        if (StringUtils.isNotBlank(ownerName)) {
+            final var owner = saveOrganization(ownerName);
+            constructionProject.setOwner(owner);
 
-        final var ownerManagerPostName = "项目经理";
-        final var ownerManagerPost = savePost(owner, ownerManagerPostName);
+            final var ownerManagerPostName = "项目经理";
+            final var ownerManagerPost = savePost(owner, ownerManagerPostName);
 
-        final var ownerDepartmentName = constructionProject.getName() + "项目部";
-        final var ownerDepartment = saveDepartment(owner, ownerDepartmentName);
+            final var ownerDepartmentName = constructionProject.getName() + "项目部";
+            final var ownerDepartment = saveDepartment(owner, ownerDepartmentName);
 
-        final var ownerManagerJobName = "项目经理";
-        final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName);
+            final var ownerManagerJobName = "项目经理";
+            final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName);
 
-        final var ownerManagerName = StringUtils.replace(data.getOwnerManager(), "\s", "");
-        final var ownerManagerMobile = StringUtils.replace(data.getOwnerManagerMobile(), "\s", "");
-        final var person = savePerson(ownerManagerName, ownerManagerMobile);
-        final var ownerManager = saveStaff(person, ownerManagerJob);
-        constructionProject.setOwnerManager(ownerManager);
+            final var ownerManagerName = StringUtils.replace(data.getOwnerManager(), "\s", "");
+            final var ownerManagerMobile = StringUtils.replace(data.getOwnerManagerMobile(), "\s", "");
+            final var person = savePerson(ownerManagerName, ownerManagerMobile);
+            final var ownerManager = saveStaff(person, ownerManagerJob);
+            constructionProject.setOwnerManager(ownerManager);
+        }
     }
 
     private void handleSupervisionUnitRelatedData(ConstructionProjectData data) {
-        final var supervisionUnitName = data.getSupervisionUnit().replace("\s", "");
-        final var supervisionUnit = saveOrganization(supervisionUnitName);
-        constructionProject.setSupervisionUnit(supervisionUnit);
+        final var supervisionUnitName = StringUtils.replace(data.getSupervisionUnit(), "\s", "");
+        if (StringUtils.isNotBlank(supervisionUnitName)) {
+            final var supervisionUnit = saveOrganization(supervisionUnitName);
+            constructionProject.setSupervisionUnit(supervisionUnit);
 
-        final var suManagerPostName = "总监理工程师";
-        final var suManagerPost = savePost(supervisionUnit, suManagerPostName);
+            final var suManagerPostName = "总监理工程师";
+            final var suManagerPost = savePost(supervisionUnit, suManagerPostName);
 
-        final var suDepartmentName = constructionProject.getName() + "项目部";
-        final var suDepartment = saveDepartment(supervisionUnit, suDepartmentName);
+            final var suDepartmentName = constructionProject.getName() + "项目部";
+            final var suDepartment = saveDepartment(supervisionUnit, suDepartmentName);
 
-        final var suManagerJobName = "总监理工程师";
-        final var suManagerJob = saveJob(suManagerPost, suDepartment, suManagerJobName);
+            final var suManagerJobName = "总监理工程师";
+            final var suManagerJob = saveJob(suManagerPost, suDepartment, suManagerJobName);
 
-        final var suManagerName = StringUtils.replace(data.getSuManager(), "\s", "");
-        final var suManagerMobile = StringUtils.replace(data.getSuManagerMobile(), "\s", "");
-        final var person = savePerson(suManagerName, suManagerMobile);
-        final var suManager = saveStaff(person, suManagerJob);
-        constructionProject.setSuManager(suManager);
+            final var suManagerName = StringUtils.replace(data.getSuManager(), "\s", "");
+            final var suManagerMobile = StringUtils.replace(data.getSuManagerMobile(), "\s", "");
+            final var person = savePerson(suManagerName, suManagerMobile);
+            final var suManager = saveStaff(person, suManagerJob);
+            constructionProject.setSuManager(suManager);
+        }
     }
 
     private void handleBuildingUnitRelatedData(ConstructionProjectData data) {
-        final var buildingUnitName = data.getBuildingUnit().replace("\s", "");
+        final var buildingUnitName = StringUtils.replace(data.getBuildingUnit(), "\s", "");
         final var buildingUnit = saveOrganization(buildingUnitName);
         constructionProject.setBuildingUnit(buildingUnit);
 

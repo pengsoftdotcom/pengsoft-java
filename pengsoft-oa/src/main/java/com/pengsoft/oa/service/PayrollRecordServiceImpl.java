@@ -22,7 +22,9 @@ import com.pengsoft.oa.excel.PayrollDetailDataReadListener;
 import com.pengsoft.oa.repository.PayrollRecordRepository;
 import com.pengsoft.support.exception.InvalidConfigurationException;
 import com.pengsoft.support.service.EntityServiceImpl;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
+import com.pengsoft.system.repository.DictionaryItemRepository;
 import com.pengsoft.system.service.AssetService;
 import com.pengsoft.system.service.StorageService;
 
@@ -44,6 +46,8 @@ import org.springframework.stereotype.Service;
 public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRepository, PayrollRecord, String>
         implements PayrollRecordService {
 
+    private static final String PAYROLL_RECORD_STATUS = "payroll_record_status";
+
     @Inject
     private AssetService assetService;
 
@@ -56,6 +60,9 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
     @Inject
     @Lazy
     private PayrollDetailDataReadListener readListener;
+
+    @Inject
+    private DictionaryItemRepository dictionaryItemRepository;
 
     @Bean
     public PayrollDetailDataReadListener payrollDetailDataReadListener(
@@ -88,9 +95,23 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
             final var sheet = storageService.download(payroll.getSheet());
             final var is = new ByteArrayInputStream(sheet.getData());
             EasyExcel.read(is, PayrollDetailData.class, readListener).sheet().doRead();
-            super.save(payroll);
         }
-        return payroll;
+        if (payroll.getStatus() == null) {
+            if (payroll.getDetails().isEmpty()) {
+                if (payroll.getCreatedAt() != null
+                        && DateUtils.currentDateTime().getDayOfYear() - payroll.getCreatedAt().getDayOfYear() > 5) {
+                    dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "arrears")
+                            .ifPresent(payroll::setStatus);
+                } else {
+                    dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "unpaid")
+                            .ifPresent(payroll::setStatus);
+                }
+            } else {
+                dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "paid")
+                        .ifPresent(payroll::setStatus);
+            }
+        }
+        return super.save(payroll);
     }
 
     @Override
