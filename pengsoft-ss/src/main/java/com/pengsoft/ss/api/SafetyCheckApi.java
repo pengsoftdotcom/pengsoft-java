@@ -188,8 +188,8 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
             predicate = QueryDslUtils.merge(predicate,
                     JPAExpressions.select(root).leftJoin(root.project.buManager, qStaff)
                             .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SECURITY_OFFICER,
-                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SUPERVISION_ENGINEER,
+                ConstructionProject.ROL_QUALITY_INSPECTOR, ConstructionProject.ROL_SECURITY_OFFICER)) {
             predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
         } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {
             predicate = Expressions.FALSE.isTrue();
