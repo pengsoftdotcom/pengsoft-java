@@ -41,11 +41,13 @@ public class ConstructionProject extends EntityImpl implements Codeable {
 
     public static final String ROL_SU_MANAGER = "su_manager";
 
+    public static final String ROL_SUPERVISION_ENGINEER = "supervision_engineer";
+
     public static final String ROL_BU_MANAGER = "bu_manager";
 
-    public static final String ROL_SECURITY_OFFICER = "security_officer";
+    public static final String ROL_QUALITY_INSPECTOR = "quality_inspector";
 
-    public static final String ROL_SUPERVISION_ENGINEER = "supervision_engineer";
+    public static final String ROL_SECURITY_OFFICER = "security_officer";
 
     private static final long serialVersionUID = 3844774310596073097L;
 

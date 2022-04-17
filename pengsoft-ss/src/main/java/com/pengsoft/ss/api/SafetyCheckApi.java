@@ -100,9 +100,10 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
             if (SecurityUtils.hasAnyRole(
-                    ConstructionProject.ROL_BU_MANAGER,
                     ConstructionProject.ROL_SU_MANAGER,
                     ConstructionProject.ROL_SECURITY_OFFICER,
+                    ConstructionProject.ROL_BU_MANAGER,
+                    ConstructionProject.ROL_QUALITY_INSPECTOR,
                     ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
                 check.setProject(getProject(getQueryEntity(), getQueryValue()));
                 check.setChecker(SecurityUtilsExt.getStaff());
@@ -121,8 +122,7 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
 
     private Job getQueryValue() {
         var job = SecurityUtilsExt.getPrimaryJob();
-        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SUPERVISION_ENGINEER,
-                ConstructionProject.ROL_SECURITY_OFFICER)) {
+        if (!SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER, ConstructionProject.ROL_BU_MANAGER)) {
             while (job.getParent() != null) {
                 job = job.getParent();
             }
