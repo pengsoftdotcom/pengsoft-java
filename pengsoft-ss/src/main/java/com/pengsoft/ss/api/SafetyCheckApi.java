@@ -222,4 +222,18 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         return getService().statisticByChecker(projectIds, checkerIds, startTime, endTime);
     }
 
+    @GetMapping("find-all-unchecked-or-unhandled-dates")
+    public List<Map<String, Object>> findAllUncheckedOrUnhandledDates(
+            @RequestParam("project.id") List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().findAllUncheckedOrUnhandledDates(projectIds, startTime, endTime);
+    }
+
+    @GetMapping("statistic-by-day")
+    public List<Map<String, Object>> statisticByDay(
+            @RequestParam("project.id") List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getService().statisticByDay(projectIds, startTime, endTime);
+    }
+
 }

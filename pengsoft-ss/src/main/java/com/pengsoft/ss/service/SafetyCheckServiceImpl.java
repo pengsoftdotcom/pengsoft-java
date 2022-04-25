@@ -110,6 +110,18 @@ public class SafetyCheckServiceImpl extends EntityServiceImpl<SafetyCheckReposit
     }
 
     @Override
+    public List<Map<String, Object>> findAllUncheckedOrUnhandledDates(@NotEmpty List<String> projectIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
+        return getRepository().findAllUncheckedOrUnhandledDates(projectIds, startTime, endTime);
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByDay(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
+            @NotNull LocalDateTime endTime) {
+        return getRepository().statisticByDay(projectIds, startTime, endTime);
+    }
+
+    @Override
     protected Sort getDefaultSort() {
         return Sort.by(Direction.DESC, "submittedAt", "handledAt");
     }

@@ -3,6 +3,7 @@ package com.pengsoft.oa.api;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -209,7 +210,12 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
     @GetMapping("statistic-by-department")
     public List<Map<String, Object>> statisticByDepartment(
             @RequestParam(value = "department.id", required = false) List<Department> departments) {
-        return getService().statisticByDepartment(departments);
+        return getService().statisticByDepartment(departments).stream().map(data -> {
+            Map<String, Object> result = new HashMap<>(data);
+            personService.findOneByUserId((String) result.get("cashier"))
+                    .ifPresent(cashier -> result.put("cashier", cashier));
+            return result;
+        }).toList();
     }
 
 }

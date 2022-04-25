@@ -34,4 +34,13 @@ class SafetyCheckRepositoryTest {
         System.out.println(result);
     }
 
+    @Test
+    void findAllUncheckedOrUnhandledDates() {
+        List<Map<String, Object>> result = repository.findAllUncheckedOrUnhandledDates(
+                List.of("24efc508-b6c1-437a-a3dd-dd30212f5e14"),
+                DateUtils.atStartOfCurrentMonth(),
+                DateUtils.atStartOfToday());
+        System.out.println(result);
+    }
+
 }

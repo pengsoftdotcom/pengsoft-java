@@ -102,4 +102,80 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
                           """, nativeQuery = true)
     List<Map<String, Object>> statisticByChecker(@NotEmpty List<String> projectIds, @NotEmpty List<String> checkerIds,
             @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
+    /**
+     * 查询指定时间段内的工程项目的未进行安全检查或未整改隐患的日期
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select
+              c.date
+            from (
+              select to_char(generate_series(cast(?2 as timestamp), cast(?3 as timestamp), '1 day'), 'YYYY-MM-DD') as date
+            ) c left join (
+              select
+                to_char(submitted_at, 'YYYY-MM-DD') date,
+                sum(
+                    case
+                        when b.code = 'risk' and a.handled_at is null then 1
+                        else 0
+                    end
+                ) as count
+              from safety_check a
+              left join dictionary_item b on a.status_id = b.id
+              where a.project_id in (?1) and a.submitted_at between ?2 and ?3
+              group by date
+            ) d on c.date = d.date
+            where d.count > 0 or d.count is null
+                  """, nativeQuery = true)
+    List<Map<String, Object>> findAllUncheckedOrUnhandledDates(@NotEmpty List<String> projectIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
+    /**
+     * 按日统计指定时间段内的工程项目的安全检查数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    @Query(value = """
+            select
+              project_id project,
+              date,
+              sum(safe) safe,
+              sum(risk) risk,
+              sum(handled) handled,
+              sum(unhandled) unhandled
+            from (
+              select
+                project_id,
+                to_char(submitted_at, 'YYYY-MM-DD') date,
+                case
+                  when b.code = 'safe' then 1
+                  else 0
+                end safe,
+                case
+                  when b.code = 'risk' then 1
+                  else 0
+                end risk,
+                case
+                  when b.code = 'risk' and a.handled_at is not null then 1
+                  else 0
+                end handled,
+                case
+                  when b.code = 'risk' and a.handled_at is null then 1
+                  else 0
+                end unhandled
+              from safety_check a
+                left join dictionary_item b on a.status_id = b.id
+              where a.project_id in (?1) and a.submitted_at between ?2 and ?3
+            ) c
+            group by project, date
+                  """, nativeQuery = true)
+    List<Map<String, Object>> statisticByDay(@NotEmpty List<String> projectIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
 }

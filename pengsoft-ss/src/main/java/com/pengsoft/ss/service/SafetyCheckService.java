@@ -79,4 +79,24 @@ public interface SafetyCheckService extends EntityService<SafetyCheck, String> {
     List<Map<String, Object>> statisticByChecker(@NotEmpty List<String> projectIds, @NotEmpty List<String> checkerIds,
             @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
 
+    /**
+     * 查询指定时间段内的工程项目的未进行安全检查或未整改隐患的日期
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    List<Map<String, Object>> findAllUncheckedOrUnhandledDates(@NotEmpty List<String> projectIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
+    /**
+     * 按日统计指定时间段内的工程项目的安全检查数据
+     * 
+     * @param projectIds 工程项目ID列表
+     * @param startTime  开始时间
+     * @param endTime    结束时间
+     */
+    List<Map<String, Object>> statisticByDay(@NotEmpty List<String> projectIds,
+            @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
 }

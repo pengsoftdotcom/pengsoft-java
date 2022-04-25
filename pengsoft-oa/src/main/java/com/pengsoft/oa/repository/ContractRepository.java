@@ -28,12 +28,13 @@ public interface ContractRepository extends EntityRepository<QContract, Contract
     @Query(value = """
             select
               controlled_by department,
+              created_by cashier,
               b.code status,
               count(1) count
             from contract a
             left join dictionary_item b on a.status_id = b.id
             where a.controlled_by in ?1
-            group by a.controlled_by, b.code
+            group by a.controlled_by, a.created_by, b.code
                 """, nativeQuery = true)
     List<Map<String, Object>> statisticByDepartmentId(@NotEmpty List<String> departmentIds);
 
