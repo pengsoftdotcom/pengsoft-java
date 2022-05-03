@@ -80,6 +80,12 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
             }
         });
         var payroll = super.save(target);
+        createDetails(payroll);
+        setStatus(payroll);
+        return super.save(payroll);
+    }
+
+    private void createDetails(PayrollRecord payroll) {
         if (payroll.getSheet() != null && payroll.getImportedAt() == null) {
             final var departmentId = SecurityUtilsExt.getPrimaryDepartmentId();
             final var jobs = jobRoleRepository.findAllByJobDepartmentIdAndRoleCode(departmentId, "worker").stream()
@@ -96,6 +102,9 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
             final var is = new ByteArrayInputStream(sheet.getData());
             EasyExcel.read(is, PayrollDetailData.class, readListener).sheet().doRead();
         }
+    }
+
+    private void setStatus(PayrollRecord payroll) {
         if (payroll.getStatus() == null) {
             if (payroll.getDetails().isEmpty()) {
                 if (payroll.getCreatedAt() != null
@@ -111,7 +120,6 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
                         .ifPresent(payroll::setStatus);
             }
         }
-        return super.save(payroll);
     }
 
     @Override

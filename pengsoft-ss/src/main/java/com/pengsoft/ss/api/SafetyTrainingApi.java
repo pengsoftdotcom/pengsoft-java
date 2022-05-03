@@ -4,25 +4,20 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapType;
-import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
-import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.ConstructionProject;
-import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.domain.QSafetyTraining;
 import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.ss.domain.SafetyTrainingFile;
 import com.pengsoft.ss.facade.SafetyTrainingFacade;
-import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
@@ -64,12 +59,6 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
     public static final String ROL_SECURITY_OFFICER = "security_officer";
 
     public static final String ROL_WORKER = "worker";
-
-    @Inject
-    private ConstructionProjectService projectService;
-
-    @Inject
-    private StaffService staffService;
 
     private ObjectMapper objectMapper;
 
@@ -118,32 +107,11 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
             if (StringUtils.isBlank(training.getSubject())) {
                 training.setSubject("例行安全教育培训");
             }
-            var job = SecurityUtilsExt.getPrimaryJob();
-            if (SecurityUtils.hasAnyRole(ROL_SECURITY_OFFICER)) {
-                training.setTrainer(SecurityUtilsExt.getStaff());
-                while (job.getParent() != null) {
-                    job = job.getParent();
-                }
-                setProject(training, job);
-            }
-            if (SecurityUtils.hasAnyRole(ROL_BU_MANAGER)) {
-                training.setTrainer(SecurityUtilsExt.getStaff());
-                setProject(training, job);
-            }
-            if (training.getProject() != null) {
-                training.setAddress(
-                        training.getProject().getBuManager().getJob().getDepartment().getShortName() + "项目部");
-            }
+            training.setTrainer(SecurityUtilsExt.getStaff());
         }
         Map<String, Object> result = objectMapper.convertValue(training, type);
         result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
         return result;
-    }
-
-    private void setProject(final SafetyTraining training, final Job job) {
-        staffService.findOne(QStaff.staff.job.id.eq(job.getId())).ifPresent(staff -> projectService
-                .findOne(QConstructionProject.constructionProject.buManager.id.eq(staff.getId()))
-                .ifPresent(training::setProject));
     }
 
     @Override

@@ -62,10 +62,12 @@ public class ConstructionProjectApi extends EntityApi<ConstructionProjectFacade,
         } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_OWNER_MANAGER)) {
             predicate = QueryDslUtils.merge(predicate, JPAExpressions.select(root).leftJoin(root.ownerManager, staff)
                     .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER)) {
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER,
+                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
             predicate = QueryDslUtils.merge(predicate, JPAExpressions.select(root).leftJoin(root.suManager, staff)
                     .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER)) {
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER,
+                ConstructionProject.ROL_SECURITY_OFFICER)) {
             predicate = QueryDslUtils.merge(predicate, JPAExpressions.select(root).leftJoin(root.buManager, staff)
                     .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
         } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {

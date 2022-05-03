@@ -31,7 +31,7 @@ public class AttendanceRecord extends OwnedExtEntityImpl {
 
     private static final long serialVersionUID = -2652386762637121804L;
 
-	@NotNull
+    @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Staff staff;
@@ -39,6 +39,21 @@ public class AttendanceRecord extends OwnedExtEntityImpl {
     @NotNull
     @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
-    private AccessRecord accessRecord;
+    private AccessRecord enterRecord;
+
+    @NotNull
+    @OneToOne
+    @NotFound(action = NotFoundAction.IGNORE)
+    private AccessRecord exitRecord;
+
+    private boolean illegal;
+
+    private String remark;
+
+    private int year;
+
+    private int month;
+
+    private int day;
 
 }

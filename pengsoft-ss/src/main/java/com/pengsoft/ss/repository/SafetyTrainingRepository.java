@@ -70,12 +70,28 @@ public interface SafetyTrainingRepository extends EntityRepository<QSafetyTraini
      */
     @Query(value = """
             select
-              project_id project,
-              count(1) count
-            from safety_training a
-            where a.project_id in (:projectIds) and a.submitted_at between :startTime and :endTime
-            group by project_id
-                      """, nativeQuery = true)
+              project,
+              count(distinct training) count,
+              sum(participate) participate,
+              sum(leave) leave
+            from (
+              select
+                project_id project,
+                a.id training,
+                case
+                  when c.code = 'participate' then 1
+                  else 0
+                end participate,
+                case
+                  when c.code = 'leave' then 1
+                  else 0
+                end leave
+              from safety_training a
+                left join safety_training_participant b on a.id = b.training_id
+                left join dictionary_item c on b.status_id = c.id
+              where a.project_id in (:projectIds) and a.submitted_at between :startTime and :endTime
+            ) d group by project
+                            """, nativeQuery = true)
     List<Map<String, Object>> statistic(@NotEmpty List<String> projectIds, @NotNull LocalDateTime startTime,
             @NotNull LocalDateTime endTime);
 

@@ -10,19 +10,16 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapLikeType;
-import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.ConstructionProject;
-import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.domain.QSafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheckFile;
 import com.pengsoft.ss.facade.SafetyCheckFacade;
 import com.pengsoft.ss.repository.SafetyCheckFileRepository;
-import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
 import com.pengsoft.support.json.ObjectMapper;
@@ -61,9 +58,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, String> {
 
     @Inject
-    private ConstructionProjectService projectService;
-
-    @Inject
     private SafetyCheckFileRepository safetyCheckFileRepository;
 
     @Inject
@@ -99,15 +93,7 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         if (StringUtils.isBlank(check.getId())) {
             dictionaryItemService.findOneByTypeCodeAndParentAndCode("safety_check_status", null, "safe")
                     .ifPresent(check::setStatus);
-            if (SecurityUtils.hasAnyRole(
-                    ConstructionProject.ROL_SU_MANAGER,
-                    ConstructionProject.ROL_SECURITY_OFFICER,
-                    ConstructionProject.ROL_BU_MANAGER,
-                    ConstructionProject.ROL_QUALITY_INSPECTOR,
-                    ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
-                check.setProject(getProject(getQueryEntity(), getQueryValue()));
-                check.setChecker(SecurityUtilsExt.getStaff());
-            }
+            check.setChecker(SecurityUtilsExt.getStaff());
         }
 
         Map<String, Object> result = objectMapper.convertValue(check, type);
@@ -118,30 +104,6 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
                     .stream().map(SafetyCheckFile::getFile).toList());
         }
         return result;
-    }
-
-    private Job getQueryValue() {
-        var job = SecurityUtilsExt.getPrimaryJob();
-        if (!SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER, ConstructionProject.ROL_BU_MANAGER)) {
-            while (job.getParent() != null) {
-                job = job.getParent();
-            }
-        }
-        return job;
-    }
-
-    private QStaff getQueryEntity() {
-        final var root = QConstructionProject.constructionProject;
-        var manager = root.buManager;
-        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER,
-                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
-            manager = root.suManager;
-        }
-        return manager;
-    }
-
-    private ConstructionProject getProject(QStaff manager, final Job queryValue) {
-        return projectService.findOne(manager.job.id.eq(queryValue.getId())).orElse(null);
     }
 
     @Override
