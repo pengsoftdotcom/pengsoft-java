@@ -72,6 +72,7 @@ public interface SafetyTrainingRepository extends EntityRepository<QSafetyTraini
             select
               project,
               count(distinct training) count,
+              count(1) should_arrive,
               sum(participate) participate,
               sum(leave) leave
             from (
