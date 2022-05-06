@@ -131,28 +131,27 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     }
 
     private Predicate getAuthorityPredicate(Predicate predicate, QSafetyCheck root) {
-        final var staff = SecurityUtilsExt.getStaff();
-        final var qStaff = QStaff.staff;
+        final var staff = QStaff.staff;
 
         if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_RU_MANAGER)) {
             predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.ruManager, qStaff)
-                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+                    JPAExpressions.select(root).leftJoin(root.project.ruManager, staff)
+                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
         } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_OWNER_MANAGER)) {
             predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.ownerManager, qStaff)
-                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER)) {
+                    JPAExpressions.select(root).leftJoin(root.project.ownerManager, staff)
+                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER,
+                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
             predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.suManager, qStaff)
-                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER)) {
+                    JPAExpressions.select(root).leftJoin(root.project.suManager, staff)
+                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
+        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER,
+                ConstructionProject.ROL_QUALITY_INSPECTOR,
+                ConstructionProject.ROL_SECURITY_OFFICER)) {
             predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.buManager, qStaff)
-                            .where(qStaff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SUPERVISION_ENGINEER,
-                ConstructionProject.ROL_QUALITY_INSPECTOR, ConstructionProject.ROL_SECURITY_OFFICER)) {
-            predicate = QueryDslUtils.merge(predicate, root.checker.id.eq(staff.getId()));
+                    JPAExpressions.select(root).leftJoin(root.project.buManager, staff)
+                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
         } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {
             predicate = Expressions.FALSE.isTrue();
         }
