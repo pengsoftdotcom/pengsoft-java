@@ -16,6 +16,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
@@ -26,6 +27,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@NoArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
 @Table(indexes = { @Index(name = "staff_person_id_job_id", columnList = "person_id, job_id", unique = true) })
@@ -55,5 +57,11 @@ public class Staff extends OwnedExtEntityImpl {
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)
     private Organization organization;
+
+    public Staff(Person person, Job job, boolean primary) {
+        this.person = person;
+        this.job = job;
+        this.primary = primary;
+    }
 
 }

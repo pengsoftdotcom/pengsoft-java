@@ -65,8 +65,6 @@ public class SafetyTraining extends EntityImpl implements Codeable {
     @Length(max = 255)
     private String address;
 
-    private boolean allWorkers = true;
-
     @NotNull
     private LocalDateTime estimatedStartTime = DateUtils.atStartOfToday().plusHours(9);
 
@@ -78,6 +76,10 @@ public class SafetyTraining extends EntityImpl implements Codeable {
     private LocalDateTime startedAt;
 
     private LocalDateTime endedAt;
+
+    private boolean allWorkers;
+
+    private long numberOfParticipants;
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)

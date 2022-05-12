@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
@@ -63,6 +64,11 @@ public class JobServiceImpl extends TreeEntityServiceImpl<JobRepository, Job, St
     public Optional<Job> findOneByDepartmentAndParentAndName(Department department, Job parent, String name) {
         return getRepository().findOneByDepartmentIdAndParentIdAndName(department.getId(),
                 Optional.ofNullable(parent).map(Job::getId).orElse(null), name);
+    }
+
+    @Override
+    public List<Job> findAllByName(@NotBlank String name) {
+        return getRepository().findAllByName(name);
     }
 
 }

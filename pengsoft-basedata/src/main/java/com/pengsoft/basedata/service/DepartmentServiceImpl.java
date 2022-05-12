@@ -10,6 +10,8 @@ import com.pengsoft.support.util.EntityUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
 /**
@@ -43,6 +45,11 @@ public class DepartmentServiceImpl extends TreeEntityServiceImpl<DepartmentRepos
             String name) {
         return getRepository().findOneByOrganizationIdAndParentIdAndName(organization.getId(),
                 Optional.ofNullable(parent).map(Department::getId).orElse(null), name);
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Direction.ASC, "shortName");
     }
 
 }

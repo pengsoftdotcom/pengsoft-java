@@ -38,4 +38,11 @@ public interface JobService extends TreeEntityService<Job, String> {
     Optional<Job> findOneByDepartmentAndParentAndName(@NotNull Department department, Job parent,
             @NotBlank String name);
 
+    /**
+     * 根据名称查询所有职位
+     * 
+     * @param name
+     */
+    List<Job> findAllByName(@NotBlank String name);
+
 }

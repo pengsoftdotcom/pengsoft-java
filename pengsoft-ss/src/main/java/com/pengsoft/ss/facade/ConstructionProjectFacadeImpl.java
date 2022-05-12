@@ -29,6 +29,7 @@ import com.pengsoft.ss.excel.WorkerData;
 import com.pengsoft.ss.excel.WorkerDataReadListener;
 import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.facade.EntityFacadeImpl;
+import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 
 import org.springframework.context.annotation.Bean;
@@ -125,8 +126,8 @@ public class ConstructionProjectFacadeImpl extends
             final var suDepartment = constructionProject.getSuManager().getDepartment();
             final var suManagerJob = constructionProject.getSuManager().getJob();
 
-            final var supervisionEngineerPostName = "监理工程师";
-            final var supervisionEngineerJobName = "监理工程师";
+            final var supervisionEngineerPostName = "监理";
+            final var supervisionEngineerJobName = "监理";
             final var supervisionEngineerRoleCode = "supervision_engineer";
             final var supervisionEngineerJob = getJob(supervisionUnit, suDepartment, suManagerJob,
                     supervisionEngineerPostName, supervisionEngineerJobName, supervisionEngineerRoleCode);
@@ -171,7 +172,7 @@ public class ConstructionProjectFacadeImpl extends
         }
     }
 
-    private Job getJob(final Organization buildingUnit, final Department buDepartment, final Job buManagerJob,
+    private Job getJob(final Organization buildingUnit, final Department department, final Job managerJob,
             final String postName, final String jobName, final String roleCode) {
         final var post = postService.findOneByOrganizationAndName(buildingUnit, postName)
                 .orElse(new Post());
@@ -182,11 +183,11 @@ public class ConstructionProjectFacadeImpl extends
         }
 
         var job = jobService
-                .findOneByDepartmentAndParentAndName(buDepartment, buManagerJob, jobName)
-                .orElse(new Job());
+                .findAllByName(jobName)
+                .stream().filter(j -> EntityUtils.equals(j.getDepartment(), department)).findAny().orElse(new Job());
         if (StringUtils.isBlank(job.getId())) {
-            job.setDepartment(buDepartment);
-            job.setParent(buManagerJob);
+            job.setDepartment(department);
+            job.setParent(managerJob);
             job.setName(jobName);
             job.setPost(post);
             job.setQuantity(100);

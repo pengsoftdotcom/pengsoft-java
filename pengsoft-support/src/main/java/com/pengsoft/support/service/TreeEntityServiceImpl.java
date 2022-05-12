@@ -114,7 +114,7 @@ public class TreeEntityServiceImpl<R extends TreeEntityRepository<?, T, ID>, T e
     }
 
     private Predicate getPredicateOfExcludeSelfAndItsChildren(final T self, Predicate predicate) {
-        if (self != null) {
+        if (EntityUtils.isNotEmpty(self)) {
             final var idPath = QueryDslUtils.getIdStringPath(getEntityClass());
             predicate = QueryDslUtils.merge(idPath.ne(self.getId().toString()), predicate);
 

@@ -7,10 +7,11 @@ import com.alibaba.excel.read.listener.ReadListener;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.basedata.service.JobService;
 import com.pengsoft.basedata.service.PersonService;
 import com.pengsoft.basedata.service.StaffService;
-
-import org.apache.commons.lang3.StringUtils;
+import com.pengsoft.support.util.EntityUtils;
+import com.pengsoft.support.util.StringUtils;
 
 import lombok.Setter;
 
@@ -31,11 +32,15 @@ public class WorkerDataReadListener implements ReadListener<WorkerData> {
     @Setter
     private Job job;
 
+    @Inject
+    private JobService jobService;
+
     @Override
     public void invoke(WorkerData data, AnalysisContext context) {
         final var name = StringUtils.replace(data.getName(), "\s", "");
         final var mobile = StringUtils.replace(data.getMobile(), "\s", "");
         final var identityCardNumber = StringUtils.replace(data.getIdentityCardNumber(), "\s", "");
+        final var extraJobName = StringUtils.replace(data.getExtraJobname(), "\s", "");
         if (StringUtils.isNotBlank(mobile)) {
             final var person = personService.findOneByMobile(data.getMobile()).orElse(new Person());
             if (StringUtils.isBlank(person.getId())) {
@@ -51,6 +56,21 @@ public class WorkerDataReadListener implements ReadListener<WorkerData> {
                 staff.setJob(job);
                 staffService.save(staff);
             }
+            if (StringUtils.isNotBlank(extraJobName)) {
+                jobService.findAllByName(extraJobName).stream().filter(
+                        extraJob -> EntityUtils.equals(extraJob.getDepartment().getOrganization(),
+                                staff.getOrganization()))
+                        .findFirst().ifPresent(extraJob -> {
+                            final var extraStaff = staffService.findOneByPersonAndJob(person, extraJob)
+                                    .orElse(new Staff());
+                            if (StringUtils.isBlank(extraStaff.getId())) {
+                                extraStaff.setPerson(person);
+                                extraStaff.setJob(extraJob);
+                                staffService.save(extraStaff);
+                            }
+                        });
+            }
+
         }
     }
 

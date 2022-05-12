@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
 
 import com.google.common.collect.Lists;
 import com.pengsoft.support.domain.Codeable;
@@ -16,6 +17,7 @@ import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -41,6 +43,19 @@ public class EntityServiceImpl<R extends EntityRepository<?, T, ID>, T extends E
     @Getter
     @Inject
     private R repository;
+
+    @Getter
+    @Inject
+    private EntityManager entityManager;
+
+    private JPAQueryFactory queryFactory;
+
+    public JPAQueryFactory getQueryFactory() {
+        if (queryFactory == null) {
+            queryFactory = new JPAQueryFactory(entityManager);
+        }
+        return queryFactory;
+    }
 
     @SuppressWarnings("unchecked")
     @Override

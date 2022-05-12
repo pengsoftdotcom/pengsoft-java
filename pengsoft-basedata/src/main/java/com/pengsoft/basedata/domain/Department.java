@@ -44,6 +44,8 @@ public class Department extends OwnedExtTreeEntityImpl<Department> {
     @Size(max = 255)
     private String shortName;
 
+    private long number;
+
     @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)

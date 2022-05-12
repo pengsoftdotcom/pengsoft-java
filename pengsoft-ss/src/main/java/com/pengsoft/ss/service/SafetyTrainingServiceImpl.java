@@ -5,16 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.StreamSupport;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.pengsoft.basedata.domain.QStaff;
-import com.pengsoft.basedata.repository.StaffRepository;
-import com.pengsoft.basedata.util.SecurityUtilsExt;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.ss.domain.SafetyTrainingFile;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
@@ -26,6 +24,7 @@ import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.system.domain.Asset;
+import com.pengsoft.system.repository.DictionaryItemRepository;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
@@ -51,7 +50,7 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
     private SafetyTrainingParticipantRepository participantRepository;
 
     @Inject
-    private StaffRepository staffRepository;
+    private DictionaryItemRepository dictionaryItemRepository;
 
     @Override
     public SafetyTraining save(final SafetyTraining target) {
@@ -64,30 +63,15 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
     }
 
     @Override
-    public void saveAndSubmit(final SafetyTraining training) {
-        submit(save(training));
-    }
-
-    @Override
-    public void submit(final SafetyTraining training) {
-        if (training.getSubmittedAt() != null) {
-            throw new BusinessException("training.submit.already");
-        }
-        if (!participantRepository.existsByTrainingId(training.getId()) && training.isAllWorkers()) {
-            final var root = QStaff.staff;
-            final var staffs = staffRepository.findAll(
-                    root.job.name.eq("工人").and(root.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())));
-            final var participants = StreamSupport.stream(staffs.spliterator(), false)
-                    .map(staff -> new SafetyTrainingParticipant(training, staff)).toList();
-            participantRepository.saveAll(participants);
-            training.setParticipants(new ArrayList<>(participants));
-        }
-        if (participantRepository.existsByTrainingId(training.getId())) {
-            training.setSubmittedAt(DateUtils.currentDateTime());
-            save(training);
-        } else {
-            throw new BusinessException("training.submit.no-participants");
-        }
+    public void submit(@Valid @NotNull SafetyTraining training, @NotEmpty List<Staff> staffs) {
+        training.setSubmittedAt(DateUtils.currentDateTime());
+        training.setNumberOfParticipants(staffs.size());
+        save(training);
+        final var participants = new ArrayList<>(
+                staffs.stream().map(staff -> new SafetyTrainingParticipant(training, staff)).toList());
+        participantRepository.saveAll(participants);
+        training.setParticipants(participants);
+        save(training);
     }
 
     @Override
@@ -116,7 +100,17 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
                 .map(file -> new SafetyTrainingFile(training, file)).toList();
         fileRepository.saveAll(trainingFiles);
         training.setFiles(trainingFiles);
-        super.save(training);
+
+        final var status = dictionaryItemRepository
+                .findOneByTypeCodeAndParentIdAndCode("safety_training_participant_status", null, "participate")
+                .orElseThrow();
+        final var confirmedAt = DateUtils.currentDateTime();
+        training.getParticipants().forEach(participant -> {
+            participant.setStatus(status);
+            participant.setConfirmedAt(confirmedAt);
+            participantRepository.save(participant);
+        });
+        // super.save(training);
     }
 
     @Override

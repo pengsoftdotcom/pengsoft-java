@@ -44,9 +44,9 @@ public interface SafetyTrainingParticipantRepository
     List<SafetyTrainingParticipant> findAllByTrainingId(@NotBlank String trainingId);
 
     /**
-     * 按建筑项目、参与状态统计
+     * 按工程项目、参与状态统计
      * 
-     * @param projectIds 建筑项目ID列表
+     * @param projectIds 工程项目ID列表
      * @param startTime  开始时间
      * @param endTime    结束时间
      */

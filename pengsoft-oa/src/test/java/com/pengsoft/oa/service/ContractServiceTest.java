@@ -39,7 +39,7 @@ class ContractServiceTest {
     PersonRepository personRepository;
 
     @Test
-    @WithUserDetails("55555555555")
+    @WithUserDetails("13368064910")
     void create() {
         final var cashier = staffRepository
                 .findOneByPersonIdAndPrimaryTrue(

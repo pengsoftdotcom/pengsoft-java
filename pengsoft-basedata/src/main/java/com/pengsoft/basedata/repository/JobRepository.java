@@ -1,5 +1,6 @@
 package com.pengsoft.basedata.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.persistence.QueryHint;
@@ -41,4 +42,11 @@ public interface JobRepository extends TreeEntityRepository<QJob, Job, String>, 
     Optional<Job> findOneByDepartmentIdAndParentIdAndName(@NotBlank String departmentId, String parentId,
             @NotBlank String name);
 
+    /**
+     * 根据名称查询所有职位
+     * 
+     * @param name
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    List<Job> findAllByName(@NotBlank String name);
 }

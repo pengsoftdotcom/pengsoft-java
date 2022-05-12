@@ -24,9 +24,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class StaffApi extends EntityApi<StaffFacade, Staff, String> {
 
     @GetMapping("/find-all-by-department-and-role-codes")
-    public List<Staff> findAllByDepartmentAndRoleCodes(@RequestParam("department.id") Department department,
-            @RequestParam("role.code") String... roleCodes) {
-        return getService().findAllByDepartmentAndRoleCodes(department, roleCodes);
+    public List<Staff> findAllByDepartmentAndRoleCodes(@RequestParam("department.id") List<Department> departments,
+            @RequestParam("role.code") List<String> roleCodes) {
+        return getService().findAllByDepartmentsAndRoleCodes(departments, roleCodes);
     }
 
 }

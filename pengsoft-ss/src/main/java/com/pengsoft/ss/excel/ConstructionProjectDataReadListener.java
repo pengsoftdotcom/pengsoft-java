@@ -119,7 +119,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             final var root = QStaff.staff;
             final var jobRole = QJobRole.jobRole;
             final var ruManager = staffService
-                    .findOne(root.person.eq(person)
+                    .findOne(root.person.id.eq(person.getId())
                             .and(JPAExpressions.selectOne().from(root.job.jobRoles, jobRole)
                                     .where(jobRole.role.code.eq("ru_manager")).exists()))
                     .orElseThrow(() -> exceptions.entityNotExists(Staff.class, "ru_manager"));
@@ -133,13 +133,13 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             final var owner = saveOrganization(ownerName);
             constructionProject.setOwner(owner);
 
-            final var ownerManagerPostName = "项目经理";
+            final var ownerManagerPostName = "项目负责人";
             final var ownerManagerPost = savePost(owner, ownerManagerPostName);
 
             final var ownerDepartmentName = constructionProject.getName() + "项目部";
             final var ownerDepartment = saveDepartment(owner, ownerDepartmentName);
 
-            final var ownerManagerJobName = "项目经理";
+            final var ownerManagerJobName = "项目负责人";
             final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName);
 
             final var ownerManagerName = StringUtils.replace(data.getOwnerManager(), "\s", "");
@@ -156,13 +156,13 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             final var supervisionUnit = saveOrganization(supervisionUnitName);
             constructionProject.setSupervisionUnit(supervisionUnit);
 
-            final var suManagerPostName = "总监理工程师";
+            final var suManagerPostName = "监理总监";
             final var suManagerPost = savePost(supervisionUnit, suManagerPostName);
 
             final var suDepartmentName = constructionProject.getName() + "项目部";
             final var suDepartment = saveDepartment(supervisionUnit, suDepartmentName);
 
-            final var suManagerJobName = "总监理工程师";
+            final var suManagerJobName = "监理总监";
             final var suManagerJob = saveJob(suManagerPost, suDepartment, suManagerJobName);
 
             final var suManagerName = StringUtils.replace(data.getSuManager(), "\s", "");

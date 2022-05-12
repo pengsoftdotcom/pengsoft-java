@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
@@ -71,8 +70,15 @@ public class StaffFacadeImpl extends EntityFacadeImpl<StaffService, Staff, Strin
     }
 
     @Override
-    public List<Staff> findAllByDepartmentAndRoleCodes(@NotNull Department department, @NotEmpty String... roleCodes) {
-        return getService().findAllByDepartmentAndRoleCodes(department, roleCodes);
+    public List<Staff> findAllByDepartmentsAndRoleCodes(@NotEmpty List<Department> departments,
+            @NotEmpty List<String> roleCodes) {
+        return getService().findAllByDepartmentsAndRoleCodes(departments, roleCodes);
+    }
+
+    @Override
+    public List<Staff> findAllByDepartmentsAndRoleCodes(@NotEmpty List<Department> departments,
+            @NotEmpty List<Person> persons, @NotEmpty List<String> roleCodes) {
+        return getService().findAllByDepartmentsAndRoleCodes(departments, persons, roleCodes);
     }
 
 }

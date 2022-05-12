@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.ss.domain.QSafetyTrainingFile;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.ss.service.SafetyTrainingFileService;
@@ -51,14 +53,8 @@ public class SafetyTrainingFacadeImpl extends EntityFacadeImpl<SafetyTrainingSer
     }
 
     @Override
-    public void saveAndSubmit(SafetyTraining training) {
-        getService().saveAndSubmit(training);
-    }
-
-    @Override
-    public void submit(SafetyTraining training) {
-        getService().submit(training);
-
+    public void submit(@Valid @NotNull SafetyTraining training, @NotEmpty List<Staff> staffs) {
+        getService().submit(training, staffs);
     }
 
     @Override

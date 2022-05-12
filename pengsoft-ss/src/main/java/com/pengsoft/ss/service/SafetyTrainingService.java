@@ -10,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.support.service.EntityService;
 import com.pengsoft.system.domain.Asset;
@@ -26,15 +27,9 @@ public interface SafetyTrainingService extends EntityService<SafetyTraining, Str
      * 提交
      * 
      * @param training {@link SafetyTraining}
+     * @param staffs   参与人
      */
-    void saveAndSubmit(@Valid @NotNull SafetyTraining training);
-
-    /**
-     * 提交
-     * 
-     * @param training {@link SafetyTraining}
-     */
-    void submit(@NotNull SafetyTraining training);
+    void submit(@Valid @NotNull SafetyTraining training, @NotEmpty List<Staff> staffs);
 
     /**
      * 开始

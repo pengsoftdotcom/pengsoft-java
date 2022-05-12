@@ -21,4 +21,6 @@ public class WorkerData {
 
     private String identityCardNumber;
 
+    private String extraJobname;
+
 }

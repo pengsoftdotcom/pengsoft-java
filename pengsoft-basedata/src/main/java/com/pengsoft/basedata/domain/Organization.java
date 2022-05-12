@@ -58,6 +58,8 @@ public class Organization extends OwnedExtTreeEntityImpl<Organization> {
     @Max(28)
     private int payday = 20;
 
+    private long number;
+
     @OneToOne(cascade = CascadeType.REMOVE)
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset logo;

@@ -4,11 +4,15 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapType;
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.QStaff;
+import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.domain.Role;
 import com.pengsoft.security.util.SecurityUtils;
@@ -31,6 +35,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -64,6 +69,9 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
 
     private MapType type;
 
+    @Inject
+    private StaffService staffService;
+
     public SafetyTrainingApi(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         type = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
@@ -71,16 +79,17 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
 
     @TaskHandler(name = "safetyTrainingConfirmTaskHandler", create = true)
     @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
-    @PostMapping("save-and-submit")
-    public void saveAndSubmit(@RequestBody SafetyTraining training) {
-        getService().saveAndSubmit(training);
-    }
-
-    @TaskHandler(name = "safetyTrainingConfirmTaskHandler", create = true)
-    @Messaging(builder = "safetyTrainingConfirmMessageBuilder")
-    @PutMapping("submit")
-    public void submit(@RequestParam("id") SafetyTraining training) {
-        getService().submit(training);
+    @PostMapping("submit")
+    public void submit(@RequestBody SafetyTraining training,
+            @RequestParam(value = "department.id", required = false) List<Department> departments,
+            @RequestParam(value = "staff.id", required = false) List<Staff> staffs) {
+        if (CollectionUtils.isNotEmpty(departments)) {
+            final var persons = staffService.findAllByDepartmentsAndRoleCodes(departments, List.of(ROL_WORKER))
+                    .stream().map(Staff::getPerson).toList();
+            staffs = staffService.findAllByDepartmentsAndRoleCodes(List.of(departments.get(0).getParent()), persons,
+                    List.of(ROL_WORKER));
+        }
+        getService().submit(training, staffs);
     }
 
     @PutMapping("start")
@@ -110,6 +119,7 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
             training.setTrainer(SecurityUtilsExt.getStaff());
         }
         Map<String, Object> result = objectMapper.convertValue(training, type);
+        result.put("participantSize", training.getParticipants().size());
         result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
         return result;
     }

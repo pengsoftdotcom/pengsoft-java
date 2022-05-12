@@ -40,11 +40,20 @@ public class EntityUtils {
         return !equals(b1, b2);
     }
 
-    public static <T extends Entity<? extends Serializable>> boolean isPersisted(final T bean) {
-        return Optional.ofNullable(bean).filter(b -> b.getId() != null && b.getCreatedAt() != null).isPresent();
+    public static <T extends Entity<? extends Serializable>> boolean isPersisted(final T entity) {
+        return Optional.ofNullable(entity).filter(b -> b.getId() != null && b.getCreatedAt() != null).isPresent();
     }
 
-    public static <T extends Entity<? extends Serializable>> boolean isNotPersisted(final T bean) {
-        return !isPersisted(bean);
+    public static <T extends Entity<? extends Serializable>> boolean isNotPersisted(final T entity) {
+        return !isPersisted(entity);
     }
+
+    public static <T extends Entity<? extends Serializable>> boolean isEmpty(final T entity) {
+        return entity == null || entity.getId() == null;
+    }
+
+    public static <T extends Entity<? extends Serializable>> boolean isNotEmpty(final T entity) {
+        return !isEmpty(entity);
+    }
+
 }

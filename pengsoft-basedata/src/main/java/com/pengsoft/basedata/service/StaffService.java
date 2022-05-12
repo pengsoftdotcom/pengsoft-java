@@ -62,9 +62,20 @@ public interface StaffService extends EntityService<Staff, String> {
     /**
      * 根据指定的部门和角色查询员工
      * 
-     * @param department 部门
-     * @param roleCodes  角色编码
+     * @param departments 部门
+     * @param roleCodes   角色编码
      */
-    List<Staff> findAllByDepartmentAndRoleCodes(@NotNull Department department, @NotEmpty String... roleCodes);
+    List<Staff> findAllByDepartmentsAndRoleCodes(@NotEmpty List<Department> departments,
+            @NotEmpty List<String> roleCodes);
+
+    /**
+     * 根据指定的部门、人员和角色查询员工
+     * 
+     * @param departments 部门
+     * @param persons     人员
+     * @param roleCodes   角色编码
+     */
+    List<Staff> findAllByDepartmentsAndRoleCodes(@NotEmpty List<Department> departments, @NotEmpty List<Person> persons,
+            @NotEmpty List<String> roleCodes);
 
 }
