@@ -100,7 +100,7 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
                 .map(file -> new SafetyTrainingFile(training, file)).toList();
         fileRepository.saveAll(trainingFiles);
         training.setFiles(trainingFiles);
-
+        super.save(training);
         final var status = dictionaryItemRepository
                 .findOneByTypeCodeAndParentIdAndCode("safety_training_participant_status", null, "participate")
                 .orElseThrow();
@@ -110,7 +110,6 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
             participant.setConfirmedAt(confirmedAt);
             participantRepository.save(participant);
         });
-        // super.save(training);
     }
 
     @Override
