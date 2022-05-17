@@ -35,6 +35,7 @@ public interface PersonRepository extends EntityRepository<QPerson, Person, Stri
         bindings.bind(root.name).first(StringPath::contains);
         bindings.bind(root.nickname).first(StringPath::contains);
         bindings.bind(root.mobile).first(StringPath::contains);
+        bindings.bind(root.identityCardNumber).first(StringPath::contains);
     }
 
     /**

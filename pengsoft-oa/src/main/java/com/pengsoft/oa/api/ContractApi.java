@@ -11,6 +11,8 @@ import javax.inject.Inject;
 
 import com.fasterxml.jackson.databind.type.MapType;
 import com.pengsoft.basedata.domain.Department;
+import com.pengsoft.basedata.domain.Person;
+import com.pengsoft.basedata.domain.QPerson;
 import com.pengsoft.basedata.service.OrganizationService;
 import com.pengsoft.basedata.service.PersonService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
@@ -39,6 +41,7 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.util.Base64Utils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,6 +51,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import net.coobird.thumbnailator.Thumbnails;
 
@@ -155,7 +160,18 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
     }
 
     @GetMapping("find-page-with-party")
-    public Page<Map<String, Object>> findPageWithParty(final Predicate predicate, final Pageable pageable) {
+    public Page<Map<String, Object>> findPageWithParty(Predicate predicate, final Pageable pageable) {
+        final var request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes()))
+                .getRequest();
+        final var keyword = request.getParameter("keyword");
+        if (StringUtils.isNotBlank(keyword)) {
+            final var root = QPerson.person;
+            final var personIds = personService.findAll(
+                    root.name.contains(keyword)
+                            .or(root.mobile.contains(keyword).or(root.identityCardNumber.contains(keyword))),
+                    Sort.unsorted()).stream().map(Person::getId).toList();
+            predicate = QueryDslUtils.merge(predicate, QContract.contract.partyBId.in(personIds));
+        }
         final var page = super.findPage(predicate, pageable);
         final var content = page.getContent().stream().map(this::setParty).toList();
         return new PageImpl<>(content, page.getPageable(), page.getTotalElements());
