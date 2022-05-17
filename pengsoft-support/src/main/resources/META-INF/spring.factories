@@ -2,4 +2,6 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration= \
 com.pengsoft.support.config.JpaConfigurer, \
 com.pengsoft.support.config.TransactionConfigurer, \
 com.pengsoft.support.config.DefaultWebMvcConfigurer, \
-com.pengsoft.support.config.AspectJConfigurer
+com.pengsoft.support.config.AspectJConfigurer, \
+com.pengsoft.support.config.AsyncConfigurer, \
+com.pengsoft.support.config.SchedulingConfigurer

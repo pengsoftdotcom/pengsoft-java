@@ -22,4 +22,9 @@ public interface ConstructionProjectFacade
      */
     void importData(MultipartFile file);
 
+    /**
+     * 发薪
+     */
+    void generatePayrollRecords();
+
 }

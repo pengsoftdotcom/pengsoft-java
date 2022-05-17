@@ -4,6 +4,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import com.pengsoft.ss.domain.QualityCheck;
+import com.pengsoft.ss.facade.QualityCheckFacade;
 import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.domain.DictionaryItem;
@@ -11,6 +12,9 @@ import com.pengsoft.system.service.DictionaryItemService;
 import com.pengsoft.task.aspect.TaskExecutor;
 import com.pengsoft.task.domain.Task;
 import com.pengsoft.task.service.TaskService;
+import com.querydsl.core.types.Predicate;
+
+import org.springframework.data.domain.Sort;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,6 +30,9 @@ public class QualityCheckRiskTaskHandler implements TaskExecutor {
 
     @Inject
     private Exceptions exceptions;
+
+    @Inject
+    private QualityCheckFacade qualityCheckFacade;
 
     @Override
     public void create(Object[] args, Object result) {
@@ -56,6 +63,13 @@ public class QualityCheckRiskTaskHandler implements TaskExecutor {
         final var task = taskService.findOneByTargetId(check.getId())
                 .orElseThrow(() -> exceptions.entityNotExists(Task.class, check.getId()));
         taskService.finish(task);
+    }
+
+    @Override
+    public void delete(Object[] args, Object result) {
+        final var predicate = (Predicate) args[0];
+        qualityCheckFacade.findAll(predicate, Sort.unsorted())
+                .forEach(check -> taskService.findOneByTargetId(check.getId()).ifPresent(taskService::delete));
     }
 
 }

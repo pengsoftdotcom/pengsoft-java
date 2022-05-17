@@ -17,4 +17,6 @@ public @interface TaskHandler {
 
     boolean finish() default false;
 
+    boolean delete() default false;
+
 }

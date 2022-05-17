@@ -11,8 +11,10 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.ss.domain.QSafetyTrainingConfirmFile;
 import com.pengsoft.ss.domain.QSafetyTrainingFile;
 import com.pengsoft.ss.domain.SafetyTraining;
+import com.pengsoft.ss.service.SafetyTrainingConfirmFileService;
 import com.pengsoft.ss.service.SafetyTrainingFileService;
 import com.pengsoft.ss.service.SafetyTrainingService;
 import com.pengsoft.support.facade.EntityFacadeImpl;
@@ -37,18 +39,32 @@ public class SafetyTrainingFacadeImpl extends EntityFacadeImpl<SafetyTrainingSer
     @Inject
     private SafetyTrainingFileService safetyTraininigFileService;
 
+    @Inject
+    private SafetyTrainingConfirmFileService safetyTraininigConfirmFileService;
+
     @Override
     public Optional<SafetyTraining> findOneByCode(String code) {
         return getService().findOneByCode(code);
     }
 
     @Override
-    public void deleteFileByAsset(SafetyTraining check, Asset asset) {
-        if (check == null) {
+    public void deleteFileByAsset(SafetyTraining training, Asset asset) {
+        if (training == null) {
             assetService.delete(asset);
         } else {
             safetyTraininigFileService.findOne(QSafetyTrainingFile.safetyTrainingFile.file.id.eq(asset.getId()))
                     .ifPresent(safetyTraininigFileService::delete);
+        }
+    }
+
+    @Override
+    public void deleteConfirmFileByAsset(SafetyTraining training, Asset asset) {
+        if (training == null) {
+            assetService.delete(asset);
+        } else {
+            safetyTraininigConfirmFileService
+                    .findOne(QSafetyTrainingConfirmFile.safetyTrainingConfirmFile.file.id.eq(asset.getId()))
+                    .ifPresent(safetyTraininigConfirmFileService::delete);
         }
     }
 
@@ -63,14 +79,15 @@ public class SafetyTrainingFacadeImpl extends EntityFacadeImpl<SafetyTrainingSer
     }
 
     @Override
-    public void end(SafetyTraining training, List<Asset> files) {
-        getService().end(training, files);
+    public void end(SafetyTraining training, List<Asset> files, List<Asset> confirmFiles) {
+        getService().end(training, files, confirmFiles);
     }
 
     @Override
-    public void delete(SafetyTraining entity) {
-        safetyTraininigFileService.delete(entity.getFiles());
-        super.delete(entity);
+    public void delete(SafetyTraining training) {
+        safetyTraininigFileService.delete(training.getFiles());
+        safetyTraininigConfirmFileService.delete(training.getConfirmFiles());
+        super.delete(training);
     }
 
     @Override

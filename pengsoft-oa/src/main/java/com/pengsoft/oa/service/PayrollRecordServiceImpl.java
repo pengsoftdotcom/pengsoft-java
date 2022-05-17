@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -28,6 +29,7 @@ import com.pengsoft.system.repository.DictionaryItemRepository;
 import com.pengsoft.system.service.AssetService;
 import com.pengsoft.system.service.StorageService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
@@ -74,11 +76,13 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
 
     @Override
     public PayrollRecord save(PayrollRecord target) {
-        findOneByYearAndMonth(target.getYear(), target.getMonth()).ifPresent(source -> {
-            if (EntityUtils.notEquals(source, target)) {
-                throw getExceptions().constraintViolated("month", "exists", target.getYear());
-            }
-        });
+        findOneByYearAndMonthAndBelongsTo(target.getYear(), target.getMonth(),
+                StringUtils.defaultString(target.getBelongsTo(), SecurityUtilsExt.getPrimaryOrganizationId()))
+                .ifPresent(source -> {
+                    if (EntityUtils.notEquals(source, target)) {
+                        throw getExceptions().constraintViolated("month", "exists", target.getYear());
+                    }
+                });
         var payroll = super.save(target);
         createDetails(payroll);
         setStatus(payroll);
@@ -123,20 +127,20 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
     }
 
     @Override
-    public void delete(PayrollRecord entity) {
-        super.delete(entity);
-        if (entity.getSheet() != null) {
-            assetService.delete(entity.getSheet());
+    public void delete(PayrollRecord payroll) {
+        super.delete(payroll);
+        if (payroll.getSheet() != null) {
+            assetService.delete(payroll.getSheet());
         }
-        if (entity.getSignedSheet() != null) {
-            assetService.delete(entity.getSignedSheet());
+        if (payroll.getSignedSheet() != null) {
+            assetService.delete(payroll.getSignedSheet());
         }
     }
 
     @Override
-    public Optional<PayrollRecord> findOneByYearAndMonth(int year, int month) {
-        return getRepository().findOneByYearAndMonthAndBelongsTo(year, month,
-                SecurityUtilsExt.getPrimaryOrganizationId());
+    public Optional<PayrollRecord> findOneByYearAndMonthAndBelongsTo(int year, int month,
+            @NotBlank String belongsTo) {
+        return getRepository().findOneByYearAndMonthAndBelongsTo(year, month, belongsTo);
     }
 
     @Override

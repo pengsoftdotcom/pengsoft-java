@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Construction project safety training file
+ * Construction project safety training confirm file
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
@@ -27,9 +27,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-public class SafetyTrainingFile extends EntityImpl {
-
-    private static final long serialVersionUID = 3579219312536097170L;
+public class SafetyTrainingConfirmFile extends EntityImpl {
 
     @NotNull
     @ManyToOne
@@ -41,7 +39,7 @@ public class SafetyTrainingFile extends EntityImpl {
     @NotFound(action = NotFoundAction.IGNORE)
     private Asset file;
 
-    public SafetyTrainingFile(SafetyTraining training, Asset file) {
+    public SafetyTrainingConfirmFile(SafetyTraining training, Asset file) {
         setTraining(training);
         setFile(file);
     }

@@ -42,6 +42,7 @@ public class TaskServiceImpl extends EntityServiceImpl<TaskRepository, Task, Str
                 .findOneByTypeCodeAndParentIdAndCode("task_status", null, STATUS_FINISHED)
                 .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, STATUS_FINISHED));
         task.setStatus(status);
+        task.setPercent(100);
         task.setFinishedBy(SecurityUtils.getUserId());
         task.setFinishedAt(DateUtils.currentDateTime());
         save(task);

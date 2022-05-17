@@ -46,7 +46,7 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
     private Job job;
 
     @Getter
-    List<PayrollDetail> payrollDetails = new ArrayList<>();
+    List<PayrollDetail> details = new ArrayList<>();
 
     @Inject
     private Exceptions exceptions;
@@ -72,18 +72,20 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
         detail.setStaff(staff);
         if (!payrollDetailService.existsByPayrollYearAndPayrollMonthAndStaff(payroll.getYear(), payroll.getMonth(),
                 staff)) {
-            payrollDetails.add(detail);
+            details.add(detail);
         }
     }
 
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
-        payrollDetailService.save(payrollDetails);
+        payrollDetailService.save(details);
+        payroll.setPaidCount(details.size());
+        if (payroll.getSignedSheet() != null) {
+            payroll.setConfirmedCount(payroll.getPaidCount());
+        }
         payroll.setImportedAt(DateUtils.currentDateTime());
-        final var paidCount = payrollDetailService.countByPayroll(payroll);
-        payroll.setPaidCount(paidCount + payrollDetails.size());
-        payroll.setDetails(payrollDetails);
-        payrollDetails = new ArrayList<>();
+        payroll.setDetails(details);
+        details = new ArrayList<>();
     }
 
 }

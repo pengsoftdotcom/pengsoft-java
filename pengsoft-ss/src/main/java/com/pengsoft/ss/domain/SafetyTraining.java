@@ -88,6 +88,11 @@ public class SafetyTraining extends EntityImpl implements Codeable {
 
     @JsonIgnore
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @OneToMany(mappedBy = "training")
+    private List<SafetyTrainingConfirmFile> confirmFiles = new ArrayList<>();
+
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @OneToMany(mappedBy = "training", cascade = CascadeType.REMOVE)
     private List<SafetyTrainingParticipant> participants = new ArrayList<>();
 

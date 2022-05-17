@@ -41,10 +41,11 @@ public interface SafetyTrainingService extends EntityService<SafetyTraining, Str
     /**
      * 结束，并上传过程拍照
      * 
-     * @param training {@link SafetyTraining}
-     * @param files    培训过程照片
+     * @param training     {@link SafetyTraining}
+     * @param files        培训过程照片
+     * @param confirmFiles 培训签到图片
      */
-    void end(@NotNull SafetyTraining training, @NotEmpty List<Asset> files);
+    void end(@NotNull SafetyTraining training, @NotEmpty List<Asset> files, List<Asset> confirmFiles);
 
     /**
      * Returns an {@link Optional} of a {@link SafetyTraining}

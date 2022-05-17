@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.oa.domain.Contract;
+import com.pengsoft.oa.domain.ContractConfirmPicture;
 import com.pengsoft.oa.domain.ContractPicture;
 import com.pengsoft.oa.service.ContractService;
 import com.pengsoft.support.facade.EntityFacade;
@@ -22,10 +23,11 @@ public interface ContractFacade extends EntityFacade<ContractService, Contract, 
     /**
      * Save with pictures
      * 
-     * @param contract {@link Contract}
-     * @param pictures {@link Asset}
+     * @param contract        {@link Contract}
+     * @param pictures        {@link Asset}
+     * @param confirmPictures {@link Asset}
      */
-    Contract saveWithPictures(@Valid Contract contract, List<Asset> pictures);
+    Contract saveWithPictures(@Valid Contract contract, List<Asset> pictures, List<Asset> confirmPictures);
 
     /**
      * delete {@link ContractPicture} by given {@link Asset}
@@ -33,6 +35,14 @@ public interface ContractFacade extends EntityFacade<ContractService, Contract, 
      * @param contract {@link Contract}
      * @param asset    {@link Asset}
      */
-    Contract deletePictureByAsset(Contract contract, @NotNull Asset asset);
+    void deletePictureByAsset(Contract contract, @NotNull Asset asset);
+
+    /**
+     * delete {@link ContractConfirmPicture} by given {@link Asset}
+     * 
+     * @param contract {@link Contract}
+     * @param asset    {@link Asset}
+     */
+    void deleteConfirmPictureByAsset(Contract contract, @NotNull Asset asset);
 
 }

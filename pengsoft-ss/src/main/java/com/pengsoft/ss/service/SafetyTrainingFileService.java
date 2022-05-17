@@ -4,8 +4,7 @@ import com.pengsoft.ss.domain.SafetyTrainingFile;
 import com.pengsoft.support.service.EntityService;
 
 /**
- * The service interface of
- * {@link SafetyTrainingFile}.
+ * The service interface of {@link SafetyTrainingFile}.
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0

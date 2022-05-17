@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapType;
@@ -97,16 +96,30 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
         getService().start(training);
     }
 
+    @TaskHandler(name = "safetyTrainingConfirmTaskHandler", create = true)
     @PutMapping("end")
     public void end(@RequestParam("id") SafetyTraining training,
-            @RequestParam(value = "file.id", required = false) @NotEmpty List<Asset> files) {
-        getService().end(training, files);
+            @RequestParam(value = "file.id", required = false) List<Asset> files,
+            @RequestParam(value = "confirmFile.id", required = false) List<Asset> confirmFiles) {
+        getService().end(training, files, confirmFiles);
+    }
+
+    @TaskHandler(name = "safetyTrainingConfirmTaskHandler", delete = true)
+    @Override
+    public void delete(Predicate predicate) {
+        super.delete(predicate);
     }
 
     @DeleteMapping("delete-file-by-asset")
     public void deletePictureByAsset(@RequestParam(value = "id", required = false) SafetyTraining training,
             @RequestParam("asset.id") Asset asset) {
         getService().deleteFileByAsset(training, asset);
+    }
+
+    @DeleteMapping("delete-confrm-file-by-asset")
+    public void deleteConfirmPictureByAsset(@RequestParam(value = "id", required = false) SafetyTraining training,
+            @RequestParam("confirmAsset.id") Asset asset) {
+        getService().deleteConfirmFileByAsset(training, asset);
     }
 
     @GetMapping("find-one-with-files")

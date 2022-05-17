@@ -8,11 +8,14 @@ import javax.validation.constraints.NotEmpty;
 
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.oa.domain.Contract;
+import com.pengsoft.oa.domain.ContractConfirmPicture;
 import com.pengsoft.oa.domain.ContractPicture;
+import com.pengsoft.oa.service.ContractConfirmPictureService;
 import com.pengsoft.oa.service.ContractPictureService;
 import com.pengsoft.oa.service.ContractService;
-import com.pengsoft.support.exception.BusinessException;
+import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.facade.EntityFacadeImpl;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.domain.Asset;
@@ -39,72 +42,122 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
     private ContractPictureService contractPictureService;
 
     @Inject
+    private ContractConfirmPictureService contractConfirmPictureService;
+
+    @Inject
     private AssetService assetService;
 
     @Inject
     private DictionaryItemService dictionaryItemService;
 
     @Override
-    public Contract saveWithPictures(Contract contract, List<Asset> pictures) {
-        if (contract.getConfirmedAt() != null) {
-            throw new BusinessException("contract.confirm.already");
-        }
+    public Contract saveWithPictures(Contract contract, List<Asset> pictures, List<Asset> confirmPictures) {
         if (StringUtils.isBlank(contract.getId())) {
             super.save(contract);
         }
-        contract.setPictures(contractPictureService.findAllByContract(contract));
-        final var sourcePictures = contract.getPictures();
-        final var targetPictures = pictures.stream().map(asset -> new ContractPicture(contract, asset)).toList();
-        final var createdPictures = targetPictures.stream().filter(t -> sourcePictures.stream().noneMatch(
-                s -> EntityUtils.equals(t.getAsset(), s.getAsset()))).toList();
-        if (CollectionUtils.isNotEmpty(createdPictures)) {
-            contractPictureService.save(createdPictures);
-        }
-        final var deletedPictures = sourcePictures.stream().filter(s -> targetPictures.stream().noneMatch(
-                t -> EntityUtils.equals(s.getAsset(), t.getAsset()))).toList();
-        if (CollectionUtils.isNotEmpty(deletedPictures)) {
-            contractPictureService.delete(sourcePictures);
-            sourcePictures.removeIf(
-                    picture -> deletedPictures.stream().anyMatch(deleted -> EntityUtils.equals(picture, deleted)));
-        }
-        sourcePictures.addAll(createdPictures);
-
-        var status = dictionaryItemService
-                .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "confirmed")
-                .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "confirmed"));
-        if (contract.getConfirmedAt() == null) {
-            if (CollectionUtils.isNotEmpty(contract.getPictures())) {
-                status = dictionaryItemService
-                        .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "unconfirmed")
-                        .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "unconfirmed"));
-            } else {
-                status = dictionaryItemService
-                        .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "not_uploaded")
-                        .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "not_uploaded"));
-            }
-        }
-        contract.setStatus(status);
+        handleContractPictures(contract, pictures);
+        handleContractConfirmPictures(contract, confirmPictures);
+        handleContractStatus(contract);
         return super.save(contract);
     }
 
+    private void handleContractStatus(Contract contract) {
+        DictionaryItem status = null;
+        if (CollectionUtils.isEmpty(contract.getPictures())) {
+            status = dictionaryItemService
+                    .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "not_uploaded")
+                    .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "not_uploaded"));
+            contract.setConfirmedAt(null);
+            contract.setConfirmedBy(null);
+        } else {
+            if (CollectionUtils.isEmpty(contract.getConfirmPictures())) {
+                status = dictionaryItemService
+                        .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "unconfirmed")
+                        .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "unconfirmed"));
+                contract.setConfirmedAt(null);
+                contract.setConfirmedBy(null);
+            } else {
+                status = dictionaryItemService
+                        .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "confirmed")
+                        .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "confirmed"));
+                contract.setConfirmedAt(DateUtils.currentDateTime());
+                contract.setConfirmedBy(SecurityUtils.getUserId());
+            }
+        }
+        contract.setStatus(status);
+
+    }
+
+    private void handleContractConfirmPictures(Contract contract, List<Asset> pictures) {
+        contract.setConfirmPictures(contractConfirmPictureService.findAllByContract(contract));
+        final var source = contract.getConfirmPictures();
+        final var target = pictures.stream().map(asset -> new ContractConfirmPicture(contract, asset)).toList();
+        final var created = target.stream()
+                .filter(t -> source.stream().noneMatch(s -> EntityUtils.equals(t.getAsset(), s.getAsset()))).toList();
+        if (CollectionUtils.isNotEmpty(created)) {
+            contractConfirmPictureService.save(created);
+        }
+        final var deleted = source.stream()
+                .filter(s -> target.stream().noneMatch(t -> EntityUtils.equals(s.getAsset(), t.getAsset()))).toList();
+        if (CollectionUtils.isNotEmpty(deleted)) {
+            contractConfirmPictureService.delete(source);
+            source.removeIf(picture -> deleted.stream().anyMatch(d -> EntityUtils.equals(picture, d)));
+        }
+        source.addAll(created);
+    }
+
+    private void handleContractPictures(Contract contract, List<Asset> pictures) {
+        contract.setPictures(contractPictureService.findAllByContract(contract));
+        final var source = contract.getPictures();
+        final var target = pictures.stream().map(asset -> new ContractPicture(contract, asset)).toList();
+        final var created = target.stream()
+                .filter(t -> source.stream().noneMatch(s -> EntityUtils.equals(t.getAsset(), s.getAsset()))).toList();
+        if (CollectionUtils.isNotEmpty(created)) {
+            contractPictureService.save(created);
+        }
+        final var deleted = source.stream()
+                .filter(s -> target.stream().noneMatch(t -> EntityUtils.equals(s.getAsset(), t.getAsset()))).toList();
+        if (CollectionUtils.isNotEmpty(deleted)) {
+            contractPictureService.delete(source);
+            source.removeIf(picture -> deleted.stream().anyMatch(d -> EntityUtils.equals(picture, d)));
+        }
+        source.addAll(created);
+    }
+
     @Override
-    public Contract deletePictureByAsset(Contract contract, Asset target) {
+    public void deletePictureByAsset(Contract contract, Asset target) {
         if (contract == null) {
             assetService.delete(target);
         } else {
-            final var picture = contract.getPictures().stream()
+            contract.getPictures().stream()
                     .filter(source -> EntityUtils.equals(source.getAsset(), target)).findFirst()
-                    .orElseThrow(() -> getExceptions().entityNotExists(ContractPicture.class, target.getId()));
-            contractPictureService.delete(picture);
-            contract.getPictures().remove(picture);
-            super.save(contract);
+                    .ifPresentOrElse(picture -> {
+                        contractPictureService.delete(picture);
+                        contract.getPictures().remove(picture);
+                        super.save(contract);
+                    }, () -> assetService.delete(target));
         }
-        return contract;
+    }
+
+    @Override
+    public void deleteConfirmPictureByAsset(Contract contract, Asset target) {
+        if (contract == null) {
+            assetService.delete(target);
+        } else {
+            contract.getConfirmPictures().stream()
+                    .filter(source -> EntityUtils.equals(source.getAsset(), target)).findFirst()
+                    .ifPresentOrElse(picture -> {
+                        contractConfirmPictureService.delete(picture);
+                        contract.getConfirmPictures().remove(picture);
+                        super.save(contract);
+                    }, () -> assetService.delete(target));
+        }
     }
 
     @Override
     public void delete(Contract contract) {
         contractPictureService.delete(contract.getPictures());
+        contractConfirmPictureService.delete(contract.getConfirmPictures());
         super.delete(contract);
     }
 

@@ -40,6 +40,14 @@ public class HandleTaskAspect {
                     log.error("task finish error: {} {}", handler.name(), e.getMessage());
                 }
             }
+
+            if (handler.delete()) {
+                try {
+                    executor.delete(args, result);
+                } catch (Exception e) {
+                    log.error("task delete error: {} {}", handler.name(), e.getMessage());
+                }
+            }
         }
     }
 

@@ -14,8 +14,10 @@ import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.ss.domain.SafetyTraining;
+import com.pengsoft.ss.domain.SafetyTrainingConfirmFile;
 import com.pengsoft.ss.domain.SafetyTrainingFile;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
+import com.pengsoft.ss.repository.SafetyTrainingConfirmFileRepository;
 import com.pengsoft.ss.repository.SafetyTrainingFileRepository;
 import com.pengsoft.ss.repository.SafetyTrainingParticipantRepository;
 import com.pengsoft.ss.repository.SafetyTrainingRepository;
@@ -26,6 +28,7 @@ import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -45,6 +48,9 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
 
     @Inject
     private SafetyTrainingFileRepository fileRepository;
+
+    @Inject
+    private SafetyTrainingConfirmFileRepository confirmFileRepository;
 
     @Inject
     private SafetyTrainingParticipantRepository participantRepository;
@@ -87,7 +93,7 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
     }
 
     @Override
-    public void end(SafetyTraining training, List<Asset> files) {
+    public void end(SafetyTraining training, List<Asset> files, List<Asset> confirmFiles) {
         if (training.getStartedAt() == null) {
             throw new BusinessException("training.end.not-started");
         }
@@ -96,20 +102,28 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
         }
         training.setEndedAt(DateUtils.currentDateTime());
         super.save(training);
-        final var trainingFiles = files.stream()
-                .map(file -> new SafetyTrainingFile(training, file)).toList();
+        final var trainingFiles = files.stream().map(file -> new SafetyTrainingFile(training, file)).toList();
         fileRepository.saveAll(trainingFiles);
         training.setFiles(trainingFiles);
+
+        if (CollectionUtils.isNotEmpty(confirmFiles)) {
+            final var trainingConfirmFiles = confirmFiles.stream()
+                    .map(file -> new SafetyTrainingConfirmFile(training, file)).toList();
+            confirmFileRepository.saveAll(trainingConfirmFiles);
+            training.setConfirmFiles(trainingConfirmFiles);
+        }
         super.save(training);
-        final var status = dictionaryItemRepository
-                .findOneByTypeCodeAndParentIdAndCode("safety_training_participant_status", null, "participate")
-                .orElseThrow();
-        final var confirmedAt = DateUtils.currentDateTime();
-        training.getParticipants().forEach(participant -> {
-            participant.setStatus(status);
-            participant.setConfirmedAt(confirmedAt);
-            participantRepository.save(participant);
-        });
+        if (CollectionUtils.isNotEmpty(confirmFiles)) {
+            final var status = dictionaryItemRepository
+                    .findOneByTypeCodeAndParentIdAndCode("safety_training_participant_status", null, "participate")
+                    .orElseThrow();
+            final var confirmedAt = DateUtils.currentDateTime();
+            training.getParticipants().forEach(participant -> {
+                participant.setStatus(status);
+                participant.setConfirmedAt(confirmedAt);
+                participantRepository.save(participant);
+            });
+        }
     }
 
     @Override

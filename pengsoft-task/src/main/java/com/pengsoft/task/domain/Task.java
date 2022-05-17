@@ -59,6 +59,8 @@ public class Task extends OwnedEntityImpl {
 
     private LocalDateTime finishedAt;
 
+    private float percent;
+
     @NotNull
     @ManyToOne
     @NotFound(action = NotFoundAction.IGNORE)

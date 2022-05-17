@@ -13,8 +13,12 @@ import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Post;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.service.JobService;
 import com.pengsoft.basedata.service.PostService;
+import com.pengsoft.basedata.service.StaffService;
+import com.pengsoft.oa.domain.PayrollRecord;
+import com.pengsoft.oa.service.PayrollRecordService;
 import com.pengsoft.security.service.RoleService;
 import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.excel.CashierData;
@@ -29,9 +33,12 @@ import com.pengsoft.ss.excel.WorkerData;
 import com.pengsoft.ss.excel.WorkerDataReadListener;
 import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.facade.EntityFacadeImpl;
+import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
+import com.pengsoft.system.service.DictionaryItemService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -48,6 +55,15 @@ import lombok.SneakyThrows;
 @Service
 public class ConstructionProjectFacadeImpl extends
         EntityFacadeImpl<ConstructionProjectService, ConstructionProject, String> implements ConstructionProjectFacade {
+
+    @Inject
+    private PayrollRecordService payrollRecordService;
+
+    @Inject
+    private DictionaryItemService dictionaryItemService;
+
+    @Inject
+    private StaffService staffService;
 
     @Inject
     private PostService postService;
@@ -210,6 +226,40 @@ public class ConstructionProjectFacadeImpl extends
     @Override
     public List<Map<String, Object>> statisticByStatus() {
         return getService().statisticByStatus();
+    }
+
+    // @Scheduled(cron = "0 0 0 * * ?")
+    @Override
+    public void generatePayrollRecords() {
+        getService().findAll().stream().forEach(project -> {
+            final var payday = project.getBuildingUnit().getPayday();
+            final var now = DateUtils.currentDateTime();
+            final var year = now.getYear();
+            final var month = now.getMonthValue();
+            final var day = now.getDayOfMonth();
+            // if (payday == day) {
+            final var payrollRecord = payrollRecordService
+                    .findOneByYearAndMonthAndBelongsTo(year, month, project.getBuildingUnit().getId())
+                    .orElse(new PayrollRecord());
+            if (StringUtils.isBlank(payrollRecord.getId())) {
+                List<Staff> cashiers = staffService.findAllByDepartmentsAndRoleCodes(
+                        List.of(project.getBuManager().getDepartment()),
+                        List.of("cashier"));
+                if (CollectionUtils.isNotEmpty(cashiers)) {
+                    payrollRecord.setCreatedBy(cashiers.get(0).getPerson().getUser().getId());
+                    payrollRecord.setCreatedAt(now);
+                    payrollRecord.setUpdatedBy(payrollRecord.getCreatedBy());
+                    payrollRecord.setUpdatedAt(payrollRecord.getCreatedAt());
+                    payrollRecord.setYear(year);
+                    payrollRecord.setMonth(month);
+                    dictionaryItemService.findOneByTypeCodeAndParentAndCode("payroll_record_status", null, "unpaid")
+                            .ifPresent(payrollRecord::setStatus);
+                    payrollRecordService.save(payrollRecord);
+                }
+            }
+            // }
+
+        });
     }
 
 }

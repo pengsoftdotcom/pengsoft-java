@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.imageio.ImageIO;
+
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
@@ -81,13 +83,19 @@ public class StorageServiceImpl implements StorageService {
         final var parts = Optional.ofNullable(contentType).orElse("unkown/unkown").split("/");
         final var isImage = "image".equals(parts[0]);
         final var extension = parts[1];
+        asset.setContentLength(file.getSize());
         if (isImage && zoomed) {
-            Thumbnails.of(is).outputFormat(extension).size(width, height).toOutputStream(os);
-            byte[] bytes = os.toByteArray();
+            final var originalImage = ImageIO.read(is);
+            final var originalWidth = originalImage.getWidth();
+            final var originalHeight = originalImage.getHeight();
+            if (originalWidth > width || originalHeight > height) {
+                Thumbnails.of(originalImage).outputFormat(extension).size(width, height).toOutputStream(os);
+            } else {
+                ImageIO.write(originalImage, extension, os);
+            }
+            final var bytes = os.toByteArray();
             is = new ByteArrayInputStream(bytes);
             asset.setContentLength(bytes.length);
-        } else {
-            asset.setContentLength(file.getSize());
         }
         asset.setContentType(contentType);
         asset.setLocked(locked);

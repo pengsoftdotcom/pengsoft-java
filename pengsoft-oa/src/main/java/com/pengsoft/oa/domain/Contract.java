@@ -68,4 +68,9 @@ public class Contract extends OwnedExtEntityImpl {
     @OneToMany(mappedBy = "contract")
     private List<ContractPicture> pictures = new ArrayList<>();
 
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @OneToMany(mappedBy = "contract")
+    private List<ContractConfirmPicture> confirmPictures = new ArrayList<>();
+
 }

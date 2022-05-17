@@ -55,15 +55,27 @@ public class SafetyCheckFacadeImpl extends EntityFacadeImpl<SafetyCheckService, 
         if (check == null) {
             assetService.delete(asset);
         } else {
+            final var deleted = check.getFiles().stream().filter(file -> file.getFile().getId().equals(asset.getId()))
+                    .toList();
+            check.getFiles().removeAll(deleted);
             safetyCheckFileService.findOne(QSafetyCheckFile.safetyCheckFile.file.id.eq(asset.getId()))
                     .ifPresent(safetyCheckFileService::delete);
         }
     }
 
     @Override
-    public void delete(SafetyCheck entity) {
-        safetyCheckFileService.delete(entity.getFiles());
-        super.delete(entity);
+    public void delete(SafetyCheck check) {
+        safetyCheckFileService.delete(check.getFiles());
+        super.delete(check);
+    }
+
+    @Override
+    public void reduce(@NotNull SafetyCheck check) {
+        check.setHandledAt(null);
+        check.setResult(null);
+        check.getFiles().stream().filter(file -> file.getType().getCode().equals("handle"))
+                .forEach(safetyCheckFileService::delete);
+        save(check);
     }
 
     @Override

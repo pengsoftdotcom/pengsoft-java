@@ -87,6 +87,18 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         getService().handle(check, result, handleFiles);
     }
 
+    @TaskHandler(name = "safetyCheckRiskTaskHandler", delete = true)
+    @Override
+    public void delete(Predicate predicate) {
+        super.delete(predicate);
+    }
+
+    @TaskHandler(name = "safetyCheckRiskTaskHandler", create = true)
+    @PutMapping("reduce")
+    public void reduce(@RequestParam("id") SafetyCheck check) {
+        getService().reduce(check);
+    }
+
     @GetMapping("find-one-with-files")
     public Map<String, Object> findOneWithFiles(@RequestParam(value = "id", required = false) SafetyCheck entity) {
         final var check = super.findOne(entity);

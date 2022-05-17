@@ -15,6 +15,7 @@ import com.pengsoft.basedata.service.OrganizationService;
 import com.pengsoft.basedata.service.PersonService;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.oa.domain.Contract;
+import com.pengsoft.oa.domain.ContractConfirmPicture;
 import com.pengsoft.oa.domain.ContractPicture;
 import com.pengsoft.oa.domain.QContract;
 import com.pengsoft.oa.facade.ContractFacade;
@@ -48,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 
 /**
@@ -57,10 +57,11 @@ import net.coobird.thumbnailator.Thumbnails;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Slf4j
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/oa/contract")
 public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
+
+    private static final String DATA_IMAGE_JPEG_BASE64 = "data:image/jpeg;base64,";
 
     private static final String CONTRACT_PARTY_TYPE_ORGANIZATION = "organization";
 
@@ -92,8 +93,9 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
     @Messaging(builder = "contractConfirmMessageBuilder")
     @PostMapping("save-with-pictures")
     public void saveWithPictures(@RequestBody Contract contract,
-            @RequestParam(value = "picture.id", defaultValue = "") List<Asset> pictures) {
-        getService().saveWithPictures(contract, pictures);
+            @RequestParam(value = "picture.id", defaultValue = "") List<Asset> pictures,
+            @RequestParam(value = "confirmPicture.id", defaultValue = "") List<Asset> confirmPictures) {
+        getService().saveWithPictures(contract, pictures, confirmPictures);
     }
 
     @DeleteMapping("delete-picture-by-asset")
@@ -102,10 +104,22 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         getService().deletePictureByAsset(contract, asset);
     }
 
+    @DeleteMapping("delete-confirm-picture-by-asset")
+    public void deleteConfirmPictureByAsset(@RequestParam(value = "id", required = false) Contract contract,
+            @RequestParam("asset.id") Asset asset) {
+        getService().deleteConfirmPictureByAsset(contract, asset);
+    }
+
     @TaskHandler(name = "contractConfirmTaskHandler", finish = true)
     @PutMapping("confirm")
     public void confirm(@RequestParam("id") Contract contract) {
         getService().confirm(contract);
+    }
+
+    @TaskHandler(name = "contractConfirmTaskHandler", delete = true)
+    @Override
+    public void delete(Predicate predicate) {
+        super.delete(predicate);
     }
 
     @GetMapping("find-one-with-party")
@@ -124,17 +138,19 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         data.put("pictures", target.getPictures().stream().map(ContractPicture::getAsset).map(asset -> {
             if (asset.isLocked()) {
                 storageService.download(asset);
-                try (ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        ByteArrayInputStream is = new ByteArrayInputStream(asset.getData());) {
-                    Thumbnails.of(is).outputFormat("jpg").size(600, 600).toOutputStream(os);
-                    asset.setAccessPath(
-                            "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(os.toByteArray()));
-                } catch (Exception e) {
-                    log.error("asset.download.failed: {}", e.getMessage());
-                }
+                asset.setAccessPath(DATA_IMAGE_JPEG_BASE64 + Base64.getEncoder().encodeToString(asset.getData()));
             }
             return asset;
         }).toList());
+        data.put("confirmPictures",
+                target.getConfirmPictures().stream().map(ContractConfirmPicture::getAsset).map(asset -> {
+                    if (asset.isLocked()) {
+                        storageService.download(asset);
+                        asset.setAccessPath(
+                                DATA_IMAGE_JPEG_BASE64 + Base64.getEncoder().encodeToString(asset.getData()));
+                    }
+                    return asset;
+                }).toList());
         return data;
     }
 
@@ -198,7 +214,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
                     ByteArrayInputStream is = new ByteArrayInputStream(asset.getData());) {
                 Thumbnails.of(is).outputFormat("jpg").size(width, height)
                         .toOutputStream(os);
-                return "data:image/jpeg;base64," + Base64Utils.encodeToString(os.toByteArray());
+                return DATA_IMAGE_JPEG_BASE64 + Base64Utils.encodeToString(os.toByteArray());
             } catch (Exception e) {
                 throw new BusinessException("asset.download.failed", e.getMessage());
             }

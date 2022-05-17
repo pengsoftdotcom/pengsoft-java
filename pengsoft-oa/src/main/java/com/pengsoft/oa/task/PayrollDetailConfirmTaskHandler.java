@@ -6,12 +6,16 @@ import javax.inject.Named;
 import com.pengsoft.oa.domain.PayrollDetail;
 import com.pengsoft.oa.domain.PayrollRecord;
 import com.pengsoft.oa.repository.PayrollDetailRepository;
+import com.pengsoft.oa.service.PayrollRecordService;
 import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.service.DictionaryItemService;
 import com.pengsoft.task.aspect.TaskExecutor;
 import com.pengsoft.task.domain.Task;
 import com.pengsoft.task.service.TaskService;
+import com.querydsl.core.types.Predicate;
+
+import org.springframework.data.domain.Sort;
 
 @Named
 public class PayrollDetailConfirmTaskHandler implements TaskExecutor {
@@ -21,6 +25,9 @@ public class PayrollDetailConfirmTaskHandler implements TaskExecutor {
 
     @Inject
     private DictionaryItemService dictionaryItemService;
+
+    @Inject
+    private PayrollRecordService payrollRecordService;
 
     @Inject
     private PayrollDetailRepository payrollDetailRepository;
@@ -65,6 +72,14 @@ public class PayrollDetailConfirmTaskHandler implements TaskExecutor {
         final var task = taskService.findOneByTargetId(payrollDetail.getId())
                 .orElseThrow(() -> exceptions.entityNotExists(Task.class, id));
         taskService.finish(task);
+    }
+
+    @Override
+    public void delete(Object[] args, Object result) {
+        final var predicate = (Predicate) args[0];
+        payrollRecordService.findAll(predicate, Sort.unsorted())
+                .forEach(payroll -> payroll.getDetails().forEach(
+                        detail -> taskService.findOneByTargetId(detail.getId()).ifPresent(taskService::delete)));
     }
 
 }

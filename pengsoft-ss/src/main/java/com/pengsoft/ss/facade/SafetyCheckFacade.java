@@ -18,11 +18,18 @@ import org.apache.http.annotation.Contract;
 public interface SafetyCheckFacade extends EntityFacade<SafetyCheckService, SafetyCheck, String>, SafetyCheckService {
 
     /**
-     * delete {@link SafetyCheck} by given {@link Asset}
+     * Delete {@link SafetyCheck} by given {@link Asset}.
      * 
      * @param check {@link Contract}
      * @param asset {@link Asset}
      */
-    void deleteFileByAsset(@NotNull SafetyCheck check, @NotNull Asset asset);
+    void deleteFileByAsset(SafetyCheck check, @NotNull Asset asset);
+
+    /**
+     * Retore the {@link SafetyCheck}.
+     * 
+     * @param check {@link SafetyCheck}
+     */
+    void reduce(@NotNull SafetyCheck check);
 
 }
