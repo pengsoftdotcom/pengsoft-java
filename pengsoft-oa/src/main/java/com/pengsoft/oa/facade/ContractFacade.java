@@ -3,8 +3,10 @@ package com.pengsoft.oa.facade;
 import java.util.List;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.ContractConfirmPicture;
 import com.pengsoft.oa.domain.ContractPicture;
@@ -19,6 +21,11 @@ import com.pengsoft.system.domain.Asset;
  * @since 1.0.0
  */
 public interface ContractFacade extends EntityFacade<ContractService, Contract, String>, ContractService {
+
+    /**
+     * 生成合同
+     */
+    void generate(@NotEmpty List<Department> departments, @NotEmpty List<String> roleCodes);
 
     /**
      * Save with pictures

@@ -94,6 +94,11 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         type = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, Object.class);
     }
 
+    @PostMapping("/generate")
+    public void generate() {
+        getService().generate(List.of(SecurityUtilsExt.getPrimaryDepartment()), List.of("worker"));
+    }
+
     @TaskHandler(name = "contractConfirmTaskHandler", create = true)
     @Messaging(builder = "contractConfirmMessageBuilder")
     @PostMapping("save-with-pictures")

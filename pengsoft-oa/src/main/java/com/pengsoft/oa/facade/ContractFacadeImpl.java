@@ -2,11 +2,14 @@ package com.pengsoft.oa.facade;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import com.pengsoft.basedata.domain.Department;
+import com.pengsoft.basedata.service.StaffService;
 import com.pengsoft.oa.domain.Contract;
 import com.pengsoft.oa.domain.ContractConfirmPicture;
 import com.pengsoft.oa.domain.ContractPicture;
@@ -36,6 +39,10 @@ import org.springframework.stereotype.Service;
 public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contract, String>
         implements ContractFacade {
 
+    private static final String CONTRACT_PARTY_TYPE = "contract_party_type";
+
+    private static final String CONTRACT_STATUS_NOT_UPLOADED = "not_uploaded";
+
     private static final String CONTRACT_STATUS = "contract_status";
 
     @Inject
@@ -49,6 +56,35 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
 
     @Inject
     private DictionaryItemService dictionaryItemService;
+
+    @Inject
+    private StaffService staffService;
+
+    @Override
+    public void generate(@NotEmpty List<Department> departments, @NotEmpty List<String> roleCodes) {
+        final var partyA = departments.get(0).getOrganization();
+        final var partyAType = dictionaryItemService
+                .findOneByTypeCodeAndParentAndCode(CONTRACT_PARTY_TYPE, null, "organization").orElseThrow();
+        final var partyBType = dictionaryItemService
+                .findOneByTypeCodeAndParentAndCode(CONTRACT_PARTY_TYPE, null, "personal").orElseThrow();
+        final var status = dictionaryItemService
+                .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, CONTRACT_STATUS_NOT_UPLOADED)
+                .orElseThrow();
+        staffService.findAllByDepartmentsAndRoleCodes(departments, roleCodes).forEach(staff -> {
+            final var contract = findOneByPartyAIdAndPartyBId(partyA.getId(), staff.getPerson().getId())
+                    .orElse(new Contract());
+            if (StringUtils.isBlank(contract.getId())) {
+                contract.setStatus(status);
+                contract.setPartyAId(partyA.getId());
+                contract.setPartyAType(partyAType);
+                contract.setPartyBId(staff.getPerson().getId());
+                contract.setPartyBType(partyBType);
+                contract.setBelongsTo(staff.getJob().getDepartment().getOrganization().getId());
+                contract.setControlledBy(staff.getJob().getDepartment().getId());
+                save(contract);
+            }
+        });
+    }
 
     @Override
     public Contract saveWithPictures(Contract contract, List<Asset> pictures, List<Asset> confirmPictures) {
@@ -65,8 +101,9 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
         DictionaryItem status = null;
         if (CollectionUtils.isEmpty(contract.getPictures())) {
             status = dictionaryItemService
-                    .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, "not_uploaded")
-                    .orElseThrow(() -> getExceptions().entityNotExists(DictionaryItem.class, "not_uploaded"));
+                    .findOneByTypeCodeAndParentAndCode(CONTRACT_STATUS, null, CONTRACT_STATUS_NOT_UPLOADED)
+                    .orElseThrow(
+                            () -> getExceptions().entityNotExists(DictionaryItem.class, CONTRACT_STATUS_NOT_UPLOADED));
             contract.setConfirmedAt(null);
             contract.setConfirmedBy(null);
         } else {
@@ -169,6 +206,11 @@ public class ContractFacadeImpl extends EntityFacadeImpl<ContractService, Contra
     @Override
     public List<Map<String, Object>> statisticByDepartment(@NotEmpty List<Department> departments) {
         return getService().statisticByDepartment(departments);
+    }
+
+    @Override
+    public Optional<Contract> findOneByPartyAIdAndPartyBId(@NotBlank String partyAId, @NotBlank String partyBId) {
+        return getService().findOneByPartyAIdAndPartyBId(partyAId, partyBId);
     }
 
 }

@@ -2,7 +2,10 @@ package com.pengsoft.oa.repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.persistence.QueryHint;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import com.pengsoft.basedata.repository.OwnedExtRepository;
@@ -11,6 +14,7 @@ import com.pengsoft.oa.domain.QContract;
 import com.pengsoft.support.repository.EntityRepository;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -37,5 +41,14 @@ public interface ContractRepository extends EntityRepository<QContract, Contract
             group by a.controlled_by, a.created_by, b.code
                 """, nativeQuery = true)
     List<Map<String, Object>> statisticByDepartmentId(@NotEmpty List<String> departmentIds);
+
+    /**
+     * 根据甲方乙方查询单个合同
+     * 
+     * @param partyAId 甲方ID
+     * @param partyBId 乙方ID
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    Optional<Contract> findOneByPartyAIdAndPartyBId(@NotBlank String partyAId, @NotBlank String partyBId);
 
 }

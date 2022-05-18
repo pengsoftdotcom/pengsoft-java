@@ -2,7 +2,9 @@ package com.pengsoft.oa.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
@@ -31,5 +33,13 @@ public interface ContractService extends EntityService<Contract, String> {
      * @param departments 部门列表
      */
     List<Map<String, Object>> statisticByDepartment(@NotEmpty List<Department> departments);
+
+    /**
+     * 根据甲方乙方查询单个合同
+     * 
+     * @param partyAId 甲方ID
+     * @param partyBId 乙方ID
+     */
+    Optional<Contract> findOneByPartyAIdAndPartyBId(@NotBlank String partyAId, @NotBlank String partyBId);
 
 }

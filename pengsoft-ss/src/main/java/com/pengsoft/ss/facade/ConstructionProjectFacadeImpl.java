@@ -36,11 +36,11 @@ import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
-import com.pengsoft.system.service.DictionaryItemService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,9 +58,6 @@ public class ConstructionProjectFacadeImpl extends
 
     @Inject
     private PayrollRecordService payrollRecordService;
-
-    @Inject
-    private DictionaryItemService dictionaryItemService;
 
     @Inject
     private StaffService staffService;
@@ -228,7 +225,7 @@ public class ConstructionProjectFacadeImpl extends
         return getService().statisticByStatus();
     }
 
-    // @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 53 10 * * ?")
     @Override
     public void generatePayrollRecords() {
         getService().findAll().stream().forEach(project -> {
@@ -246,14 +243,15 @@ public class ConstructionProjectFacadeImpl extends
                         List.of(project.getBuManager().getDepartment()),
                         List.of("cashier"));
                 if (CollectionUtils.isNotEmpty(cashiers)) {
-                    payrollRecord.setCreatedBy(cashiers.get(0).getPerson().getUser().getId());
+                    final var cashier = cashiers.get(0);
+                    payrollRecord.setCreatedBy(cashier.getPerson().getUser().getId());
                     payrollRecord.setCreatedAt(now);
                     payrollRecord.setUpdatedBy(payrollRecord.getCreatedBy());
                     payrollRecord.setUpdatedAt(payrollRecord.getCreatedAt());
+                    payrollRecord.setControlledBy(cashier.getDepartment().getId());
+                    payrollRecord.setBelongsTo(cashier.getOrganization().getId());
                     payrollRecord.setYear(year);
                     payrollRecord.setMonth(month);
-                    dictionaryItemService.findOneByTypeCodeAndParentAndCode("payroll_record_status", null, "unpaid")
-                            .ifPresent(payrollRecord::setStatus);
                     payrollRecordService.save(payrollRecord);
                 }
             }

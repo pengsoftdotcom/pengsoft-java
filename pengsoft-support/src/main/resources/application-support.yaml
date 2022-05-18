@@ -18,7 +18,7 @@ spring:
     hibernate:
       ddl-auto: update
     properties:
-#      javax.persistence.validation.mode: none
+      #      javax.persistence.validation.mode: none
       "[hibernate.globally_quoted_identifiers]": true
       "[hibernate.dialect]": org.hibernate.dialect.PostgreSQL10Dialect
       "[hibernate.format_sql]": true
@@ -37,8 +37,8 @@ spring:
       "[hibernate.cache.region.factory_class]": org.redisson.hibernate.RedissonRegionFactory
   servlet:
     multipart:
-        max-file-size: 3MB
-        max-request-size: 30MB
+      max-file-size: 5MB
+      max-request-size: 50MB
 logging:
   level:
     root: info

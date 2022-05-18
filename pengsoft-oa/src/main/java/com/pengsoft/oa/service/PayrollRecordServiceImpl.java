@@ -25,11 +25,11 @@ import com.pengsoft.support.exception.InvalidConfigurationException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
+import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 import com.pengsoft.system.service.AssetService;
 import com.pengsoft.system.service.StorageService;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
@@ -80,13 +80,14 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
                 StringUtils.defaultString(target.getBelongsTo(), SecurityUtilsExt.getPrimaryOrganizationId()))
                 .ifPresent(source -> {
                     if (EntityUtils.notEquals(source, target)) {
-                        throw getExceptions().constraintViolated("month", "exists", target.getYear());
+                        throw getExceptions().constraintViolated("year::month", "exists",
+                                target.getYear() + "::" + target.getMonth());
                     }
                 });
-        var payroll = super.save(target);
-        createDetails(payroll);
-        setStatus(payroll);
-        return super.save(payroll);
+        super.save(target);
+        createDetails(target);
+        setStatus(target);
+        return super.save(target);
     }
 
     private void createDetails(PayrollRecord payroll) {

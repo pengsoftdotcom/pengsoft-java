@@ -16,11 +16,6 @@ class StaffRepositoryTest {
     StaffRepository repository;
 
     @Test
-    void findAllByJobDepartmentOrganization() {
-        repository.findAllByJobDepartmentOrganizationId("1");
-    }
-
-    @Test
     void findAllByJobIn() {
         repository.findAllByJobIdIn(List.of("1"));
     }

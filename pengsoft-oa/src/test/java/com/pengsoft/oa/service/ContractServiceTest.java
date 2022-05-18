@@ -56,6 +56,7 @@ class ContractServiceTest {
         final var root = QStaff.staff;
         final var jobRoles = root.job.jobRoles;
         final var jobRole = QJobRole.jobRole;
+
         StreamSupport.stream(staffRepository
                 .findAll(root.job.department.eq(cashier.getDepartment())
                         .and(JPAExpressions.selectOne().from(jobRoles, jobRole).where(jobRole.role.code.eq("worker"))

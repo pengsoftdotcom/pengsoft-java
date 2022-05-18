@@ -45,7 +45,7 @@ public class RegionServiceImpl extends TreeEntityServiceImpl<RegionRepository, R
         while (StringUtils.notEquals(address.getDetail(), detail)) {
             address.setDetail(detail);
             String regionId = (address.getRegion() == null) ? "" : address.getRegion().getId();
-            Optional<Region> optional = ((RegionRepository) getRepository()).findOneByParentIdsAndName(regionId,
+            Optional<Region> optional = getRepository().findOneByParentIdsAndName(regionId,
                     detail);
             if (optional.isPresent()) {
                 Region region = optional.get();

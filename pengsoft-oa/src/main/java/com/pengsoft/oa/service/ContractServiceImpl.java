@@ -2,8 +2,10 @@ package com.pengsoft.oa.service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 
 import com.pengsoft.basedata.domain.Department;
@@ -49,6 +51,11 @@ public class ContractServiceImpl extends EntityServiceImpl<ContractRepository, C
     @Override
     public List<Map<String, Object>> statisticByDepartment(@NotEmpty List<Department> departments) {
         return getRepository().statisticByDepartmentId(departments.stream().map(Department::getId).toList());
+    }
+
+    @Override
+    public Optional<Contract> findOneByPartyAIdAndPartyBId(@NotBlank String partyAId, @NotBlank String partyBId) {
+        return getRepository().findOneByPartyAIdAndPartyBId(partyAId, partyBId);
     }
 
 }
