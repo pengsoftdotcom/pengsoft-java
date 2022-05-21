@@ -234,29 +234,28 @@ public class ConstructionProjectFacadeImpl extends
             final var year = now.getYear();
             final var month = now.getMonthValue();
             final var day = now.getDayOfMonth();
-            // if (payday == day) {
-            final var payrollRecord = payrollRecordService
-                    .findOneByYearAndMonthAndBelongsTo(year, month, project.getBuildingUnit().getId())
-                    .orElse(new PayrollRecord());
-            if (StringUtils.isBlank(payrollRecord.getId())) {
-                List<Staff> cashiers = staffService.findAllByDepartmentsAndRoleCodes(
-                        List.of(project.getBuManager().getDepartment()),
-                        List.of("cashier"));
-                if (CollectionUtils.isNotEmpty(cashiers)) {
-                    final var cashier = cashiers.get(0);
-                    payrollRecord.setCreatedBy(cashier.getPerson().getUser().getId());
-                    payrollRecord.setCreatedAt(now);
-                    payrollRecord.setUpdatedBy(payrollRecord.getCreatedBy());
-                    payrollRecord.setUpdatedAt(payrollRecord.getCreatedAt());
-                    payrollRecord.setControlledBy(cashier.getDepartment().getId());
-                    payrollRecord.setBelongsTo(cashier.getOrganization().getId());
-                    payrollRecord.setYear(year);
-                    payrollRecord.setMonth(month);
-                    payrollRecordService.save(payrollRecord);
+            if (payday == day) {
+                final var payrollRecord = payrollRecordService
+                        .findOneByYearAndMonthAndBelongsTo(year, month, project.getBuildingUnit().getId())
+                        .orElse(new PayrollRecord());
+                if (StringUtils.isBlank(payrollRecord.getId())) {
+                    List<Staff> cashiers = staffService.findAllByDepartmentsAndRoleCodes(
+                            List.of(project.getBuManager().getDepartment()),
+                            List.of("cashier"));
+                    if (CollectionUtils.isNotEmpty(cashiers)) {
+                        final var cashier = cashiers.get(0);
+                        payrollRecord.setCreatedBy(cashier.getPerson().getUser().getId());
+                        payrollRecord.setCreatedAt(now);
+                        payrollRecord.setUpdatedBy(payrollRecord.getCreatedBy());
+                        payrollRecord.setUpdatedAt(payrollRecord.getCreatedAt());
+                        payrollRecord.setControlledBy(cashier.getDepartment().getId());
+                        payrollRecord.setBelongsTo(cashier.getOrganization().getId());
+                        payrollRecord.setYear(year);
+                        payrollRecord.setMonth(month);
+                        payrollRecordService.save(payrollRecord);
+                    }
                 }
             }
-            // }
-
         });
     }
 
