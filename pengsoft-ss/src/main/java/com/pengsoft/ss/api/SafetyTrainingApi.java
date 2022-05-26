@@ -19,6 +19,7 @@ import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QSafetyTraining;
 import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
 import com.pengsoft.ss.domain.SafetyTraining;
+import com.pengsoft.ss.domain.SafetyTrainingConfirmFile;
 import com.pengsoft.ss.domain.SafetyTrainingFile;
 import com.pengsoft.ss.facade.SafetyTrainingFacade;
 import com.pengsoft.support.Constant;
@@ -134,6 +135,8 @@ public class SafetyTrainingApi extends EntityApi<SafetyTrainingFacade, SafetyTra
         Map<String, Object> result = objectMapper.convertValue(training, type);
         result.put("participantSize", training.getParticipants().size());
         result.put("files", training.getFiles().stream().map(SafetyTrainingFile::getFile).toList());
+        result.put("confirmFiles",
+                training.getConfirmFiles().stream().map(SafetyTrainingConfirmFile::getFile).toList());
         return result;
     }
 

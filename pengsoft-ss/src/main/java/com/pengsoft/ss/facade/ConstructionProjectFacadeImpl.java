@@ -225,7 +225,7 @@ public class ConstructionProjectFacadeImpl extends
         return getService().statisticByStatus();
     }
 
-    @Scheduled(cron = "0 53 10 * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     @Override
     public void generatePayrollRecords() {
         getService().findAll().stream().forEach(project -> {
