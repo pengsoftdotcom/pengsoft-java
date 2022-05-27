@@ -84,10 +84,10 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
                                 target.getYear() + "::" + target.getMonth());
                     }
                 });
-        super.save(target);
-        createDetails(target);
-        setStatus(target);
-        return super.save(target);
+        final var payroll = super.save(target);
+        createDetails(payroll);
+        setStatus(payroll);
+        return super.save(payroll);
     }
 
     private void createDetails(PayrollRecord payroll) {

@@ -35,7 +35,7 @@ public class SecurityOfficerDataReadListener implements ReadListener<SecurityOff
     public void invoke(SecurityOfficerData data, AnalysisContext context) {
         final var name = StringUtils.replace(data.getName(), "\s", "");
         final var mobile = StringUtils.replace(data.getMobile(), "\s", "");
-        if (StringUtils.isNotBlank(data.getMobile())) {
+        if (StringUtils.isNotBlank(mobile)) {
             final var person = personService.findOneByMobile(mobile).orElse(new Person());
             if (StringUtils.isBlank(person.getId())) {
                 person.setName(name);

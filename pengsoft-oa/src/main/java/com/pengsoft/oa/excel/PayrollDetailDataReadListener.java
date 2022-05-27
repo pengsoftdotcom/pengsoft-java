@@ -18,6 +18,7 @@ import com.pengsoft.oa.service.PayrollDetailService;
 import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.support.util.DateUtils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 
 import lombok.Getter;
@@ -31,7 +32,7 @@ import lombok.Setter;
  */
 public class PayrollDetailDataReadListener implements ReadListener<PayrollDetailData> {
 
-    private PayrollDetailService payrollDetailService;
+    private PayrollDetailService service;
 
     private StaffRepository staffRepository;
 
@@ -55,30 +56,32 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
             PayrollDetailService payrollDetailService,
             StaffRepository staffRepository,
             PersonRepository personRepository) {
-        this.payrollDetailService = payrollDetailService;
+        this.service = payrollDetailService;
         this.staffRepository = staffRepository;
         this.personRepository = personRepository;
     }
 
     @Override
     public void invoke(PayrollDetailData data, AnalysisContext context) {
-        final var detail = new PayrollDetail();
-        BeanUtils.copyProperties(data, detail);
-        detail.setPayroll(payroll);
-        final var person = personRepository.findOneByIdentityCardNumber(data.getIdentityCardNumber())
-                .orElseThrow(() -> exceptions.entityNotExists(Person.class, data.getIdentityCardNumber()));
-        final var staff = staffRepository.findOneByPersonIdAndJobId(person.getId(), job.getId())
-                .orElseThrow(() -> exceptions.entityNotExists(Staff.class, data.getIdentityCardNumber()));
-        detail.setStaff(staff);
-        if (!payrollDetailService.existsByPayrollYearAndPayrollMonthAndStaff(payroll.getYear(), payroll.getMonth(),
-                staff)) {
-            details.add(detail);
+        final var identityCardNumber = StringUtils.replace(data.getIdentityCardNumber(), "\s", "");
+        if (StringUtils.isNotBlank(identityCardNumber)) {
+            final var detail = new PayrollDetail();
+            BeanUtils.copyProperties(data, detail);
+            detail.setPayroll(payroll);
+            final var person = personRepository.findOneByIdentityCardNumber(identityCardNumber)
+                    .orElseThrow(() -> exceptions.entityNotExists(Person.class, identityCardNumber));
+            final var staff = staffRepository.findOneByPersonIdAndJobId(person.getId(), job.getId())
+                    .orElseThrow(() -> exceptions.entityNotExists(Staff.class, person.getId()));
+            detail.setStaff(staff);
+            if (!service.existsByPayrollYearAndPayrollMonthAndStaff(payroll.getYear(), payroll.getMonth(), staff)) {
+                details.add(detail);
+            }
         }
     }
 
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
-        payrollDetailService.save(details);
+        service.save(details);
         payroll.setPaidCount(details.size());
         if (payroll.getSignedSheet() != null) {
             payroll.setConfirmedCount(payroll.getPaidCount());
