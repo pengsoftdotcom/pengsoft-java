@@ -1,6 +1,5 @@
 package com.pengsoft.oa.service;
 
-import java.io.ByteArrayInputStream;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -11,27 +10,20 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import com.alibaba.excel.EasyExcel;
-import com.pengsoft.basedata.domain.JobRole;
-import com.pengsoft.basedata.repository.JobRoleRepository;
 import com.pengsoft.basedata.repository.PersonRepository;
 import com.pengsoft.basedata.repository.StaffRepository;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.oa.domain.PayrollRecord;
-import com.pengsoft.oa.excel.PayrollDetailData;
 import com.pengsoft.oa.excel.PayrollDetailDataReadListener;
 import com.pengsoft.oa.repository.PayrollRecordRepository;
-import com.pengsoft.support.exception.InvalidConfigurationException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 import com.pengsoft.system.service.AssetService;
-import com.pengsoft.system.service.StorageService;
 
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
@@ -54,16 +46,6 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
     private AssetService assetService;
 
     @Inject
-    private StorageService storageService;
-
-    @Inject
-    private JobRoleRepository jobRoleRepository;
-
-    @Inject
-    @Lazy
-    private PayrollDetailDataReadListener readListener;
-
-    @Inject
     private DictionaryItemRepository dictionaryItemRepository;
 
     @Bean
@@ -80,50 +62,26 @@ public class PayrollRecordServiceImpl extends EntityServiceImpl<PayrollRecordRep
                 StringUtils.defaultString(target.getBelongsTo(), SecurityUtilsExt.getPrimaryOrganizationId()))
                 .ifPresent(source -> {
                     if (EntityUtils.notEquals(source, target)) {
-                        throw getExceptions().constraintViolated("year::month", "exists",
-                                target.getYear() + "::" + target.getMonth());
+                        throw getExceptions().constraintViolated("month", "exists", target.getMonth());
                     }
                 });
-        final var payroll = super.save(target);
-        createDetails(payroll);
-        setStatus(payroll);
-        return super.save(payroll);
+        updateStatus(target);
+        return super.save(target);
     }
 
-    private void createDetails(PayrollRecord payroll) {
-        if (payroll.getSheet() != null && payroll.getImportedAt() == null) {
-            final var departmentId = SecurityUtilsExt.getPrimaryDepartmentId();
-            final var jobs = jobRoleRepository.findAllByJobDepartmentIdAndRoleCode(departmentId, "worker").stream()
-                    .map(JobRole::getJob).toList();
-            if (jobs.isEmpty()) {
-                throw new InvalidConfigurationException("no job with role worker configed");
-            }
-            if (jobs.size() > 1) {
-                throw new InvalidConfigurationException("multiple jobs with role worker configed");
-            }
-            readListener.setJob(jobs.get(0));
-            readListener.setPayroll(payroll);
-            final var sheet = storageService.download(payroll.getSheet());
-            final var is = new ByteArrayInputStream(sheet.getData());
-            EasyExcel.read(is, PayrollDetailData.class, readListener).sheet().doRead();
-        }
-    }
-
-    private void setStatus(PayrollRecord payroll) {
-        if (payroll.getStatus() == null) {
-            if (payroll.getDetails().isEmpty()) {
-                if (payroll.getCreatedAt() != null
-                        && DateUtils.currentDateTime().getDayOfYear() - payroll.getCreatedAt().getDayOfYear() > 5) {
-                    dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "arrears")
-                            .ifPresent(payroll::setStatus);
-                } else {
-                    dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "unpaid")
-                            .ifPresent(payroll::setStatus);
-                }
+    private void updateStatus(PayrollRecord payroll) {
+        if (payroll.getDetails().isEmpty()) {
+            if (payroll.getCreatedAt() != null
+                    && DateUtils.currentDateTime().getDayOfYear() - payroll.getCreatedAt().getDayOfYear() > 5) {
+                dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "arrears")
+                        .ifPresent(payroll::setStatus);
             } else {
-                dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "paid")
+                dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "unpaid")
                         .ifPresent(payroll::setStatus);
             }
+        } else {
+            dictionaryItemRepository.findOneByTypeCodeAndParentIdAndCode(PAYROLL_RECORD_STATUS, null, "paid")
+                    .ifPresent(payroll::setStatus);
         }
     }
 

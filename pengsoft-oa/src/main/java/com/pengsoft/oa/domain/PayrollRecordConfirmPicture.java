@@ -1,39 +1,36 @@
 package com.pengsoft.oa.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.OwnedExtEntityImpl;
-import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.system.domain.Asset;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Payroll record
+ * Payroll record confirm picture
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Entity
-@Table(indexes = { @Index(name = "payroll_detail_payroll_id", columnList = "payroll_id, staff_id", unique = true) })
-public class PayrollDetail extends OwnedExtEntityImpl {
-
-    private static final long serialVersionUID = -4847027306280433452L;
+public class PayrollRecordConfirmPicture extends OwnedExtEntityImpl {
 
     @NotNull
     @ManyToOne
@@ -41,16 +38,8 @@ public class PayrollDetail extends OwnedExtEntityImpl {
     private PayrollRecord payroll;
 
     @NotNull
-    @ManyToOne
+    @OneToOne
     @NotFound(action = NotFoundAction.IGNORE)
-    private Staff staff;
-
-    private BigDecimal grossPay;
-
-    private BigDecimal netPay;
-
-    private LocalDateTime confirmedAt;
-
-    private String confirmedBy;
+    private Asset asset;
 
 }

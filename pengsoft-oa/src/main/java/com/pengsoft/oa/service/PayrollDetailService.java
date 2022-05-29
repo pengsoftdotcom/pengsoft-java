@@ -1,5 +1,7 @@
 package com.pengsoft.oa.service;
 
+import java.util.Optional;
+
 import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Staff;
@@ -23,14 +25,12 @@ public interface PayrollDetailService extends EntityService<PayrollDetail, Strin
     void confirm(@NotNull PayrollDetail payrollDetail);
 
     /**
-     * Whether exists a {@link PayrollDetail} with the given payroll record year,
-     * month and staff id.
+     * Return the {@link PayrollDetail} with the given payroll record and staff.
      * 
-     * @param year  The payroll record year
-     * @param month The payroll record month
-     * @param staff The {@link Staff}
+     * @param payroll {@link PayrollRecord}
+     * @param staff   {@link Staff}
      */
-    boolean existsByPayrollYearAndPayrollMonthAndStaff(int year, int month, @NotNull Staff staff);
+    Optional<PayrollDetail> findOneByPayrollAndStaff(@NotNull PayrollRecord payroll, @NotNull Staff staff);
 
     /**
      * Returns the number of payroll details with given payroll record.

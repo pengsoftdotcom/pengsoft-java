@@ -1,6 +1,9 @@
 package com.pengsoft.oa.service;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.oa.domain.PayrollDetail;
@@ -11,6 +14,7 @@ import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.DateUtils;
+import com.pengsoft.support.util.EntityUtils;
 
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Sort;
@@ -32,6 +36,16 @@ public class PayrollDetailServiceImpl extends EntityServiceImpl<PayrollDetailRep
     private PayrollRecordRepository payrollRecordRepository;
 
     @Override
+    public PayrollDetail save(PayrollDetail target) {
+        findOneByPayrollAndStaff(target.getPayroll(), target.getStaff()).ifPresent(source -> {
+            if (EntityUtils.notEquals(source, target)) {
+                throw getExceptions().constraintViolated("payroll", "exists", target.getPayroll().getId());
+            }
+        });
+        return super.save(target);
+    }
+
+    @Override
     public void confirm(PayrollDetail payrollDetail) {
         if (payrollDetail.getConfirmedAt() != null) {
             throw new BusinessException("payroll.confirm.already");
@@ -48,8 +62,8 @@ public class PayrollDetailServiceImpl extends EntityServiceImpl<PayrollDetailRep
     }
 
     @Override
-    public boolean existsByPayrollYearAndPayrollMonthAndStaff(int year, int month, Staff staff) {
-        return getRepository().existsByPayrollYearAndPayrollMonthAndStaffId(year, month, staff.getId());
+    public Optional<PayrollDetail> findOneByPayrollAndStaff(@NotNull PayrollRecord payroll, @NotNull Staff staff) {
+        return getRepository().findOneByPayrollIdAndStaffId(payroll.getId(), staff.getId());
     }
 
     @Override

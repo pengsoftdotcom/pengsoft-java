@@ -69,8 +69,14 @@ public class PayrollRecord extends OwnedExtEntityImpl {
     private LocalDateTime importedAt;
 
     @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @OneToMany(mappedBy = "payroll", cascade = CascadeType.REMOVE)
     private List<PayrollDetail> details = new ArrayList<>();
+
+    @JsonIgnore
+    @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+    @OneToMany(mappedBy = "payroll", cascade = CascadeType.REMOVE)
+    private List<PayrollRecordConfirmPicture> confirmPictures = new ArrayList<>();
 
     public PayrollRecord() {
         final var now = DateUtils.currentDate();

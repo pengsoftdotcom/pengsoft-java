@@ -1,6 +1,7 @@
 package com.pengsoft.oa.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
@@ -30,17 +31,6 @@ public interface PayrollDetailRepository
     }
 
     /**
-     * Whether exists a {@link PayrollDetail} with the given payroll record year,
-     * month and staff id.
-     * 
-     * @param year    The payroll record year
-     * @param month   The payroll record month
-     * @param staffId The staff id
-     */
-    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
-    boolean existsByPayrollYearAndPayrollMonthAndStaffId(int year, int month, @NotBlank String staffId);
-
-    /**
      * Returns the number of payroll details with given payroll record id.
      * 
      * @param payrollId The payroll record id.
@@ -64,5 +54,15 @@ public interface PayrollDetailRepository
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     List<PayrollDetail> findAllByPayrollId(@NotBlank String payrollId);
+
+    /**
+     * Return the {@link PayrollDetail} with the given payroll record id and staff
+     * id.
+     * 
+     * @param payrollId The payroll record id.
+     * @param staffId   The staff id.
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    Optional<PayrollDetail> findOneByPayrollIdAndStaffId(@NotBlank String payrollId, @NotBlank String staffId);
 
 }

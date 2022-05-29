@@ -25,6 +25,7 @@ import com.pengsoft.support.json.ObjectMapper;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.StringUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
@@ -118,7 +119,7 @@ public class WeikenFaceRecognitionService implements FaceRecognitionService {
             final var departmentId = group.getControlledBy();
             final var jobIds = jobRoleRepository.findAllByJobDepartmentIdAndRoleCode(departmentId, "worker").stream()
                     .map(JobRole::getJob).map(Job::getId).toList();
-            if (jobIds.isEmpty()) {
+            if (CollectionUtils.isEmpty(jobIds)) {
                 throw new InvalidConfigurationException("no job with role worker configed");
             }
             if (jobIds.size() > 1) {

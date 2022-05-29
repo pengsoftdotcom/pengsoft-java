@@ -17,9 +17,9 @@ import com.pengsoft.oa.domain.PayrollRecord;
 import com.pengsoft.oa.service.PayrollDetailService;
 import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.support.util.DateUtils;
+import com.pengsoft.support.util.EntityUtils;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeanUtils;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -38,16 +38,14 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
 
     private PersonRepository personRepository;
 
-    @Getter
     @Setter
     private PayrollRecord payroll;
 
-    @Getter
     @Setter
     private Job job;
 
     @Getter
-    List<PayrollDetail> details = new ArrayList<>();
+    private List<PayrollDetail> details = new ArrayList<>();
 
     @Inject
     private Exceptions exceptions;
@@ -65,22 +63,26 @@ public class PayrollDetailDataReadListener implements ReadListener<PayrollDetail
     public void invoke(PayrollDetailData data, AnalysisContext context) {
         final var identityCardNumber = StringUtils.replace(data.getIdentityCardNumber(), "\s", "");
         if (StringUtils.isNotBlank(identityCardNumber)) {
-            final var detail = new PayrollDetail();
-            BeanUtils.copyProperties(data, detail);
-            detail.setPayroll(payroll);
             final var person = personRepository.findOneByIdentityCardNumber(identityCardNumber)
                     .orElseThrow(() -> exceptions.entityNotExists(Person.class, identityCardNumber));
             final var staff = staffRepository.findOneByPersonIdAndJobId(person.getId(), job.getId())
                     .orElseThrow(() -> exceptions.entityNotExists(Staff.class, person.getId()));
-            detail.setStaff(staff);
-            if (!service.existsByPayrollYearAndPayrollMonthAndStaff(payroll.getYear(), payroll.getMonth(), staff)) {
-                details.add(detail);
+            final var detail = service.findOneByPayrollAndStaff(payroll, staff).orElse(new PayrollDetail());
+            if (StringUtils.isBlank(detail.getId())) {
+                detail.setPayroll(payroll);
+                detail.setStaff(staff);
             }
+            detail.setGrossPay(data.getGrossPay());
+            detail.setNetPay(data.getNetPay());
+            details.add(detail);
         }
     }
 
     @Override
     public void doAfterAllAnalysed(AnalysisContext context) {
+        payroll.getDetails().stream()
+                .filter(source -> details.stream().noneMatch(target -> EntityUtils.equals(source, target)))
+                .forEach(service::delete);
         service.save(details);
         payroll.setPaidCount(details.size());
         if (payroll.getSignedSheet() != null) {

@@ -34,7 +34,6 @@ import com.pengsoft.system.annotation.Messaging;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.AssetService;
 import com.pengsoft.system.service.DictionaryItemService;
-import com.pengsoft.system.service.StorageService;
 import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
 
@@ -81,9 +80,6 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
 
     @Inject
     private AssetService assetService;
-
-    @Inject
-    private StorageService storageService;
 
     private ObjectMapper objectMapper;
 
@@ -147,7 +143,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         final var data = setParty(target);
         data.put("pictures", target.getPictures().stream().map(ContractPicture::getAsset).map(asset -> {
             if (asset.isLocked()) {
-                storageService.download(asset);
+                assetService.download(asset);
                 asset.setAccessPath(DATA_IMAGE_JPEG_BASE64 + Base64.getEncoder().encodeToString(asset.getData()));
             }
             return asset;
@@ -155,7 +151,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
         data.put("confirmPictures",
                 target.getConfirmPictures().stream().map(ContractConfirmPicture::getAsset).map(asset -> {
                     if (asset.isLocked()) {
-                        storageService.download(asset);
+                        assetService.download(asset);
                         asset.setAccessPath(
                                 DATA_IMAGE_JPEG_BASE64 + Base64.getEncoder().encodeToString(asset.getData()));
                     }
@@ -229,7 +225,7 @@ public class ContractApi extends EntityApi<ContractFacade, Contract, String> {
     public String download(String id, @RequestParam(defaultValue = "600") int width,
             @RequestParam(defaultValue = "600") int height) {
         var asset = assetService.findOne(id).orElseThrow(() -> getExceptions().entityNotExists(Asset.class, id));
-        asset = this.storageService.download(asset);
+        asset = assetService.download(asset);
         if (asset.getContentType().startsWith("image")) {
             try (ByteArrayOutputStream os = new ByteArrayOutputStream();
                     ByteArrayInputStream is = new ByteArrayInputStream(asset.getData());) {
