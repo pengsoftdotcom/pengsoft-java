@@ -7,6 +7,14 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.alibaba.excel.EasyExcel;
 import com.pengsoft.basedata.domain.Department;
@@ -36,13 +44,6 @@ import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.support.util.DateUtils;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import lombok.SneakyThrows;
 
@@ -221,8 +222,28 @@ public class ConstructionProjectFacadeImpl extends
     }
 
     @Override
-    public List<Map<String, Object>> statisticByStatus() {
-        return getService().statisticByStatus();
+    public List<ConstructionProject> findAllByRuManager(@NotNull Staff ruManager) {
+        return getService().findAllByRuManager(ruManager);
+    }
+
+    @Override
+    public List<ConstructionProject> findAllByOwnerManager(@NotNull Staff ownerManager) {
+        return getService().findAllByOwnerManager(ownerManager);
+    }
+
+    @Override
+    public List<ConstructionProject> findAllBySuManager(@NotNull Staff suManager) {
+        return getService().findAllBySuManager(suManager);
+    }
+
+    @Override
+    public List<ConstructionProject> findAllByBuManager(@NotNull Staff buManager) {
+        return getService().findAllByBuManager(buManager);
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByStatus(Department department) {
+        return getService().statisticByStatus(department);
     }
 
     @Scheduled(cron = "0 0 0 * * ?")

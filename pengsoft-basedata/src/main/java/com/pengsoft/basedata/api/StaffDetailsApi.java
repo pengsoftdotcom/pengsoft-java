@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Authorized
+@Authorized(writable = true)
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/user-details")
 public class StaffDetailsApi {

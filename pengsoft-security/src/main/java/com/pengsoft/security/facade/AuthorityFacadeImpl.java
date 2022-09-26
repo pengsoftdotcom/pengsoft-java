@@ -46,7 +46,7 @@ public class AuthorityFacadeImpl extends EntityFacadeImpl<AuthorityService, Auth
     private RoleService roleService;
 
     @Override
-    public void saveEntityAdminAuthorities(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public <T extends Entity<ID>, ID extends Serializable> void saveEntityAdminAuthorities(final Class<T> entityClass) {
         final Class<?> apiClass = getApiClass(entityClass);
         if (!apiClass.isAnnotationPresent(Authorized.class)) {
             final var entityAdmin = getEntityAdmin(entityClass);
@@ -55,7 +55,8 @@ public class AuthorityFacadeImpl extends EntityFacadeImpl<AuthorityService, Auth
         }
     }
 
-    private List<Authority> getEntityAuthorities(final Class<? extends Entity<? extends Serializable>> entityClass,
+    private <T extends Entity<ID>, ID extends Serializable> List<Authority> getEntityAuthorities(
+            final Class<T> entityClass,
             final Class<?> apiClass) {
         final var authorityCodePrefix = SecurityUtils.getEntityAdminAuthorityCodePrefixFromEntityClass(entityClass)
                 + StringUtils.GLOBAL_SEPARATOR;
@@ -78,7 +79,7 @@ public class AuthorityFacadeImpl extends EntityFacadeImpl<AuthorityService, Auth
         }).toList();
     }
 
-    private Role getEntityAdmin(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    private <T extends Entity<ID>, ID extends Serializable> Role getEntityAdmin(final Class<T> entityClass) {
         final var entityAdminCode = SecurityUtils.getEntityAdminRoleCode(entityClass);
         return roleService.findOneByCode(entityAdminCode).orElseThrow(
                 () -> new InvalidConfigurationException("'" + entityClass.getName() + "' entity admin not found"));

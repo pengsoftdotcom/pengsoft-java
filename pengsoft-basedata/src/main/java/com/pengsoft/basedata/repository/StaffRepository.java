@@ -47,14 +47,22 @@ public interface StaffRepository extends EntityRepository<QStaff, Staff, String>
     Optional<Staff> findOneByPersonIdAndJobId(@NotBlank String personId, @NotBlank String jobId);
 
     /**
-     * Returns an {@link Optional} of a {@link Staff} with the given person and
-     * primary
-     * true.
+     * Returns an {@link Optional} of a {@link Staff} with the given person id and
+     * primary true.
      *
-     * @param personId The id of {@link Staff}'s person
+     * @param personId The person id.
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     Optional<Staff> findOneByPersonIdAndPrimaryTrue(@NotBlank String personId);
+
+    /**
+     * Returns an {@link Optional} of a {@link Staff} with the given user id and
+     * primary true.
+     *
+     * @param userId The user id.
+     */
+    @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
+    Optional<Staff> findOneByPersonUserIdAndPrimaryTrue(@NotBlank String userId);
 
     /**
      * Returns all {@link Staff}s with the given person.

@@ -10,11 +10,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.databind.type.MapLikeType;
-import com.pengsoft.basedata.domain.QStaff;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
-import com.pengsoft.security.domain.Role;
-import com.pengsoft.security.util.SecurityUtils;
-import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QSafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheck;
 import com.pengsoft.ss.domain.SafetyCheckFile;
@@ -31,8 +27,6 @@ import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.service.DictionaryItemService;
 import com.pengsoft.task.annotation.TaskHandler;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -121,7 +115,6 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
     @Override
     public Page<SafetyCheck> findPage(Predicate predicate, Pageable pageable) {
         final var root = QSafetyCheck.safetyCheck;
-        predicate = getAuthorityPredicate(predicate, root);
         predicate = getQueryPredicate(predicate, root);
         return super.findPage(predicate, pageable);
     }
@@ -138,34 +131,6 @@ public class SafetyCheckApi extends EntityApi<SafetyCheckFacade, SafetyCheck, St
         if (StringUtils.isNotBlank(handled)) {
             predicate = QueryDslUtils.merge(predicate,
                     Boolean.parseBoolean(handled) ? root.handledAt.isNotNull() : root.handledAt.isNull());
-        }
-        return predicate;
-    }
-
-    private Predicate getAuthorityPredicate(Predicate predicate, QSafetyCheck root) {
-        final var staff = QStaff.staff;
-
-        if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_RU_MANAGER)) {
-            predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.ruManager, staff)
-                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_OWNER_MANAGER)) {
-            predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.ownerManager, staff)
-                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_SU_MANAGER,
-                ConstructionProject.ROL_SUPERVISION_ENGINEER)) {
-            predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.suManager, staff)
-                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (SecurityUtils.hasAnyRole(ConstructionProject.ROL_BU_MANAGER,
-                ConstructionProject.ROL_QUALITY_INSPECTOR,
-                ConstructionProject.ROL_SECURITY_OFFICER)) {
-            predicate = QueryDslUtils.merge(predicate,
-                    JPAExpressions.select(root).leftJoin(root.project.buManager, staff)
-                            .where(staff.department.id.eq(SecurityUtilsExt.getPrimaryDepartmentId())).exists());
-        } else if (!SecurityUtils.hasAnyRole(Role.ADMIN)) {
-            predicate = Expressions.FALSE.isTrue();
         }
         return predicate;
     }

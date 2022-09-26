@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
@@ -16,6 +17,7 @@ import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.repository.DepartmentRepository;
 import com.pengsoft.basedata.repository.OrganizationRepository;
 import com.pengsoft.basedata.repository.StaffRepository;
+import com.pengsoft.security.domain.User;
 import com.pengsoft.support.exception.BusinessException;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
@@ -107,6 +109,11 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
     @Override
     public Optional<Staff> findOneByPersonAndPrimaryTrue(final Person person) {
         return getRepository().findOneByPersonIdAndPrimaryTrue(person.getId());
+    }
+
+    @Override
+    public Optional<Staff> findOneByPersonUserAndPrimaryTrue(@NotNull User user) {
+        return getRepository().findOneByPersonUserIdAndPrimaryTrue(user.getId());
     }
 
     @Override

@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.springframework.context.ApplicationContext;
+
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import com.pengsoft.basedata.domain.CodingRule;
@@ -29,8 +31,6 @@ import com.pengsoft.ss.service.ConstructionProjectService;
 import com.pengsoft.support.exception.Exceptions;
 import com.pengsoft.support.util.StringUtils;
 import com.querydsl.jpa.JPAExpressions;
-
-import org.springframework.context.ApplicationContext;
 
 import lombok.Getter;
 
@@ -140,7 +140,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             final var ownerDepartment = saveDepartment(owner, ownerDepartmentName);
 
             final var ownerManagerJobName = "项目负责人";
-            final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName);
+            final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName, "owner");
 
             final var ownerManagerName = StringUtils.replace(data.getOwnerManager(), "\s", "");
             final var ownerManagerMobile = StringUtils.replace(data.getOwnerManagerMobile(), "\s", "");
@@ -163,7 +163,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             final var suDepartment = saveDepartment(supervisionUnit, suDepartmentName);
 
             final var suManagerJobName = "监理总监";
-            final var suManagerJob = saveJob(suManagerPost, suDepartment, suManagerJobName);
+            final var suManagerJob = saveJob(suManagerPost, suDepartment, suManagerJobName, "su_manager");
 
             final var suManagerName = StringUtils.replace(data.getSuManager(), "\s", "");
             final var suManagerMobile = StringUtils.replace(data.getSuManagerMobile(), "\s", "");
@@ -185,7 +185,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
         final var buDepartment = saveDepartment(buildingUnit, buDepartmentName);
 
         final var buManagerJobName = "项目经理";
-        final var buManagerJob = saveJob(buManagerPost, buDepartment, buManagerJobName);
+        final var buManagerJob = saveJob(buManagerPost, buDepartment, buManagerJobName, "bu_manager");
 
         final var buManagerName = StringUtils.replace(data.getBuManager(), "\s", "");
         final var buManagerMobile = data.getBuManagerMobile().replace("\s", "");
@@ -226,7 +226,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
         return post;
     }
 
-    private Job saveJob(Post post, Department department, String name) {
+    private Job saveJob(Post post, Department department, String name, String roleCode) {
         final var job = jobService
                 .findOneByDepartmentAndParentAndName(department, null, name)
                 .orElse(new Job());
@@ -236,7 +236,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             job.setName(name);
             job.setDepartmentChief(true);
             jobService.save(job);
-            roleService.findOneByCode("bu_manager").map(List::of)
+            roleService.findOneByCode(roleCode).map(List::of)
                     .ifPresent(roles -> jobService.grantRoles(job, roles));
         }
         return job;

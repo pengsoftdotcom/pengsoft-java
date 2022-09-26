@@ -1,10 +1,10 @@
 spring:
   profiles:
-    active: support, security, system, basedata, weixin, iot, acs, oa, ss
+    active: support, security, system, basedata, weixin, iot, acs, oa, ss, ${ENV}
   messages:
     basename: META-INF/support, META-INF/security, META-INF/system, META-INF/basedata, META-INF/weixin, META-INF/iot, META-INF/acs, META-INF/oa, META-INF/ss
-logging:
-  config: classpath:META-INF/log4j2.xml
+# logging:
+#   config: classpath:META-INF/log4j2.xml
 pengsoft:
   system:
     captcha:

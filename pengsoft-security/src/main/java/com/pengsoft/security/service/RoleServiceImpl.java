@@ -43,7 +43,7 @@ public class RoleServiceImpl extends TreeEntityServiceImpl<RoleRepository, Role,
     }
 
     @Override
-    public Role saveEntityAdmin(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public <T extends Entity<ID>, ID extends Serializable> Role saveEntityAdmin(final Class<T> entityClass) {
         final var admin = createRoleIfNotExists(null, Role.ADMIN);
         final var moduleAdminCode = SecurityUtils.getModuleAdminRoleCode(entityClass);
         final var moduleAdmin = createRoleIfNotExists(admin, moduleAdminCode);

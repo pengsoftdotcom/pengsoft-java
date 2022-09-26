@@ -26,7 +26,7 @@ public interface RoleService extends TreeEntityService<Role, String> {
      * @param entityClass The entity class
      * @return The entity admin.
      */
-    Role saveEntityAdmin(Class<? extends Entity<? extends Serializable>> entityClass);
+    <T extends Entity<ID>, ID extends Serializable> Role saveEntityAdmin(Class<T> entityClass);
 
     /**
      * Copy the authorities of source role to the target role.

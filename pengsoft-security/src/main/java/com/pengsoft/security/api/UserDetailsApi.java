@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Authorized
+@Authorized(writable = true)
 @RestController
 @RequestMapping(Constant.API_PREFIX + "/user-details")
 public class UserDetailsApi {
@@ -66,7 +66,6 @@ public class UserDetailsApi {
     @AuthorityChanged
     @PostMapping("sign-out")
     public void signOut(@CurrentSecurityContext(expression = "authentication.principal.user") User user) {
-        System.out.println(user);
         // HandleAuthorityChangedAspect will do the rest.
     }
 

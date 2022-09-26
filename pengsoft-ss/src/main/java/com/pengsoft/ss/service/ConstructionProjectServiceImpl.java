@@ -5,15 +5,18 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+import com.pengsoft.basedata.domain.Department;
+import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.repository.ConstructionProjectRepository;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
-
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 
 /**
  * The implementer of {@link ConstructionProjectService} based on JPA.
@@ -51,8 +54,28 @@ public class ConstructionProjectServiceImpl
     }
 
     @Override
-    public List<Map<String, Object>> statisticByStatus() {
-        return getRepository().statisticByStatus();
+    public List<ConstructionProject> findAllByRuManager(@NotNull Staff ruManager) {
+        return getRepository().findAllByRuManagerDepartmentId(ruManager.getDepartment().getId());
+    }
+
+    @Override
+    public List<ConstructionProject> findAllByOwnerManager(@NotNull Staff ownerManager) {
+        return getRepository().findAllByOwnerManagerDepartmentId(ownerManager.getDepartment().getId());
+    }
+
+    @Override
+    public List<ConstructionProject> findAllBySuManager(@NotNull Staff suManager) {
+        return getRepository().findAllBySuManagerDepartmentId(suManager.getDepartment().getId());
+    }
+
+    @Override
+    public List<ConstructionProject> findAllByBuManager(@NotNull Staff buManager) {
+        return getRepository().findAllByBuManagerDepartmentId(buManager.getDepartment().getId());
+    }
+
+    @Override
+    public List<Map<String, Object>> statisticByStatus(Department department) {
+        return getRepository().statisticByStatus(department.getId());
     }
 
 }

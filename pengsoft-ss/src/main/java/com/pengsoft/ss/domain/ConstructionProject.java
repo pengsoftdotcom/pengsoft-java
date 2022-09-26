@@ -49,6 +49,8 @@ public class ConstructionProject extends EntityImpl implements Codeable {
 
     public static final String ROL_SECURITY_OFFICER = "security_officer";
 
+    public static final String ROL_WORKER = "worker";
+
     private static final long serialVersionUID = 3844774310596073097L;
 
     @Size(max = 255)

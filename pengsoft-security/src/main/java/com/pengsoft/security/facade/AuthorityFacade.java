@@ -20,6 +20,6 @@ public interface AuthorityFacade extends EntityFacade<AuthorityService, Authorit
      *
      * @param entityClass The entity class
      */
-    void saveEntityAdminAuthorities(Class<? extends Entity<? extends Serializable>> entityClass);
+    <T extends Entity<ID>, ID extends Serializable> void saveEntityAdminAuthorities(Class<T> entityClass);
 
 }

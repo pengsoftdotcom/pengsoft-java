@@ -150,7 +150,8 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The module admin role code.
      */
-    public static String getModuleAdminRoleCode(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static <T extends Entity<ID>, ID extends Serializable> String getModuleAdminRoleCode(
+            final Class<T> entityClass) {
         final var moduleCode = getModuleCodeFromEntityClass(entityClass).replaceAll(ESCAPES + PACKAGE_SEPARATOR,
                 StringUtils.UNDERLINE);
         return StringUtils.join(new String[] { moduleCode, Role.ADMIN }, StringUtils.UNDERLINE);
@@ -162,7 +163,8 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The entity admin role code
      */
-    public static String getEntityAdminRoleCode(final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static <T extends Entity<ID>, ID extends Serializable> String getEntityAdminRoleCode(
+            final Class<T> entityClass) {
         final var moduleCode = getModuleCodeFromEntityClass(entityClass);
         final var entityCode = getEntityCodeFromEntityClass(entityClass);
         return StringUtils.join(new String[] { moduleCode, entityCode, Role.ADMIN }, StringUtils.UNDERLINE);
@@ -174,8 +176,8 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The entity code.
      */
-    public static String getModuleCodeFromEntityClass(
-            final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static <T extends Entity<ID>, ID extends Serializable> String getModuleCodeFromEntityClass(
+            final Class<T> entityClass) {
         var packageName = getModuleCodeFromPackageName(entityClass.getPackageName());
         return packageName.replaceAll(ESCAPES + PACKAGE_SEPARATOR, StringUtils.UNDERLINE);
     }
@@ -198,8 +200,8 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The entity code.
      */
-    public static String getEntityCodeFromEntityClass(
-            final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static <T extends Entity<ID>, ID extends Serializable> String getEntityCodeFromEntityClass(
+            final Class<T> entityClass) {
         return StringUtils.camelCaseToSnakeCase(entityClass.getSimpleName(), false);
     }
 
@@ -209,8 +211,8 @@ public class SecurityUtils {
      * @param entityClass The entity class.
      * @return The entity admin authority code prefix.
      */
-    public static String getEntityAdminAuthorityCodePrefixFromEntityClass(
-            final Class<? extends Entity<? extends Serializable>> entityClass) {
+    public static <T extends Entity<ID>, ID extends Serializable> String getEntityAdminAuthorityCodePrefixFromEntityClass(
+            final Class<T> entityClass) {
         final var moduleCode = getModuleCodeFromEntityClass(entityClass);
         final var entityCode = getEntityCodeFromEntityClass(entityClass);
         return StringUtils.join(new String[] { moduleCode, entityCode }, StringUtils.GLOBAL_SEPARATOR);

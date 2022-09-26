@@ -10,6 +10,7 @@ import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.Staff;
+import com.pengsoft.security.domain.User;
 import com.pengsoft.support.service.EntityService;
 
 /**
@@ -33,9 +34,17 @@ public interface StaffService extends EntityService<Staff, String> {
      * primary
      * true.
      *
-     * @param person {@link Staff}'s person
+     * @param person The person
      */
     Optional<Staff> findOneByPersonAndPrimaryTrue(@NotNull Person person);
+
+    /**
+     * Returns an {@link Optional} of a {@link Staff} with the given user id and
+     * primary true.
+     *
+     * @param user The user.
+     */
+    Optional<Staff> findOneByPersonUserAndPrimaryTrue(@NotNull User user);
 
     /**
      * Returns an {@link Optional} of a {@link Staff} with the given person and job.

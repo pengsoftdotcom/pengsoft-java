@@ -20,14 +20,14 @@ public class ClassUtils extends org.apache.commons.lang3.ClassUtils {
     public static Class<?> getSuperclassGenericType(final Class<?> clazz, final int index) {
         final var genericSuperclass = clazz.getGenericSuperclass();
         if (!(genericSuperclass instanceof ParameterizedType)) {
-            return Object.class;
+            return null;
         }
         final var typeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
         if (index >= typeArguments.length || index < 0) {
-            return Object.class;
+            return null;
         }
         if (!(typeArguments[index] instanceof Class)) {
-            return Object.class;
+            return null;
         }
         return (Class<?>) typeArguments[index];
     }

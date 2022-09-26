@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
@@ -12,6 +13,7 @@ import com.pengsoft.basedata.domain.Person;
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.basedata.service.PersonService;
 import com.pengsoft.basedata.service.StaffService;
+import com.pengsoft.security.domain.User;
 import com.pengsoft.support.facade.EntityFacadeImpl;
 import com.pengsoft.support.util.StringUtils;
 
@@ -52,6 +54,11 @@ public class StaffFacadeImpl extends EntityFacadeImpl<StaffService, Staff, Strin
     @Override
     public Optional<Staff> findOneByPersonAndPrimaryTrue(final Person person) {
         return getService().findOneByPersonAndPrimaryTrue(person);
+    }
+
+    @Override
+    public Optional<Staff> findOneByPersonUserAndPrimaryTrue(@NotNull User user) {
+        return getService().findOneByPersonUserAndPrimaryTrue(user);
     }
 
     @Override

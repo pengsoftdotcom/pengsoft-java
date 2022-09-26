@@ -28,14 +28,13 @@ import org.springframework.security.core.GrantedAuthority;
  */
 @Named
 @Aspect
-public class HandleOperationAuthorityAspect {
+public class HandleApiOperationAuthorityAspect<T extends Entity<ID>, ID extends Serializable> {
 
     @SuppressWarnings("unchecked")
     @Around(JoinPoints.ALL_API)
     public Object handle(final ProceedingJoinPoint jp) throws Throwable {
         final var apiClass = jp.getTarget().getClass();
-        final var entityClass = (Class<? extends Entity<? extends Serializable>>) ClassUtils
-                .getSuperclassGenericType(apiClass, 1);
+        final var entityClass = (Class<T>) ClassUtils.getSuperclassGenericType(apiClass, 1);
         var method = ((MethodSignature) jp.getSignature()).getMethod();
         method = ClassUtils.getPublicMethod(apiClass, jp.getSignature().getName(), method.getParameterTypes());
         if (SecurityUtils.isAuthenticated() && SecurityUtils.isOperationNotAuthorized(apiClass, method)) {
