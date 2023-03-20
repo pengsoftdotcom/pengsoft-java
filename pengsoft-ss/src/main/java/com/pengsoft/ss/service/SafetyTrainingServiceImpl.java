@@ -12,6 +12,10 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
 import com.pengsoft.basedata.domain.Staff;
 import com.pengsoft.ss.domain.SafetyTraining;
 import com.pengsoft.ss.domain.SafetyTrainingConfirmFile;
@@ -28,15 +32,8 @@ import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.system.domain.Asset;
 import com.pengsoft.system.repository.DictionaryItemRepository;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
-import org.springframework.stereotype.Service;
-
 /**
- * The implementer of {@link SafetyTrainingService} based on
- * JPA.
+ * The implementer of {@link SafetyTrainingService} based on JPA.
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
@@ -147,11 +144,6 @@ public class SafetyTrainingServiceImpl extends EntityServiceImpl<SafetyTrainingR
     public List<Map<String, Object>> statisticByTrainer(@NotEmpty List<String> projectIds,
             @NotEmpty List<String> trainerIds, @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime) {
         return getRepository().statisticByTrainer(projectIds, trainerIds, startTime, endTime);
-    }
-
-    @Override
-    protected Sort getDefaultSort() {
-        return Sort.by(Direction.DESC, "code");
     }
 
 }

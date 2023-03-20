@@ -3,6 +3,7 @@ package com.pengsoft.ss.api;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,9 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.security.util.SecurityUtils;
 import com.pengsoft.ss.domain.ConstructionProject;
+import com.pengsoft.ss.domain.QConstructionProject;
 import com.pengsoft.ss.facade.ConstructionProjectFacade;
 import com.pengsoft.support.Constant;
 import com.pengsoft.support.api.EntityApi;
+import com.pengsoft.support.util.QueryDslUtils;
+import com.querydsl.core.types.Predicate;
 
 /**
  * The web api of {@link ConstructionProject}
@@ -42,6 +46,15 @@ public class ConstructionProjectApi extends EntityApi<ConstructionProjectFacade,
         } else {
             return List.of();
         }
+    }
+
+    @Override
+    public List<ConstructionProject> findAll(Predicate predicate, Sort sort) {
+        if (!predicate.toString().contains("status.code")) {
+            var root = QConstructionProject.constructionProject;
+            predicate = QueryDslUtils.merge(predicate, root.status.code.eq("building"));
+        }
+        return super.findAll(predicate, sort);
     }
 
 }
