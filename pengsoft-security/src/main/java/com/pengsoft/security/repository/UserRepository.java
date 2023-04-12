@@ -5,17 +5,16 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.security.domain.QUser;
 import com.pengsoft.security.domain.User;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.DateTimePath;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link User} based on JPA
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface UserRepository extends EntityRepository<QUser, User, String> {
 
     @Override

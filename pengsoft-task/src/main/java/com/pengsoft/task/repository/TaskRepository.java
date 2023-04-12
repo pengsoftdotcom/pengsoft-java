@@ -5,23 +5,20 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.support.repository.EntityRepository;
 import com.pengsoft.task.domain.QTask;
 import com.pengsoft.task.domain.Task;
 import com.querydsl.core.types.dsl.StringPath;
 
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
-
 /**
- * The repository interface of {@link Task}
- * based on JPA
+ * The repository interface of {@link Task} based on JPA
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface TaskRepository extends EntityRepository<QTask, Task, String> {
 
     @Override

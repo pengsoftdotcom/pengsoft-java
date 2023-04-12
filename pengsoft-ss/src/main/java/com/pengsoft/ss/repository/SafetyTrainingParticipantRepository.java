@@ -9,13 +9,12 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.ss.domain.QSafetyTrainingParticipant;
 import com.pengsoft.ss.domain.SafetyTrainingParticipant;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link SafetyTrainingParticipant} based on JPA
@@ -23,9 +22,7 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
-public interface SafetyTrainingParticipantRepository
-        extends EntityRepository<QSafetyTrainingParticipant, SafetyTrainingParticipant, String> {
+public interface SafetyTrainingParticipantRepository extends EntityRepository<QSafetyTrainingParticipant, SafetyTrainingParticipant, String> {
 
     /**
      * 安全培训是否存在参与人

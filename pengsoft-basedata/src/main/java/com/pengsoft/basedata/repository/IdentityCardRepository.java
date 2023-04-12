@@ -4,6 +4,9 @@ import java.util.Optional;
 
 import javax.persistence.QueryHint;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.IdentityCard;
 import com.pengsoft.basedata.domain.Post;
 import com.pengsoft.basedata.domain.QIdentityCard;
@@ -13,17 +16,12 @@ import com.pengsoft.support.validation.IdentityNumber;
 import com.querydsl.core.types.dsl.DatePath;
 import com.querydsl.core.types.dsl.StringPath;
 
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
-
 /**
  * The repository interface of {@link Post} based on JPA
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface IdentityCardRepository extends EntityRepository<QIdentityCard, IdentityCard, String>, OwnedRepository {
 
     @Override

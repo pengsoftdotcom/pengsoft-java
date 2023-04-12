@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 import com.pengsoft.ss.domain.ConstructionProject;
 import com.pengsoft.ss.domain.QConstructionProject;
@@ -23,7 +22,6 @@ import com.querydsl.core.types.dsl.StringPath;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface ConstructionProjectRepository
         extends EntityRepository<QConstructionProject, ConstructionProject, String> {
 
@@ -109,4 +107,5 @@ public interface ConstructionProjectRepository
             ) a left join dictionary_item b on a.status_id = b.id
                   """, nativeQuery = true)
     List<Map<String, Object>> statisticByStatus(String departmentId);
+
 }

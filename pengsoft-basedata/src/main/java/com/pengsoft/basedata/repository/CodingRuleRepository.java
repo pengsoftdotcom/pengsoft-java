@@ -5,12 +5,11 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.basedata.domain.CodingRule;
 import com.pengsoft.basedata.domain.QCodingRule;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link CodingRule} based on JPA
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface CodingRuleRepository extends EntityRepository<QCodingRule, CodingRule, String>, OwnedExtRepository {
 
     /**

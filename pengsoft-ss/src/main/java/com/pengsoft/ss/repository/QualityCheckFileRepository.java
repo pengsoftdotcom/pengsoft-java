@@ -5,21 +5,18 @@ import java.util.List;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.ss.domain.QQualityCheckFile;
 import com.pengsoft.ss.domain.QualityCheckFile;
 import com.pengsoft.support.repository.EntityRepository;
 
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
-
 /**
- * The repository interface of {@link QualityCheckFile}
- * based on JPA
+ * The repository interface of {@link QualityCheckFile} based on JPA
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface QualityCheckFileRepository extends EntityRepository<QQualityCheckFile, QualityCheckFile, String> {
 
     /**

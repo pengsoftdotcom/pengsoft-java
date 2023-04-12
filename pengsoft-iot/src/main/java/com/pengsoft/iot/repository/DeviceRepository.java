@@ -6,17 +6,16 @@ import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.iot.domain.Device;
 import com.pengsoft.iot.domain.Group;
 import com.pengsoft.iot.domain.QDevice;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link Device} based on JPA
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface DeviceRepository extends EntityRepository<QDevice, Device, String>, OwnedExtRepository {
 
     /**

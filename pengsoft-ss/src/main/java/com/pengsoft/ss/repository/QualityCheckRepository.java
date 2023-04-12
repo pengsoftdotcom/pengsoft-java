@@ -10,15 +10,14 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.ss.domain.QQualityCheck;
 import com.pengsoft.ss.domain.QualityCheck;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link QualityCheck} based on JPA
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface QualityCheckRepository extends EntityRepository<QQualityCheck, QualityCheck, String> {
 
     @Override
@@ -102,4 +100,5 @@ public interface QualityCheckRepository extends EntityRepository<QQualityCheck, 
                           """, nativeQuery = true)
     List<Map<String, Object>> statisticByChecker(@NotEmpty List<String> projectIds, @NotEmpty List<String> checkerIds,
             @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
+
 }

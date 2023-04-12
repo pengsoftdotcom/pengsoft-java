@@ -4,13 +4,12 @@ import java.util.List;
 
 import javax.persistence.QueryHint;
 
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.basedata.domain.JobRole;
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.QJobRole;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link JobRole} based on JPA
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface JobRoleRepository extends EntityRepository<QJobRole, JobRole, String> {
 
     /**

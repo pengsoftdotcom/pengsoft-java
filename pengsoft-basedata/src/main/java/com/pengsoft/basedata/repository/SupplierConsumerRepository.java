@@ -1,12 +1,11 @@
 package com.pengsoft.basedata.repository;
 
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.QSupplierConsumer;
 import com.pengsoft.basedata.domain.SupplierConsumer;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link SupplierConsumer} based on JPA
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface SupplierConsumerRepository
         extends EntityRepository<QSupplierConsumer, SupplierConsumer, String>, OwnedExtRepository {
 

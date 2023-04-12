@@ -6,14 +6,13 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.QJob;
 import com.pengsoft.support.repository.TreeEntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link Job} based on JPA
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface JobRepository extends TreeEntityRepository<QJob, Job, String>, OwnedExtRepository {
 
     @Override
@@ -49,4 +47,5 @@ public interface JobRepository extends TreeEntityRepository<QJob, Job, String>, 
      */
     @QueryHints(value = @QueryHint(name = "org.hibernate.cacheable", value = "true"), forCounting = false)
     List<Job> findAllByName(@NotBlank String name);
+
 }

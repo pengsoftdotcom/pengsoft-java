@@ -5,13 +5,12 @@ import java.util.List;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.ContractConfirmPicture;
 import com.pengsoft.oa.domain.QContractConfirmPicture;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link ContractConfirmPicture} based on JPA
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com∏
  * @since 1.0.0
  */
-@Repository
 public interface ContractConfirmPictureRepository
         extends EntityRepository<QContractConfirmPicture, ContractConfirmPicture, String>, OwnedExtRepository {
 

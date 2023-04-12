@@ -5,14 +5,13 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.QRank;
 import com.pengsoft.basedata.domain.Rank;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link Rank} based on JPA
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface RankRepository extends EntityRepository<QRank, Rank, String>, OwnedExtRepository {
 
     @Override
@@ -31,8 +29,7 @@ public interface RankRepository extends EntityRepository<QRank, Rank, String>, O
 
     /**
      * Returns an {@link Optional} of a {@link Rank} with the given organization id
-     * and
-     * name.
+     * and name.
      *
      * @param organizationId The id of {@link Rank}'s organization
      * @param name           The {@link Rank}'s name

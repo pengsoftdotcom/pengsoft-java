@@ -5,13 +5,12 @@ import java.util.List;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.PayrollRecordConfirmPicture;
 import com.pengsoft.oa.domain.QPayrollRecordConfirmPicture;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link PayrollRecordConfirmPicture} based on JPA
@@ -19,10 +18,8 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com∏
  * @since 1.0.0
  */
-@Repository
 public interface PayrollRecordConfirmPictureRepository
-        extends EntityRepository<QPayrollRecordConfirmPicture, PayrollRecordConfirmPicture, String>,
-        OwnedExtRepository {
+        extends EntityRepository<QPayrollRecordConfirmPicture, PayrollRecordConfirmPicture, String>, OwnedExtRepository {
 
     /**
      * Returns all {@link PayrollRecordConfirmPicture}s with the given payroll

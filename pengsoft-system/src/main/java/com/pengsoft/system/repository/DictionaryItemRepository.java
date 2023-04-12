@@ -6,18 +6,15 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.support.repository.TreeEntityRepository;
 import com.pengsoft.system.domain.DictionaryItem;
 import com.pengsoft.system.domain.QDictionaryItem;
 import com.querydsl.core.types.dsl.StringExpression;
 
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface DictionaryItemRepository
-        extends TreeEntityRepository<QDictionaryItem, DictionaryItem, String> {
+public interface DictionaryItemRepository extends TreeEntityRepository<QDictionaryItem, DictionaryItem, String> {
 
     @Override
     default void customize(QuerydslBindings bindings, QDictionaryItem root) {

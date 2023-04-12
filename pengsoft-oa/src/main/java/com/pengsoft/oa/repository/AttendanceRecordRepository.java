@@ -5,13 +5,12 @@ import java.util.Map;
 
 import javax.validation.constraints.NotEmpty;
 
+import org.springframework.data.jpa.repository.Query;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.AttendanceRecord;
 import com.pengsoft.oa.domain.QAttendanceRecord;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link AttendanceRecord} based on JPA
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface AttendanceRecordRepository
         extends EntityRepository<QAttendanceRecord, AttendanceRecord, String>, OwnedExtRepository {
 

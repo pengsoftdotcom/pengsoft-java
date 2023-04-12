@@ -7,6 +7,13 @@ import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.BusinessLicense;
 import com.pengsoft.basedata.domain.Organization;
 import com.pengsoft.basedata.domain.Person;
@@ -14,21 +21,12 @@ import com.pengsoft.basedata.domain.QOrganization;
 import com.pengsoft.support.repository.TreeEntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
-
 /**
  * The repository interface of {@link Organization} based on JPA
  *
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface OrganizationRepository
         extends TreeEntityRepository<QOrganization, Organization, String>, OwnedExtRepository {
 

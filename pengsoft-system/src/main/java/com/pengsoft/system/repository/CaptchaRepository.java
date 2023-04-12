@@ -7,16 +7,14 @@ import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.support.repository.EntityRepository;
 import com.pengsoft.system.domain.Captcha;
 import com.pengsoft.system.domain.QCaptcha;
 import com.querydsl.core.types.dsl.TemporalExpression;
 
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
-
-@Repository
 public interface CaptchaRepository extends EntityRepository<QCaptcha, Captcha, String> {
 
     @Override
@@ -28,4 +26,5 @@ public interface CaptchaRepository extends EntityRepository<QCaptcha, Captcha, S
     @QueryHints(value = { @QueryHint(name = "org.hibernate.cacheable", value = "true") }, forCounting = false)
     List<Captcha> findAllByUserIdAndCreatedAtAfterOrderByCreatedAtDesc(@NotBlank String userId,
             @NotNull LocalDateTime createdAt);
+
 }

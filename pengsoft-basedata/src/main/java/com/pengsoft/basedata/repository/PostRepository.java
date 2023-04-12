@@ -5,14 +5,13 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.Post;
 import com.pengsoft.basedata.domain.QPost;
 import com.pengsoft.support.repository.EntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link Post} based on JPA
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface PostRepository extends EntityRepository<QPost, Post, String>, OwnedExtRepository {
 
     @Override
@@ -31,8 +29,7 @@ public interface PostRepository extends EntityRepository<QPost, Post, String>, O
 
     /**
      * Returns an {@link Optional} of a {@link Post} with the given organization id
-     * and
-     * name.
+     * and name.
      *
      * @param organizationId The id of {@link Post}'s organization
      * @param name           The {@link Post}'s name

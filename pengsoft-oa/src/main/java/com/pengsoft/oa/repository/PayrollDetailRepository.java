@@ -6,14 +6,13 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.PayrollDetail;
 import com.pengsoft.oa.domain.QPayrollDetail;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link PayrollDetail} based on JPA
@@ -21,9 +20,7 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
-public interface PayrollDetailRepository
-        extends EntityRepository<QPayrollDetail, PayrollDetail, String>, OwnedExtRepository {
+public interface PayrollDetailRepository extends EntityRepository<QPayrollDetail, PayrollDetail, String>, OwnedExtRepository {
 
     @Override
     default void customize(QuerydslBindings bindings, QPayrollDetail root) {

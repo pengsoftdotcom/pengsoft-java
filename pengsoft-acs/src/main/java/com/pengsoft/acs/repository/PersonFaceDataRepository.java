@@ -6,15 +6,14 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.acs.domain.PersonFaceData;
 import com.pengsoft.acs.domain.QPersonFaceData;
 import com.pengsoft.security.repository.OwnedRepository;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link PersonFaceData} based on JPA
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface PersonFaceDataRepository
         extends EntityRepository<QPersonFaceData, PersonFaceData, String>, OwnedRepository {
 

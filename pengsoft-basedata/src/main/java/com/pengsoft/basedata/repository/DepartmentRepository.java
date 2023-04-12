@@ -5,14 +5,13 @@ import java.util.Optional;
 import javax.persistence.QueryHint;
 import javax.validation.constraints.NotBlank;
 
+import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.data.querydsl.binding.QuerydslBindings;
+
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.QDepartment;
 import com.pengsoft.support.repository.TreeEntityRepository;
 import com.querydsl.core.types.dsl.StringPath;
-
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.data.querydsl.binding.QuerydslBindings;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link Department} based on JPA
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
 public interface DepartmentRepository
         extends TreeEntityRepository<QDepartment, Department, String>, OwnedExtRepository {
 
@@ -32,8 +30,7 @@ public interface DepartmentRepository
 
     /**
      * Returns an {@link Optional} of a {@link Department} with the given
-     * organization,
-     * parent and name.
+     * organization, parent and name.
      *
      * @param organizationId The id of {@link Department}'s organization
      * @param parentId       The id of {@link Department}'s parent

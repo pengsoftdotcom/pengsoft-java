@@ -9,14 +9,13 @@ import javax.persistence.QueryHint;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.QueryHints;
+
 import com.pengsoft.basedata.repository.OwnedExtRepository;
 import com.pengsoft.oa.domain.PayrollRecord;
 import com.pengsoft.oa.domain.QPayrollRecord;
 import com.pengsoft.support.repository.EntityRepository;
-
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
-import org.springframework.stereotype.Repository;
 
 /**
  * The repository interface of {@link PayrollRecord,} based on JPA
@@ -24,9 +23,7 @@ import org.springframework.stereotype.Repository;
  * @author peng.dang@pengsoft.com
  * @since 1.0.0
  */
-@Repository
-public interface PayrollRecordRepository
-        extends EntityRepository<QPayrollRecord, PayrollRecord, String>, OwnedExtRepository {
+public interface PayrollRecordRepository extends EntityRepository<QPayrollRecord, PayrollRecord, String>, OwnedExtRepository {
 
     /**
      * Returns an {@link Optional} of a {@link PayrollRecord} with the given year,
