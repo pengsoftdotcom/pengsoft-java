@@ -7,6 +7,11 @@ import javax.inject.Inject;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
+import org.springframework.stereotype.Service;
+
 import com.pengsoft.basedata.domain.Department;
 import com.pengsoft.basedata.domain.Job;
 import com.pengsoft.basedata.domain.Organization;
@@ -23,11 +28,6 @@ import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
 import com.pengsoft.support.util.StringUtils;
 import com.querydsl.jpa.JPAExpressions;
-
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
-import org.springframework.stereotype.Service;
 
 /**
  * The implementer of {@link StaffService} based on JPA.
@@ -86,8 +86,11 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
 
     private void updateOrganizationStaffNumber(Organization organization) {
         final var root = QStaff.staff;
-        organization.setNumber(getQueryFactory().select(root.person.countDistinct()).from(root)
-                .where(root.organization.id.eq(organization.getId())).fetchOne());
+        final var number = getQueryFactory().select(root.person.countDistinct()).from(root)
+                .where(root.organization.id.eq(organization.getId())).fetchOne();
+        if (number != null) {
+            organization.setNumber(number);
+        }
         organizationRepository.save(organization);
     }
 

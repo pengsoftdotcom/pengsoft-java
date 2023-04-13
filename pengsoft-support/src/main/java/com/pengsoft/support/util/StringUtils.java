@@ -1,6 +1,5 @@
 package com.pengsoft.support.util;
 
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 /**
@@ -117,12 +116,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
         if (isBlank(text)) {
             return true;
         } else {
-            final var chars = new ArrayList<Character>();
-            final var array = text.toCharArray();
-            for (final var c : array) {
-                chars.add(c);
-            }
-            return chars.stream().allMatch(Character::isDigit) && text.length() == 11;
+            return text.chars().mapToObj(i -> (char) i).allMatch(Character::isDigit) && text.length() == 11;
         }
     }
 
