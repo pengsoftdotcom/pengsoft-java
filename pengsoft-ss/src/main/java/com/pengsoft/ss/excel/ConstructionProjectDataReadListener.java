@@ -188,7 +188,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
         final var buManagerJob = saveJob(buManagerPost, buDepartment, buManagerJobName, "bu_manager");
 
         final var buManagerName = StringUtils.replace(data.getBuManager(), "\s", "");
-        final var buManagerMobile = data.getBuManagerMobile().replace("\s", "");
+        final var buManagerMobile = StringUtils.isNotBlank(data.getBuManagerMobile()) ? data.getBuManagerMobile().replace("\s", "") : null;
         final var person = savePerson(buManagerName, buManagerMobile);
         final var buManager = saveStaff(person, buManagerJob);
         constructionProject.setBuManager(buManager);

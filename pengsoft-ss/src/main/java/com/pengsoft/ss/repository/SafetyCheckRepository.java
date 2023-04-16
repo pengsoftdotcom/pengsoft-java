@@ -109,26 +109,30 @@ public interface SafetyCheckRepository extends EntityRepository<QSafetyCheck, Sa
      * @param endTime    结束时间
      */
     @Query(value = """
-            select
-              c.date
-            from (
-              select to_char(generate_series(cast(?2 as timestamp), cast(?3 as timestamp), '1 day'), 'YYYY-MM-DD') as date
+            select c.name, c.date from (
+                select b.id, b.name, a.date from (
+                    select to_char(generate_series(cast(:startTime as timestamp), cast(:endTime as timestamp), '1 day'), 'YYYY-MM-DD') as date
+                ) a cross join construction_project b
+                where to_char(b.started_at, 'YYYY-MM-DD') <= a.date
+                    and (b.completed_at is null or to_char(b.completed_at, 'YYYY-MM-DD') >= a.date)
+                    and b.id in (:projectIds)
             ) c left join (
-              select
-                to_char(submitted_at, 'YYYY-MM-DD') date,
-                sum(
-                    case
-                        when b.code = 'risk' and a.handled_at is null then 1
-                        else 0
-                    end
-                ) as count
-              from safety_check a
-              left join dictionary_item b on a.status_id = b.id
-              where a.project_id in (?1) and a.submitted_at between ?2 and ?3
-              group by date
-            ) d on c.date = d.date
+                select
+                    project_id,
+                    to_char(submitted_at, 'YYYY-MM-DD') date,
+                    sum(
+                        case
+                            when b.code = 'risk' and a.handled_at is null then 1
+                            else 0
+                        end
+                    ) as count
+                from safety_check a
+                    left join dictionary_item b on a.status_id = b.id
+                where submitted_at >= :startTime and submitted_at <= :endTime
+                group by project_id, date
+            ) d on c.id = d.project_id and c.date = d.date
             where d.count > 0 or d.count is null
-                  """, nativeQuery = true)
+                      """, nativeQuery = true)
     List<Map<String, Object>> findAllUncheckedOrUnhandledDates(@NotEmpty List<String> projectIds,
             @NotNull LocalDateTime startTime, @NotNull LocalDateTime endTime);
 

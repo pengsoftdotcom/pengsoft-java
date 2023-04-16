@@ -2,14 +2,15 @@ package com.pengsoft.basedata.service;
 
 import java.util.Optional;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
 import com.pengsoft.basedata.domain.CodingRule;
 import com.pengsoft.basedata.repository.CodingRuleRepository;
 import com.pengsoft.basedata.util.SecurityUtilsExt;
 import com.pengsoft.support.service.EntityServiceImpl;
 import com.pengsoft.support.util.EntityUtils;
-
-import org.springframework.context.annotation.Primary;
-import org.springframework.stereotype.Service;
 
 /**
  * The implementer of {@link CodingRuleService} based on JPA.
@@ -36,6 +37,11 @@ public class CodingRuleServiceImpl extends EntityServiceImpl<CodingRuleRepositor
     public Optional<CodingRule> findOneByEntity(String entity) {
         return getRepository().findOneByEntityAndControlledByAndBelongsTo(entity,
                 SecurityUtilsExt.getPrimaryDepartmentId(), SecurityUtilsExt.getPrimaryOrganizationId());
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by("prefix");
     }
 
 }
