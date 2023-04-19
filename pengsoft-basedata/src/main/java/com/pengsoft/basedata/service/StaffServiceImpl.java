@@ -111,7 +111,12 @@ public class StaffServiceImpl extends EntityServiceImpl<StaffRepository, Staff, 
 
     @Override
     public Optional<Staff> findOneByPersonAndPrimaryTrue(final Person person) {
-        return getRepository().findOneByPersonIdAndPrimaryTrue(person.getId());
+        var optional = getRepository().findOneByPersonIdAndPrimaryTrue(person.getId());
+        if (optional.isPresent()) {
+            return optional;
+        } else {
+            return findAllByPerson(person).stream().findAny();
+        }
     }
 
     @Override
