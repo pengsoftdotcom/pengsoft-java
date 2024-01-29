@@ -8,6 +8,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.pengsoft.basedata.domain.Department;
@@ -76,6 +78,11 @@ public class ConstructionProjectServiceImpl
     @Override
     public List<Map<String, Object>> statisticByStatus(Department department) {
         return getRepository().statisticByStatus(department.getId());
+    }
+
+    @Override
+    protected Sort getDefaultSort() {
+        return Sort.by(Order.asc("status.code"), Order.desc("startedAt"));
     }
 
 }
