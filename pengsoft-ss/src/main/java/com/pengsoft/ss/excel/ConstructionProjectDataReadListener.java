@@ -140,7 +140,7 @@ public class ConstructionProjectDataReadListener implements ReadListener<Constru
             final var ownerDepartment = saveDepartment(owner, ownerDepartmentName);
 
             final var ownerManagerJobName = "项目负责人";
-            final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName, "owner");
+            final var ownerManagerJob = saveJob(ownerManagerPost, ownerDepartment, ownerManagerJobName, "owner_manager");
 
             final var ownerManagerName = StringUtils.replace(data.getOwnerManager(), "\s", "");
             final var ownerManagerMobile = StringUtils.replace(data.getOwnerManagerMobile(), "\s", "");
